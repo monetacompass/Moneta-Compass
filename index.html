@@ -16,6 +16,8 @@
     --rust: #A8462F;
     --card: #F6F3EA;
     --input-bg: #FFFFFF;
+    --font-serif: "Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;
+    --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   html[data-theme="dark"]{
     --paper: #1C201A;
@@ -28,22 +30,27 @@
     --input-bg: #2A2F26;
   }
   html, body{ transition: background 0.2s, color 0.2s; }
+  html{ overflow-x:hidden; }
   *{box-sizing:border-box;}
   body{
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family: "Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;
+    font-family: var(--font-serif);
     min-height:100vh;
+    overflow-x:hidden;
+    -webkit-text-size-adjust:100%;
   }
-  .wrap{ max-width:480px; margin:0 auto; padding:28px 20px 110px; position:relative; transition:max-width 0.2s; }
+  .wrap{ max-width:480px; margin:0 auto; padding:24px 18px 110px; position:relative; transition:max-width 0.2s; width:100%; }
   @media (min-width:720px){ .wrap{ max-width:760px; padding:40px 32px 110px; } }
   @media (min-width:1080px){ .wrap{ max-width:1040px; padding:48px 40px 110px; } }
   .masthead{
-    display:flex; align-items:center; justify-content:space-between;
-    border-bottom:2px solid var(--ink); padding-bottom:10px; margin-bottom:22px; min-height:30px;
+    border-bottom:2px solid var(--ink); padding-bottom:12px; margin-bottom:22px;
   }
-  .masthead h1{ font-size:22px; font-weight:600; letter-spacing:0.3px; margin:0; display:flex; align-items:center; gap:10px; }
+  .masthead-top{
+    display:flex; align-items:center; justify-content:space-between; min-height:34px; gap:10px;
+  }
+  .masthead h1{ font-family:var(--font-serif); font-size:21px; font-weight:600; letter-spacing:0.2px; margin:0; display:flex; align-items:center; gap:10px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .back-btn{
     display:inline-flex; align-items:center; justify-content:center;
     width:34px; height:34px; border-radius:50%; flex-shrink:0;
@@ -52,48 +59,66 @@
     transition:border-color 0.15s, background 0.15s;
   }
   .back-btn:hover{ border-color:var(--moss); background:var(--paper); }
-  .navlinks{ display:flex; align-items:center; gap:8px; }
-  .navlink{
-    font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:11.5px; color:var(--ink-soft);
-    background:none; border:none; cursor:pointer; text-decoration:underline; text-underline-offset:3px; padding:0; white-space:nowrap;
+  .navlinks{
+    display:flex; align-items:center; gap:6px; margin-top:12px;
+    overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px;
   }
-  .navsep{ color:var(--paper-line); font-size:11px; }
+  .navlinks::-webkit-scrollbar{ display:none; }
+  .navlink{
+    font-family:var(--font-sans); font-size:12.5px; font-weight:500; color:var(--ink-soft);
+    background:var(--card); border:1px solid var(--paper-line); border-radius:999px;
+    padding:7px 13px; cursor:pointer; white-space:nowrap; flex-shrink:0;
+    transition:border-color 0.15s, color 0.15s;
+  }
+  .navlink:hover{ border-color:var(--moss); color:var(--ink); }
 
   /* ---- Auth view ---- */
-  .login-intro{ font-size:15px; line-height:1.55; color:var(--ink-soft); margin:0 0 22px; }
+  .login-intro{ font-family:var(--font-sans); font-size:15px; line-height:1.55; color:var(--ink-soft); margin:0 0 22px; }
+  .auth-card{
+    background:var(--card); border:1px solid var(--paper-line); border-radius:12px;
+    padding:22px 20px; box-shadow:0 2px 14px rgba(34,40,31,0.06);
+  }
   .auth-tabs{ display:flex; gap:6px; margin-bottom:18px; }
   .auth-tab{
     flex:1; padding:9px; text-align:center; background:var(--card); border:1px solid var(--paper-line);
-    font-family:inherit; font-size:13.5px; color:var(--ink-soft); cursor:pointer; border-radius:2px;
+    font-family:var(--font-sans); font-size:13.5px; font-weight:500; color:var(--ink-soft); cursor:pointer; border-radius:8px;
   }
   .auth-tab.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
-  .login-error{ font-size:12.5px; color:var(--rust); margin:8px 0 0; min-height:16px; }
-  .login-msg{ font-size:13px; color:var(--moss); margin:8px 0 0; min-height:16px; }
+  .login-error{ font-family:var(--font-sans); font-size:12.5px; color:var(--rust); margin:8px 0 0; min-height:16px; }
+  .login-msg{ font-family:var(--font-sans); font-size:13px; color:var(--moss); margin:8px 0 0; min-height:16px; }
   .login-note{
-    font-size:12px; color:var(--ink-soft); line-height:1.5; margin-top:18px;
+    font-family:var(--font-sans); font-size:12px; color:var(--ink-soft); line-height:1.5; margin-top:18px;
     padding-top:14px; border-top:1px solid var(--paper-line);
   }
 
   /* ---- Home / hero view ---- */
-  .hero-eyebrow{ font-size:14px; color:var(--ink-soft); margin-bottom:6px; }
-  .hero-headline{ font-size:30px; line-height:1.22; font-weight:600; letter-spacing:-0.2px; margin:0 0 14px; }
-  .hero-body{ font-size:15.5px; line-height:1.55; color:var(--ink-soft); margin:0 0 22px; max-width:60ch; }
+  .hero-eyebrow{ font-family:var(--font-sans); font-size:13px; font-weight:600; letter-spacing:0.3px; text-transform:uppercase; color:var(--moss); margin-bottom:8px; }
+  .hero-headline{ font-size:28px; line-height:1.22; font-weight:600; letter-spacing:-0.2px; margin:0 0 14px; }
+  .hero-body{ font-family:var(--font-sans); font-size:15px; line-height:1.6; color:var(--ink-soft); margin:0 0 22px; max-width:60ch; }
   .hero-stat{
-    background:var(--card); border:1px solid var(--paper-line); border-radius:2px;
+    background:var(--card); border:1px solid var(--paper-line); border-radius:8px;
     padding:14px 16px; margin-bottom:26px; display:flex; align-items:baseline; justify-content:space-between;
   }
-  .hero-stat .label{ font-size:12px; color:var(--ink-soft); }
+  .hero-stat .label{ font-family:var(--font-sans); font-size:12px; color:var(--ink-soft); }
   .hero-stat .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:20px; }
   .tip-row{ display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--paper-line); }
   .tip-row .dot{ width:8px; height:8px; border-radius:50%; margin-top:7px; flex-shrink:0; background:var(--moss); }
+  .tip-icon-badge{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    background:var(--card); border:1px solid var(--paper-line); color:var(--moss);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tip-icon-num{ font-family:var(--font-sans); font-size:14px; font-weight:700; color:var(--paper); background:var(--moss); border-color:var(--moss); }
   .tip-title{ font-size:15.5px; margin-bottom:2px; }
   .tip-body{ font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
   .cta{
-    display:block; width:100%; text-align:center; margin-top:28px; padding:15px;
-    background:var(--ink); color:var(--paper); border:none; font-family:inherit;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%; text-align:center; margin-top:28px; padding:15px;
+    background:var(--ink); color:var(--paper); border:none; font-family:var(--font-sans);
     font-size:15px; font-weight:600; border-radius:8px; cursor:pointer;
     transition:opacity 0.15s;
   }
+  .cta svg{ flex-shrink:0; }
   .cta:hover{ opacity:0.88; }
 
   /* ---- Months list view ---- */
@@ -112,7 +137,7 @@
   .total-block{ margin-bottom:34px; }
   .total-label{ font-size:13px; color:var(--ink-soft); margin-bottom:6px; }
   .total-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:48px; font-weight:700; line-height:1; letter-spacing:-1px; }
-  .section-label{ font-size:14px; color:var(--ink); font-weight:600; margin: 34px 0 14px; padding-bottom:8px; border-bottom:1.5px solid var(--paper-line); letter-spacing:0.2px; }
+  .section-label{ font-family:var(--font-sans); font-size:13px; text-transform:uppercase; letter-spacing:0.6px; color:var(--ink); font-weight:600; margin: 34px 0 14px; padding-bottom:8px; border-bottom:1.5px solid var(--paper-line); }
   .day-heading{ font-size:12px; color:var(--ink-soft); margin:16px 0 4px; }
   .entry-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--paper-line); }
   .entry-row .dot{ width:8px;height:8px;border-radius:50%; flex-shrink:0; }
@@ -131,7 +156,7 @@
   .recur-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:17px; font-weight:500; margin-right:8px; }
   .stop-btn{
     background:transparent; border:1px solid var(--paper-line); color:var(--ink-soft);
-    font-family:inherit; font-size:11.5px; padding:6px 10px; border-radius:2px; cursor:pointer; white-space:nowrap;
+    font-family:var(--font-sans); font-size:11.5px; padding:6px 10px; border-radius:2px; cursor:pointer; white-space:nowrap;
   }
   .stop-btn:hover{ border-color:var(--rust); color:var(--rust); }
 
@@ -216,14 +241,19 @@
     padding:20px 14px; text-align:center; cursor:pointer; transition:border-color 0.15s, transform 0.15s;
   }
   .dashboard-tile:hover{ border-color:var(--moss); transform:translateY(-1px); }
-  .dashboard-tile .tile-icon{ font-size:26px; margin-bottom:8px; display:block; }
-  .dashboard-tile .tile-label{ font-size:13.5px; font-weight:600; }
-  .dashboard-tile .tile-sub{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+  .dashboard-tile .tile-icon{ display:flex; justify-content:center; margin-bottom:10px; color:var(--ink); }
+  .dashboard-tile .tile-label{ font-family:var(--font-sans); font-size:13.5px; font-weight:600; }
+  .dashboard-tile .tile-sub{ font-family:var(--font-sans); font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
+  .feature-detail-panel{
+    grid-column: 1 / -1;
+    background:var(--card); border:1px solid var(--moss); border-radius:8px;
+    padding:16px 18px; margin:2px 0 4px;
+  }
 
   .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:32px; }
   @media (min-width:600px){ .stat-grid{ grid-template-columns:repeat(3,1fr); } }
   .stat-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:6px; padding:18px 18px; }
-  .stat-card .label{ font-size:12px; color:var(--ink-soft); }
+  .stat-card .label{ font-family:var(--font-sans); font-size:12px; color:var(--ink-soft); }
   .stat-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:23px; font-weight:600; margin-top:6px; }
 
   @media (min-width:720px){
@@ -261,6 +291,31 @@
   .legend-label{ flex:1; color:var(--ink); }
   .legend-value{ color:var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:11.5px; white-space:nowrap; }
 
+  /* ---- Analytics ---- */
+  .trend-row{ display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--paper-line); font-size:14px; }
+  .trend-row.total{ font-weight:600; }
+  .trend-pct{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:13.5px; font-weight:600; }
+  .trend-pct.up{ color:var(--rust); } .trend-pct.up::before{ content:"▲ "; font-size:9px; }
+  .trend-pct.down{ color:var(--moss); } .trend-pct.down::before{ content:"▼ "; font-size:9px; }
+  .trend-pct.flat{ color:var(--ink-soft); }
+  .insight-card{
+    background:var(--card); border:1px solid var(--paper-line); border-left:3px solid var(--moss);
+    border-radius:6px; padding:12px 16px; margin-bottom:10px; font-size:13.5px; line-height:1.5;
+  }
+
+  /* ---- Contact footer ---- */
+  .contact-footer{
+    margin-top:36px; padding-top:20px; border-top:1px solid var(--paper-line);
+    text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  .contact-label{ font-family:var(--font-sans); font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.5px; }
+  .contact-x-link{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:40px; height:40px; border-radius:50%; background:var(--ink); color:var(--paper);
+    transition:opacity 0.15s;
+  }
+  .contact-x-link:hover{ opacity:0.85; }
+
   /* ---- Floating add button ---- */
   .fab{
     position:fixed; right:calc(50% - 240px + 20px); bottom:26px;
@@ -283,13 +338,14 @@
   .backdrop.open{ display:flex; }
   .modal{ background:var(--card); width:100%; max-width:480px; border-radius:10px 10px 0 0; padding:20px 20px 24px; border-top:1px solid var(--paper-line); max-height:90vh; overflow-y:auto; }
   .modal h2{ font-size:17px; margin:0 0 14px; }
-  .row{ display:flex; gap:10px; margin-bottom:10px; }
+  .row{ display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .row > .field{ min-width:120px; }
   .row:last-of-type{ margin-bottom:0; }
   .field{ flex:1; display:flex; flex-direction:column; gap:4px; }
-  .field label{ font-size:11px; color:var(--ink-soft); }
+  .field label{ font-family:var(--font-sans); font-size:11px; color:var(--ink-soft); }
   input, select{
-    font-family:inherit; font-size:15px; padding:8px 9px; border:1px solid var(--paper-line);
-    background:var(--input-bg); color:var(--ink); border-radius:2px; width:100%;
+    font-family:var(--font-sans); font-size:15px; padding:9px 11px; border:1px solid var(--paper-line);
+    background:var(--input-bg); color:var(--ink); border-radius:6px; width:100%;
   }
   input:focus, select:focus{ outline:2px solid var(--moss); outline-offset:-1px; }
   .amount-field input{ font-family: ui-monospace, "SF Mono", Menlo, monospace; }
@@ -303,23 +359,23 @@
   .receipt-preview{ display:none; width:100%; max-height:180px; object-fit:contain; margin-top:8px; border:1px solid var(--paper-line); background:#f5f5f5; }
   .receipt-preview.show{ display:block; }
   .modal-actions{ display:flex; gap:10px; margin-top:16px; }
-  button.add{ flex:1; padding:12px; background:var(--ink); color:var(--paper); border:none; font-family:inherit; font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; transition:opacity 0.15s; }
+  button.add{ flex:1; padding:12px; background:var(--ink); color:var(--paper); border:none; font-family:var(--font-sans); font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; transition:opacity 0.15s; }
   button.add:hover{ opacity:0.88; }
   button.add:disabled{ opacity:0.5; cursor:default; }
-  button.cancel{ flex:0 0 90px; padding:11px; background:transparent; color:var(--ink-soft); border:1px solid var(--paper-line); font-family:inherit; font-size:14px; border-radius:2px; cursor:pointer; }
+  button.cancel{ flex:0 0 90px; padding:11px; background:transparent; color:var(--ink-soft); border:1px solid var(--paper-line); font-family:var(--font-sans); font-size:14px; border-radius:2px; cursor:pointer; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="masthead" id="masthead">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <button id="homeBtn" class="back-btn" aria-label="Home" style="display:none;font-size:15px;">🏠</button>
-      <h1 id="pageTitle">Moneta Compass</h1>
+    <div class="masthead-top">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <button id="homeBtn" class="back-btn" aria-label="Home" style="display:none;"><svg width="15" height="14" viewBox="0 0 16 16" style="display:block;"><path d="M2 7L8 2L14 7V14H10V9H6V14H2V7Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
+        <h1 id="pageTitle">Moneta Compass</h1>
+      </div>
+      <button id="themeToggle" class="back-btn" aria-label="Toggle dark mode" style="font-size:15px;flex-shrink:0;">🌙</button>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div id="pageSub"></div>
-      <button id="themeToggle" class="back-btn" aria-label="Toggle dark mode" style="font-size:15px;">🌙</button>
-    </div>
+    <div id="pageSub"></div>
   </div>
   <div id="mainArea"><div class="loading">Loading…</div></div>
   <button class="fab" id="fabAdd" aria-label="Add expense or income" style="display:none;"><span class="fab-icon">✎</span><span>Add</span></button>
@@ -364,6 +420,12 @@
           <input type="text" id="note" placeholder="e.g. groceries">
         </div>
       </div>
+      <div class="row">
+        <div class="field">
+          <label for="entryAccount">Account</label>
+          <select id="entryAccount"></select>
+        </div>
+      </div>
       <div class="receipt-row" id="receiptSection">
         <button type="button" id="scanReceiptBtn">📷 Scan receipt</button>
         <input type="file" id="receiptInput" accept="image/*" capture="environment" style="display:none;">
@@ -401,6 +463,28 @@ sb.auth.onAuthStateChange((event) => {
   }
 });
 
+function logoMark(size){
+  size = size || 56;
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">
+    <circle cx="50" cy="50" r="46" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
+    <circle cx="50" cy="50" r="39" fill="none" stroke="var(--ink)" stroke-width="1.2" opacity="0.5"/>
+    <polygon points="50,24 63,50 50,50 37,50" fill="var(--ink)"/>
+    <polygon points="50,76 63,50 50,50 37,50" fill="#B08B2E"/>
+    <circle cx="50" cy="50" r="5.5" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+  </svg>`;
+}
+
+const TILE_ICONS = {
+  accounts: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M2 8L10 3L18 8M3 8V16M7 8V16M13 8V16M17 8V16M2 16H18" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  ledger: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M10 5C10 4 9 3 7 3H3V15H7C9 15 10 16 10 17M10 5C10 4 11 3 13 3H17V15H13C11 15 10 16 10 17M10 5V17" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  bills: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M4 7H14L11.5 4.5M16 13H6L8.5 15.5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  watchlist: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 15L8 9L11 12L17 5M13 5H17V9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  portfolio: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 8C3 7.4 3.4 7 4 7H16C16.6 7 17 7.4 17 8V15C17 15.6 16.6 16 16 16H4C3.4 16 3 15.6 3 15V8Z M7 7V5C7 4.4 7.4 4 8 4H12C12.6 4 13 4.4 13 5V7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>',
+  networth: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M10 3V17M5 6H15M5 6L2 11H8L5 6ZM15 6L12 11H18L15 6Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
+  growth: '<svg viewBox="0 0 20 20" width="24" height="24"><rect x="3" y="11" width="3" height="6" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="8.5" y="7" width="3" height="10" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="14" y="3" width="3" height="14" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>',
+  settings: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M10 2V4M10 16V18M2 10H4M16 10H18M4.8 4.8L6.2 6.2M13.8 13.8L15.2 15.2M15.2 4.8L13.8 6.2M6.2 13.8L4.8 15.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'
+};
+
 const CATEGORY_COLORS = {
   "Rent/Mortgage": "#6B4C3A",
   Food: "#A8462F", Transport: "#5B7CA8", Housing: "#55694A",
@@ -409,11 +493,11 @@ const CATEGORY_COLORS = {
 };
 const CATEGORY_ORDER = ["Rent/Mortgage","Housing","Utilities","Food","Transport","Shopping","Health","Fun","Other"];
 const TIPS = [
-  { title: "Write it down before you spend it", body: "A quick log turns a vague sense of \"I'm probably fine\" into a number you can actually check yourself against." },
-  { title: "Give every category a ceiling", body: "An unlimited budget is really no budget. Deciding a number ahead of time is what makes a purchase feel like a choice." },
-  { title: "Review weekly, not monthly", body: "By the time a month closes, the money's gone. A five-minute weekly look catches drift while you can still steer it." },
-  { title: "Let small leaks show up on paper", body: "Coffee, subscriptions, delivery fees — none of them feel like much alone. Logged side by side, the pattern is obvious." },
-  { title: "Automate the boring transfers", body: "Move savings the moment income lands, before it has a chance to become \"spare\" money sitting in checking." }
+  { icon:'ledger', title: "Write it down before you spend it", body: "A quick log turns a vague sense of \"I'm probably fine\" into a number you can actually check yourself against." },
+  { icon:'bills', title: "Watch your bills as closely as your spending", body: "Rent and subscriptions feel automatic — until one goes up. Seeing every due date in one place catches it early." },
+  { icon:'networth', title: "Know your net worth, not just your balance", body: "A chequing balance is a snapshot. Assets minus debts is the actual number that tells you if you're moving forward." },
+  { icon:'growth', title: "Let compounding do the heavy lifting", body: "Small, regular contributions grow faster than most people expect — seeing the curve is what makes it click." },
+  { icon:'accounts', title: "Keep every account in one place", body: "Chequing, savings, cards, loans — scattered across apps, it's hard to see the full picture. Together, it's obvious." }
 ];
 
 let currentUser = null;
@@ -428,6 +512,18 @@ let detailReturnView = 'portfolio';
 let customCategories = []; // ["Pet Care", ...]
 let categoryBudgets = {};  // { "Food": 400, ... }
 let netWorthItems = [];    // [{ id, category, label, balance }]
+let accounts = [];         // [{ id, name, type, currency, balance, institution }]
+let transfers = [];        // [{ id, fromAccountId, toAccountId, amount, note, date }]
+let userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
+
+const AVATAR_SKIN = ["#F4D3B8","#E8B48C","#C98A5E","#A9704A","#8D5A3A","#5C3A26"];
+const AVATAR_HAIR_COLORS = ["#22281F","#5C4331","#A8752E","#C9A84C","#B0B0B0","#EDE8DC"];
+const AVATAR_CLOTHING_COLORS = ["#55694A","#5B7CA8","#A8462F","#8A5A9E","#B08B2E","#3E8E7E"];
+const AVATAR_BG_COLORS = ["#EDE8DC","#D8CFC0","#C9DCD3","#D9C9DC","#DCD3C9","#C9D3DC"];
+const AVATAR_HAIR_STYLES = ["bald","short","long","curly"];
+const AVATAR_EYE_STYLES = ["dot","line","round"];
+const ACCOUNT_TYPES = ["Chequing","Savings","Cash","Credit Card","Investment","Loan","Mortgage"];
+const ACCOUNT_LIABILITY_TYPES = ["Credit Card","Loan","Mortgage"];
 let incomeEntries = [];    // [{ id, amount, category, note, date }]
 const INCOME_CATEGORIES = ["Salary","Freelance","Investment","Gift","Other"];
 const ASSET_CATS = ["Cash","Chequing/Savings","Investments","TFSA/RRSP"];
@@ -443,7 +539,7 @@ const TRANSLATIONS = {
   en: {
     appName: "Moneta Compass",
     signIn: "Sign in", logOut: "Log out", myLedger: "My ledger →",
-    savingTips: "Saving tips", recurring: "Recurring", watchlist: "Watchlist", settings: "Settings",
+    savingTips: "Home", recurring: "Bills", watchlist: "Watchlist", settings: "Settings",
     login: "Log in", signup: "Sign up", email: "Email", password: "Password",
     forgotPassword: "Forgot password?", createAccount: "Create account",
     heroHeadline: "Money you can see is money you can control.",
@@ -457,7 +553,7 @@ const TRANSLATIONS = {
     noExpensesYet: "No expenses yet. Tap + to add your first one.",
     totalSpentIn: "Total spent in", entries: "Entries",
     noRecurringYet: 'No recurring expenses yet. Add one from the + button and check "Repeats every month."',
-    stop: "Stop",
+    stop: "Stop", accountsPage: "Accounts", growthCalc: "Growth Calculator", monthVsLast: "This month vs. last month",
     expenseTab: "Expense", incomeTab: "Income", addIncome: "Add income",
     refreshPrices: "Refresh prices", noStocksYet: "No stocks yet. Add a ticker symbol above, like AAPL or MSFT.",
     addHoldingBtn: "Add holding", noHoldingsYet: "No holdings yet. Add a stock above to start tracking it.",
@@ -470,7 +566,7 @@ const TRANSLATIONS = {
   fr: {
     appName: "Moneta Compass",
     signIn: "Se connecter", logOut: "Se déconnecter", myLedger: "Mon registre →",
-    savingTips: "Conseils d'épargne", recurring: "Récurrent", watchlist: "Liste de suivi", settings: "Paramètres",
+    savingTips: "Accueil", recurring: "Factures", watchlist: "Liste de suivi", settings: "Paramètres",
     login: "Connexion", signup: "S'inscrire", email: "E-mail", password: "Mot de passe",
     forgotPassword: "Mot de passe oublié ?", createAccount: "Créer un compte",
     heroHeadline: "L'argent que vous voyez est de l'argent que vous contrôlez.",
@@ -484,7 +580,7 @@ const TRANSLATIONS = {
     noExpensesYet: "Aucune dépense pour l'instant. Appuyez sur + pour commencer.",
     totalSpentIn: "Total dépensé en", entries: "Entrées",
     noRecurringYet: 'Aucune dépense récurrente. Ajoutez-en une avec le bouton + et cochez "Se répète chaque mois."',
-    stop: "Arrêter",
+    stop: "Arrêter", accountsPage: "Comptes", growthCalc: "Calculateur de croissance", monthVsLast: "Ce mois-ci vs le mois dernier",
     expenseTab: "Dépense", incomeTab: "Revenu", addIncome: "Ajouter un revenu",
     refreshPrices: "Actualiser les prix", noStocksYet: "Aucune action. Ajoutez un symbole boursier ci-dessus, comme AAPL.",
     addHoldingBtn: "Ajouter une position", noHoldingsYet: "Aucune position. Ajoutez une action ci-dessus pour commencer.",
@@ -497,7 +593,7 @@ const TRANSLATIONS = {
   es: {
     appName: "Moneta Compass",
     signIn: "Iniciar sesión", logOut: "Cerrar sesión", myLedger: "Mi registro →",
-    savingTips: "Consejos de ahorro", recurring: "Recurrente", watchlist: "Lista de seguimiento", settings: "Ajustes",
+    savingTips: "Inicio", recurring: "Facturas", watchlist: "Lista de seguimiento", settings: "Ajustes",
     login: "Iniciar sesión", signup: "Registrarse", email: "Correo electrónico", password: "Contraseña",
     forgotPassword: "¿Olvidaste tu contraseña?", createAccount: "Crear cuenta",
     heroHeadline: "El dinero que puedes ver es dinero que puedes controlar.",
@@ -511,7 +607,7 @@ const TRANSLATIONS = {
     noExpensesYet: "Aún no hay gastos. Toca + para añadir el primero.",
     totalSpentIn: "Total gastado en", entries: "Entradas",
     noRecurringYet: 'Aún no hay gastos recurrentes. Añade uno con el botón + y marca "Se repite cada mes."',
-    stop: "Detener",
+    stop: "Detener", accountsPage: "Cuentas", growthCalc: "Calculadora de crecimiento", monthVsLast: "Este mes frente al anterior",
     expenseTab: "Gasto", incomeTab: "Ingreso", addIncome: "Añadir ingreso",
     refreshPrices: "Actualizar precios", noStocksYet: "Sin acciones aún. Añade un símbolo bursátil arriba, como AAPL.",
     addHoldingBtn: "Añadir posición", noHoldingsYet: "Sin posiciones aún. Añade una acción arriba para empezar.",
@@ -524,7 +620,7 @@ const TRANSLATIONS = {
   fa: {
     appName: "Moneta Compass",
     signIn: "ورود", logOut: "خروج", myLedger: "دفتر من ←",
-    savingTips: "نکات پس‌انداز", recurring: "تکرارشونده", watchlist: "لیست پایش", settings: "تنظیمات",
+    savingTips: "خانه", recurring: "قبض‌ها", watchlist: "لیست پایش", settings: "تنظیمات",
     login: "ورود", signup: "ثبت‌نام", email: "ایمیل", password: "رمز عبور",
     forgotPassword: "رمز عبور را فراموش کرده‌اید؟", createAccount: "ساخت حساب",
     heroHeadline: "پولی که می‌بینی، پولی است که کنترلش می‌کنی.",
@@ -538,7 +634,7 @@ const TRANSLATIONS = {
     noExpensesYet: "هنوز هزینه‌ای ثبت نشده. برای افزودن اولین مورد + را بزنید.",
     totalSpentIn: "مجموع هزینه در", entries: "ورودی‌ها",
     noRecurringYet: 'هنوز هزینه تکرارشونده‌ای نیست. با دکمه + یکی اضافه کنید و "هر ماه تکرار شود" را علامت بزنید.',
-    stop: "توقف",
+    stop: "توقف", accountsPage: "حساب‌ها", growthCalc: "ماشین‌حساب رشد", monthVsLast: "این ماه در مقابل ماه قبل",
     expenseTab: "هزینه", incomeTab: "درآمد", addIncome: "افزودن درآمد",
     refreshPrices: "به‌روزرسانی قیمت‌ها", noStocksYet: "هنوز سهامی نیست. یک نماد اضافه کنید، مثل AAPL.",
     addHoldingBtn: "افزودن دارایی", noHoldingsYet: "هنوز دارایی‌ای نیست. یک سهم اضافه کنید تا شروع شود.",
@@ -578,6 +674,54 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6
 const currentMonthKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`; };
 const currentDay = () => new Date().getDate();
 function nextMonthKey(key){ let [y,m]=key.split('-').map(Number); m++; if(m>12){m=1;y++;} return `${y}-${pad2(m)}`; }
+function shiftMonthKey(key, delta){
+  let [y,m] = key.split('-').map(Number);
+  m += delta;
+  while(m > 12){ m -= 12; y++; }
+  while(m < 1){ m += 12; y--; }
+  return `${y}-${pad2(m)}`;
+}
+
+// Compares a month's spending to the prior month and a 3-month trailing
+// average, both overall and per category, and surfaces the most notable
+// changes as plain-language insights.
+function computeAnalytics(monthKey){
+  const prevMonthKey = shiftMonthKey(monthKey, -1);
+  const curEntries = expenses.filter(e => e.date.slice(0,7) === monthKey);
+  const prevEntries = expenses.filter(e => e.date.slice(0,7) === prevMonthKey);
+  const curTotal = curEntries.reduce((s,e)=>s+e.amount,0);
+  const prevTotal = prevEntries.reduce((s,e)=>s+e.amount,0);
+  const totalChangePct = prevTotal > 0 ? ((curTotal-prevTotal)/prevTotal*100) : null;
+
+  const cats = new Set([...curEntries.map(e=>e.category), ...prevEntries.map(e=>e.category)]);
+  const categoryChanges = [...cats].map(cat => {
+    const curAmt = curEntries.filter(e=>e.category===cat).reduce((s,e)=>s+e.amount,0);
+    const prevAmt = prevEntries.filter(e=>e.category===cat).reduce((s,e)=>s+e.amount,0);
+    let pct = null;
+    if(prevAmt > 0) pct = ((curAmt-prevAmt)/prevAmt*100);
+    else if(curAmt > 0) pct = null; // no prior baseline — show as "New" rather than a misleading %
+    return { cat, curAmt, prevAmt, pct };
+  }).filter(c => c.curAmt > 0 || c.prevAmt > 0)
+    .sort((a,b) => Math.abs(b.pct==null?0:b.pct) - Math.abs(a.pct==null?0:a.pct));
+
+  const trailingMonths = [1,2,3].map(n => shiftMonthKey(monthKey, -n));
+  const insights = [];
+  cats.forEach(cat => {
+    const curAmt = curEntries.filter(e=>e.category===cat).reduce((s,e)=>s+e.amount,0);
+    let sum = 0;
+    trailingMonths.forEach(mk => {
+      sum += expenses.filter(e => e.date.slice(0,7)===mk && e.category===cat).reduce((s,e)=>s+e.amount,0);
+    });
+    const avg3mo = sum / 3;
+    const diff = curAmt - avg3mo;
+    if(diff > 15 && avg3mo > 0){
+      insights.push({ cat, diff, curAmt, avg3mo });
+    }
+  });
+  insights.sort((a,b) => b.diff - a.diff);
+
+  return { totalChangePct, categoryChanges, insights: insights.slice(0,2), curTotal, prevTotal };
+}
 function daysInMonth(monthKey){ const [y,m]=monthKey.split('-').map(Number); return new Date(y,m,0).getDate(); }
 function fmt(n){
   const symbol = CURRENCY_SYMBOLS[userSettings.currency] || "$";
@@ -607,6 +751,39 @@ function escapeHtml(str){ const div=document.createElement('div'); div.textConte
 
 // Builds a donut chart from segments [{label, value, color}] using stacked
 // stroke-dasharray circles — no external chart library needed.
+function defaultAvatarConfig(){
+  return { skin:AVATAR_SKIN[1], hairColor:AVATAR_HAIR_COLORS[0], hairStyle:'short', eyeStyle:'dot', clothing:AVATAR_CLOTHING_COLORS[0], bg:AVATAR_BG_COLORS[0] };
+}
+
+function avatarSVG(config, size){
+  size = size || 96;
+  const c = Object.assign(defaultAvatarConfig(), config || {});
+  let hair = '';
+  if(c.hairStyle === 'short'){
+    hair = `<path d="M20 42C20 22 34 12 50 12C66 12 80 22 80 42V46H68C68 34 60 28 50 28C40 28 32 34 32 46H20V42Z" fill="${c.hairColor}"/>`;
+  }else if(c.hairStyle === 'long'){
+    hair = `<path d="M18 44C18 22 32 10 50 10C68 10 82 22 82 44V70H70V48C70 34 61 26 50 26C39 26 30 34 30 48V70H18V44Z" fill="${c.hairColor}"/>`;
+  }else if(c.hairStyle === 'curly'){
+    hair = `<circle cx="26" cy="30" r="10" fill="${c.hairColor}"/><circle cx="40" cy="18" r="11" fill="${c.hairColor}"/><circle cx="58" cy="16" r="11" fill="${c.hairColor}"/><circle cx="74" cy="28" r="10" fill="${c.hairColor}"/><circle cx="50" cy="20" r="13" fill="${c.hairColor}"/>`;
+  }
+  let eyes = '';
+  if(c.eyeStyle === 'dot'){
+    eyes = `<circle cx="41" cy="52" r="2.6" fill="#22281F"/><circle cx="59" cy="52" r="2.6" fill="#22281F"/>`;
+  }else if(c.eyeStyle === 'line'){
+    eyes = `<line x1="36" y1="52" x2="46" y2="52" stroke="#22281F" stroke-width="2.4" stroke-linecap="round"/><line x1="54" y1="52" x2="64" y2="52" stroke="#22281F" stroke-width="2.4" stroke-linecap="round"/>`;
+  }else{
+    eyes = `<circle cx="41" cy="52" r="4" fill="#fff" stroke="#22281F" stroke-width="1.4"/><circle cx="41" cy="52" r="1.8" fill="#22281F"/><circle cx="59" cy="52" r="4" fill="#fff" stroke="#22281F" stroke-width="1.4"/><circle cx="59" cy="52" r="1.8" fill="#22281F"/>`;
+  }
+  return `<svg viewBox="0 0 100 100" width="${size}" height="${size}">
+    <circle cx="50" cy="50" r="50" fill="${c.bg}"/>
+    <path d="M20 96C20 76 33 66 50 66C67 66 80 76 80 96Z" fill="${c.clothing}"/>
+    <circle cx="50" cy="50" r="26" fill="${c.skin}"/>
+    ${eyes}
+    <path d="M43 62C46 65 54 65 57 62" stroke="#22281F" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    ${hair}
+  </svg>`;
+}
+
 function donutChartSVG(segments, opts){
   opts = opts || {};
   const size = opts.size || 200;
@@ -615,10 +792,12 @@ function donutChartSVG(segments, opts){
   const cx = size / 2, cy = size / 2;
   const circumference = 2 * Math.PI * radius;
   const total = segments.reduce((s,seg) => s + seg.value, 0);
+  const sorted = [...segments].filter(s=>s.value>0).sort((a,b) => b.value - a.value);
+  const gapPx = sorted.length > 1 ? 4 : 0;
 
   const centerLabel = opts.centerLabel ? `
-    <text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="11" fill="var(--ink-soft)" font-family="Iowan Old Style, Georgia, serif">${opts.centerLabel}</text>
-    <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)" font-family="ui-monospace, SF Mono, Menlo, monospace">${opts.centerValue||''}</text>` : '';
+    <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="12" fill="var(--ink-soft)" font-family="var(--font-sans)" letter-spacing="0.3px">${opts.centerLabel}</text>
+    <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="21" font-weight="700" fill="var(--ink)" font-family="ui-monospace, SF Mono, Menlo, monospace">${opts.centerValue||''}</text>` : '';
 
   if(total <= 0){
     return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
@@ -629,15 +808,14 @@ function donutChartSVG(segments, opts){
 
   let cumulative = 0;
   let circles = '';
-  segments.forEach(seg => {
-    if(seg.value <= 0) return;
+  sorted.forEach(seg => {
     const pct = seg.value / total;
-    const dash = pct * circumference;
+    const dash = Math.max(0, pct * circumference - gapPx);
     const gap = circumference - dash;
     const offset = -cumulative * circumference;
     circles += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${seg.color}" stroke-width="${stroke}"
       stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${offset}"
-      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`;
+      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>`;
     cumulative += pct;
   });
 
@@ -651,15 +829,17 @@ function getSymbolColor(symbol){
   return STOCK_PALETTE[hash % STOCK_PALETTE.length];
 }
 
-function donutLegendHTML(segments, formatFn){
+function donutLegendHTML(segments, formatFn, limit){
   const total = segments.reduce((s,seg)=>s+seg.value,0);
-  return segments.filter(s=>s.value>0).map(seg => {
+  let sorted = segments.filter(s=>s.value>0).sort((a,b)=>b.value-a.value);
+  if(limit) sorted = sorted.slice(0, limit);
+  return sorted.map(seg => {
     const pct = total>0 ? ((seg.value/total)*100).toFixed(0) : 0;
     return `
       <div class="legend-row">
         <span class="legend-dot" style="background:${seg.color}"></span>
         <span class="legend-label">${escapeHtml(seg.label)}</span>
-        <span class="legend-value">${formatFn(seg.value)} · ${pct}%</span>
+        <span class="legend-value"><strong>${pct}%</strong> · ${formatFn(seg.value)}</span>
       </div>`;
   }).join('');
 }
@@ -742,7 +922,7 @@ async function boot(){
 async function loadUserData(){
   const { data: exp } = await sb.from('expenses').select('*').order('date', {ascending:false});
   expenses = (exp||[]).map(e => ({
-    id:e.id, amount:Number(e.amount), category:e.category, note:e.note||'', date:e.date, recurringId:e.recurring_id||null
+    id:e.id, amount:Number(e.amount), category:e.category, note:e.note||'', date:e.date, recurringId:e.recurring_id||null, accountId:e.account_id||null
   }));
   const { data: rec } = await sb.from('recurring_templates').select('*');
   recurringTemplates = (rec||[]).map(t => ({
@@ -781,7 +961,26 @@ async function loadUserData(){
   netWorthItems = (nw||[]).map(x => ({ id:x.id, category:x.category, label:x.label, balance:Number(x.balance) }));
 
   const { data: inc } = await sb.from('income_entries').select('*').order('date', {ascending:false});
-  incomeEntries = (inc||[]).map(x => ({ id:x.id, amount:Number(x.amount), category:x.category, note:x.note||'', date:x.date }));
+  incomeEntries = (inc||[]).map(x => ({ id:x.id, amount:Number(x.amount), category:x.category, note:x.note||'', date:x.date, accountId:x.account_id||null }));
+
+  const { data: acc } = await sb.from('accounts').select('*').order('created_at', {ascending:true});
+  accounts = (acc||[]).map(a => ({ id:a.id, name:a.name, type:a.type, currency:a.currency, balance:Number(a.balance), institution:a.institution||'' }));
+
+  const { data: tr } = await sb.from('transfers').select('*').order('date', {ascending:false}).limit(50);
+  transfers = (tr||[]).map(x => ({ id:x.id, fromAccountId:x.from_account_id, toAccountId:x.to_account_id, amount:Number(x.amount), note:x.note||'', date:x.date }));
+
+  const { data: prof } = await sb.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+  if(prof){
+    userProfile = { username:prof.username, avatarType:prof.avatar_type||'none', avatarConfig:prof.avatar_config||null, avatarPath:prof.avatar_path||null, avatarUrl:null };
+    if(prof.avatar_type === 'upload' && prof.avatar_path){
+      try{
+        const { data: signed } = await sb.storage.from('avatars').createSignedUrl(prof.avatar_path, 3600);
+        if(signed) userProfile.avatarUrl = signed.signedUrl;
+      }catch(e){}
+    }
+  }else{
+    userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
+  }
 }
 
 function logOut(){
@@ -792,6 +991,9 @@ function logOut(){
   customCategories = []; categoryBudgets = {};
   netWorthItems = [];
   incomeEntries = [];
+  accounts = [];
+  transfers = [];
+  userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
   userSettings = { language: 'en', currency: 'USD' };
   applyDirection();
   view = "home";
@@ -800,34 +1002,48 @@ function logOut(){
 
 async function renderAuth(){
   view = "auth";
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backToLanding" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Moneta Compass`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backToLanding" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
   document.getElementById('pageSub').innerHTML = '';
   document.getElementById('fabAdd').style.display = 'none';
 
   document.getElementById('mainArea').innerHTML = `
-    <p class="login-intro">Sign in with your email to save your data and pick up right where you left off.</p>
-    <div class="auth-tabs">
-      <button type="button" class="auth-tab ${authMode==='login'?'active':''}" id="tabLogin">Log in</button>
-      <button type="button" class="auth-tab ${authMode==='signup'?'active':''}" id="tabSignup">Sign up</button>
+    <div style="text-align:center;margin:10px 0 28px;">
+      ${logoMark(64)}
+      <div style="font-family:var(--font-serif);font-size:22px;font-weight:600;margin-top:10px;">Moneta Compass</div>
+      <p class="login-intro" style="max-width:36ch;margin:8px auto 0;">Sign in with your email to save your data and pick up right where you left off.</p>
     </div>
-    <form id="authForm">
-      <div class="row">
-        <div class="field">
-          <label for="authEmail">Email</label>
-          <input type="email" id="authEmail" required autocomplete="email">
-        </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab ${authMode==='login'?'active':''}" id="tabLogin">Log in</button>
+        <button type="button" class="auth-tab ${authMode==='signup'?'active':''}" id="tabSignup">Sign up</button>
       </div>
-      <div class="row">
-        <div class="field">
-          <label for="authPassword">Password</label>
-          <input type="password" id="authPassword" required minlength="6" autocomplete="${authMode==='signup'?'new-password':'current-password'}">
+      <form id="authForm">
+        ${authMode==='signup' ? `
+        <div class="row">
+          <div class="field">
+            <label for="authUsername">Username</label>
+            <input type="text" id="authUsername" required minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+" placeholder="letters, numbers, underscore" autocomplete="off">
+          </div>
+        </div>` : ''}
+        <div class="row">
+          <div class="field">
+            <label for="authEmail">Email</label>
+            <input type="email" id="authEmail" required autocomplete="email">
+          </div>
         </div>
-      </div>
-      <div class="login-error" id="authError"></div>
-      <div class="login-msg" id="authMsg"></div>
-      <button type="submit" class="cta" id="authSubmitBtn" style="margin-top:14px;">${authMode==='signup' ? t('createAccount') : t('login')}</button>
-    </form>
-    ${authMode==='login' ? `<button type="button" class="navlink" id="forgotPasswordBtn" style="margin-top:14px;">${t('forgotPassword')}</button>` : ''}
+        <div class="row">
+          <div class="field">
+            <label for="authPassword">Password</label>
+            <input type="password" id="authPassword" required minlength="6" autocomplete="${authMode==='signup'?'new-password':'current-password'}">
+          </div>
+        </div>
+        <div class="login-error" id="authError"></div>
+        <div class="login-msg" id="authMsg"></div>
+        <button type="submit" class="cta" id="authSubmitBtn" style="margin-top:14px;">${authMode==='signup' ? t('createAccount') : t('login')}</button>
+      </form>
+      ${authMode==='login' ? `<button type="button" class="navlink" id="forgotPasswordBtn" style="margin-top:14px;">${t('forgotPassword')}</button>` : ''}
+    </div>
     <p class="login-note">Passwords are handled by Supabase's auth system, not stored in this page. Use a real password you don't mind creating fresh — this is a new account, separate from everything else.</p>
   `;
 
@@ -861,15 +1077,28 @@ async function renderAuth(){
 
     try{
       if(authMode === 'signup'){
+        const username = document.getElementById('authUsername').value.trim();
+        if(!/^[a-zA-Z0-9_]{3,20}$/.test(username)){
+          errorEl.textContent = 'Username must be 3-20 characters: letters, numbers, or underscore only.';
+          btn.disabled = false; return;
+        }
+        const { data: existing } = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
+        if(existing){
+          errorEl.textContent = 'That username is already taken.';
+          btn.disabled = false; return;
+        }
+
         const { data, error } = await sb.auth.signUp({ email, password });
         if(error) throw error;
         if(data.session){
           currentUser = data.user;
+          await sb.from('profiles').insert({ id: currentUser.id, username, avatar_type:'none' });
           await loadUserData();
           view = "home";
           render();
         }else{
-          msgEl.textContent = 'Check your email to confirm your account, then log in.';
+          msgEl.textContent = 'Check your email to confirm your account, then log in. (Your username is saved and ready.)';
+          try{ await sb.from('profiles').insert({ id: data.user.id, username, avatar_type:'none' }); }catch(e){}
         }
       }else{
         const { data, error } = await sb.auth.signInWithPassword({ email, password });
@@ -919,7 +1148,7 @@ async function insertGeneratedEntries(list){
 function render(){
   document.getElementById('fabAdd').style.display = (currentUser && view !== 'networth' ? 'flex' : 'none');
   const homeBtn = document.getElementById('homeBtn');
-  homeBtn.style.display = (currentUser && view !== 'home' && view !== 'auth') ? 'inline-block' : 'none';
+  homeBtn.style.display = (currentUser && view !== 'home' && view !== 'auth') ? 'inline-flex' : 'none';
   homeBtn.onclick = () => { view = "home"; render(); };
   if(view === "home") renderHome();
   else if(view === "months") renderMonths();
@@ -931,9 +1160,10 @@ function render(){
   else if(view === "portfolioDetail") renderStockDetail(activeSymbol);
   else if(view === "networth") renderNetWorth();
   else if(view === "growth") renderGrowthCalculator();
+  else if(view === "accounts") renderAccounts();
 }
 function navBar(items){
-  const html = items.map((it,i) => `${i>0?'<span class="navsep">·</span>':''}<button class="navlink" data-nav="${i}">${escapeHtml(it.label)}</button>`).join('');
+  const html = items.map((it,i) => `<button class="navlink" data-nav="${i}">${escapeHtml(it.label)}</button>`).join('');
   document.getElementById('pageSub').innerHTML = `<div class="navlinks">${html}</div>`;
   document.querySelectorAll('[data-nav]').forEach(btn => {
     const idx = parseInt(btn.getAttribute('data-nav'),10);
@@ -961,13 +1191,14 @@ function renderHome(){
   const remaining = monthIncome - monthTotal;
 
   const tiles = [
-    { icon:'📒', label:t('myLedger').replace(' →',''), sub:'Expenses by month', onClick:()=>{ view="months"; render(); } },
-    { icon:'↻', label:t('recurring'), sub:`${fmt(recurringMonthlyTotal)}/mo`, onClick:()=>{ view="recurring"; render(); } },
-    { icon:'📈', label:t('watchlist'), sub:`${watchlist.length} tracked`, onClick:openWatchlist },
-    { icon:'🧭', label:'Portfolio', sub:`${portfolio.length} holdings`, onClick:openPortfolio },
-    { icon:'💰', label:'Net Worth', sub:'Assets & debts', onClick:()=>{ view="networth"; render(); } },
-    { icon:'🌱', label:'Growth Calculator', sub:'Future value & inflation', onClick:()=>{ view="growth"; render(); } },
-    { icon:'⚙️', label:t('settings'), sub:'Language, currency, budgets', onClick:()=>{ view="settings"; render(); } }
+    { icon:TILE_ICONS.accounts, label:t('accountsPage'), sub:`${accounts.length} linked`, onClick:()=>{ view="accounts"; render(); } },
+    { icon:TILE_ICONS.ledger, label:t('myLedger').replace(' →',''), sub:'Expenses by month', onClick:()=>{ view="months"; render(); } },
+    { icon:TILE_ICONS.bills, label:t('recurring'), sub:`${fmt(recurringMonthlyTotal)}/mo`, onClick:()=>{ view="recurring"; render(); } },
+    { icon:TILE_ICONS.watchlist, label:t('watchlist'), sub:`${watchlist.length} tracked`, onClick:openWatchlist },
+    { icon:TILE_ICONS.portfolio, label:'Portfolio', sub:`${portfolio.length} holdings`, onClick:openPortfolio },
+    { icon:TILE_ICONS.networth, label:'Net Worth', sub:'Assets & debts', onClick:()=>{ view="networth"; render(); } },
+    { icon:TILE_ICONS.growth, label:t('growthCalc'), sub:'Future value & inflation', onClick:()=>{ view="growth"; render(); } },
+    { icon:TILE_ICONS.settings, label:t('settings'), sub:'Language, currency, password', onClick:()=>{ view="settings"; render(); } }
   ];
   const tilesHtml = tiles.map(tile => `
     <div class="dashboard-tile" data-idx="${tiles.indexOf(tile)}">
@@ -975,32 +1206,6 @@ function renderHome(){
       <div class="tile-label">${escapeHtml(tile.label)}</div>
       <div class="tile-sub">${escapeHtml(tile.sub)}</div>
     </div>`).join('');
-
-  const budgetedCats = Object.keys(categoryBudgets).filter(c => categoryBudgets[c] > 0);
-  let budgetHtml = '';
-  if(budgetedCats.length > 0){
-    const catTotals = {};
-    monthEntries.forEach(e => { catTotals[e.category] = (catTotals[e.category]||0) + e.amount; });
-    budgetHtml = `<div class="section-label">Budgets for ${monthName}</div>`;
-    budgetedCats.forEach(cat => {
-      const spent = catTotals[cat] || 0;
-      const limit = categoryBudgets[cat];
-      const pct = Math.min(100, (spent/limit)*100);
-      const over = spent > limit;
-      budgetHtml += `
-        <div class="budget-row" data-goto-budget="1" style="cursor:pointer;">
-          <div class="budget-top">
-            <span>${escapeHtml(cat)}</span>
-            <span>${fmt(spent)} / ${fmt(limit)}</span>
-          </div>
-          <div class="budget-track"><div class="budget-fill ${over?'over':'ok'}" style="width:${pct}%;"></div></div>
-        </div>`;
-    });
-  }else{
-    budgetHtml = `
-      <div class="section-label">Budgets</div>
-      <p class="hero-body" style="font-size:13px;">No budget limits set yet. Go to Settings to give any category a monthly ceiling and it'll show up here.</p>`;
-  }
 
   const isBrandNew = expenses.length===0 && incomeEntries.length===0 && recurringTemplates.length===0
     && watchlist.length===0 && portfolio.length===0 && netWorthItems.length===0;
@@ -1010,33 +1215,58 @@ function renderHome(){
       <div style="font-size:13px;color:var(--ink-soft);">Tap "Add" below to log an expense or income, or pick any tile above to explore that section first.</div>
     </div>` : '';
 
+  // One consolidated "This month" summary — replaces the old 5-card stat
+  // grid and the separate budget list, so the dashboard reads as one clear
+  // picture instead of several scattered numbers.
+  let thisMonthHtml = '';
+  if(!isBrandNew){
+    const catTotals = {};
+    monthEntries.forEach(e => { catTotals[e.category] = (catTotals[e.category]||0) + e.amount; });
+    const catSegments = Object.keys(catTotals).map(cat => ({
+      label: cat, value: catTotals[cat], color: CATEGORY_COLORS[cat] || CATEGORY_COLORS.Other
+    }));
+
+    let chartBlock;
+    if(monthTotal > 0){
+      chartBlock = `
+        <div class="chart-block-inner">
+          ${donutChartSVG(catSegments, { centerLabel:'Spent', centerValue: fmt(monthTotal) })}
+          <div class="legend-list">${donutLegendHTML(catSegments, fmt, 4)}</div>
+        </div>`;
+    }else{
+      chartBlock = `<p class="hero-body" style="font-size:13px;">No expenses logged in ${monthName} yet.</p>`;
+    }
+
+    thisMonthHtml = `
+      <div class="section-label">This month — ${monthName}</div>
+      <div class="networth-summary" style="grid-template-columns:1fr 1fr;margin-bottom:20px;">
+        <div class="nw-card" data-goto="detail" style="cursor:pointer;"><div class="label" style="color:var(--moss);">${t('incomeIn')}</div><div class="value" style="font-size:19px;">${fmt(monthIncome)}</div></div>
+        <div class="nw-card highlight" data-goto="detail" style="cursor:pointer;"><div class="label">${t('remaining')}</div><div class="value" style="font-size:19px;${remaining<0?'color:#E08A6D;':''}">${fmt(remaining)}</div></div>
+      </div>
+      ${chartBlock}
+    `;
+  }
+
+  const avatarSmall = userProfile.avatarType === 'upload' && userProfile.avatarUrl
+    ? `<img src="${userProfile.avatarUrl}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">`
+    : userProfile.avatarType === 'custom' && userProfile.avatarConfig
+      ? avatarSVG(userProfile.avatarConfig, 40)
+      : '';
+
   document.getElementById('mainArea').innerHTML = `
-    <div class="hero-eyebrow">Welcome back</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      ${avatarSmall}
+      <div class="hero-eyebrow" style="margin-bottom:0;">Welcome back${userProfile.username ? `, ${escapeHtml(userProfile.username)}` : ''}</div>
+    </div>
     <h2 class="hero-headline">Here's where things stand.</h2>
     ${welcomeHint}
 
     <div class="dashboard-grid">${tilesHtml}</div>
 
-    <div class="stat-grid">
-      <div class="stat-card" data-goto="detail" style="cursor:pointer;"><div class="label">${t('incomeIn')} ${monthName}</div><div class="value" style="color:var(--moss);">${fmt(monthIncome)}</div></div>
-      <div class="stat-card" data-goto="detail" style="cursor:pointer;"><div class="label">${t('spentIn')} ${monthName}</div><div class="value">${fmt(monthTotal)}</div></div>
-      <div class="stat-card" data-goto="detail" style="cursor:pointer;"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--rust);':''}">${fmt(remaining)}</div></div>
-      <div class="stat-card" data-goto="recurring" style="cursor:pointer;"><div class="label">${t('committedMonthly')}</div><div class="value">${fmt(recurringMonthlyTotal)}</div></div>
-      <div class="stat-card" data-goto="portfolio" style="cursor:pointer;"><div class="label">${t('holdingsTracked')}</div><div class="value">${portfolio.length + watchlist.length}</div></div>
-    </div>
-
-    ${budgetHtml}
+    ${thisMonthHtml}
   `;
 
-  document.querySelectorAll('.stat-card[data-goto]').forEach(el => {
-    el.addEventListener('click', () => {
-      const dest = el.getAttribute('data-goto');
-      if(dest === 'detail'){ activeMonth = monthKey; view = "detail"; render(); }
-      else if(dest === 'recurring'){ view = "recurring"; render(); }
-      else if(dest === 'portfolio'){ openPortfolio(); }
-    });
-  });
-  document.querySelectorAll('[data-goto-budget]').forEach(el => {
+  document.querySelectorAll('[data-goto="detail"]').forEach(el => {
     el.addEventListener('click', () => { activeMonth = monthKey; view = "detail"; render(); });
   });
 
@@ -1048,22 +1278,26 @@ function renderHome(){
 function renderPublicLanding(){
   let tipsHtml = '';
   TIPS.forEach(tip => {
-    tipsHtml += `<div class="tip-row"><div class="dot"></div><div><div class="tip-title">${tip.title}</div><div class="tip-body">${tip.body}</div></div></div>`;
+    tipsHtml += `<div class="tip-row"><div class="tip-icon-badge">${TILE_ICONS[tip.icon]}</div><div><div class="tip-title">${tip.title}</div><div class="tip-body">${tip.body}</div></div></div>`;
   });
 
   const features = [
-    { icon:'📒', label:'Budgeting', sub:'Track spending by month',
+    { icon:TILE_ICONS.accounts, label:'Accounts', sub:'Chequing, cards, loans — all in one place',
+      detail:"Add every account you have — chequing, savings, credit cards, loans, mortgages — and see exactly what you hold and what you owe, all entered by you, never connected to your bank." },
+    { icon:TILE_ICONS.ledger, label:'Budgeting', sub:'Track spending by month',
       detail:"Log every expense in seconds and see it organized automatically by month and category — with charts showing exactly where your money goes, no spreadsheet required." },
-    { icon:'💵', label:'Income', sub:'Watch your balance in real time',
+    { icon:'<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 13L7 9L10 11L17 4M12 4H17V9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17H17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>', label:'Income', sub:'Watch your balance in real time',
       detail:"Log what comes in alongside what goes out. Your remaining balance updates the moment you add an expense, so you always know what's actually left to spend." },
-    { icon:'↻', label:'Recurring bills', sub:'Rent, subscriptions, auto-tracked',
-      detail:"Set up rent, subscriptions, or any regular payment once and it logs itself every month after that. Prices change? Update the amount in one tap without re-entering the whole bill." },
-    { icon:'📈', label:'Stock watchlist', sub:'Live prices you follow',
-      detail:"Follow any publicly traded stock with live prices and daily change, plus full details — market cap, day range, 52-week range — the moment you tap in." },
-    { icon:'🧭', label:'Portfolio', sub:'Real holdings, real gains',
+    { icon:TILE_ICONS.bills, label:'Bills', sub:'Rent, subscriptions, auto-tracked',
+      detail:"Set up rent, subscriptions, or any regular payment once and it logs itself every month after that, with a due-soon list so nothing catches you off guard." },
+    { icon:TILE_ICONS.watchlist, label:'Stock watchlist', sub:'Live prices you follow',
+      detail:"Follow any publicly traded stock with live prices and daily change, plus full details — market cap, day range, 52-week range, YTD — the moment you tap in." },
+    { icon:TILE_ICONS.portfolio, label:'Portfolio', sub:'Real holdings, real gains',
       detail:"Log the shares you actually own and watch real gains and losses move with the market, alongside upcoming and past earnings for every position." },
-    { icon:'💰', label:'Net worth', sub:'Assets minus debts, at a glance',
-      detail:"Add your cash, accounts, investments, and debts in one place. Pay down a loan or watch an investment grow, and your total net worth updates right there." }
+    { icon:TILE_ICONS.networth, label:'Net worth', sub:'Assets minus debts, at a glance',
+      detail:"Every account and investment feeds one number: total assets minus total liabilities. Pay down a loan or watch an investment grow, and it updates right there." },
+    { icon:TILE_ICONS.growth, label:'Growth Calculator', sub:'Future value & inflation',
+      detail:"Project what an investment could grow into — every input adjustable, inflation included, with a live chart showing nominal value, real value, and what you actually contributed." }
   ];
   const featuresHtml = features.map((f,i) => `
     <div class="dashboard-tile" data-feature="${i}">
@@ -1074,49 +1308,78 @@ function renderPublicLanding(){
 
   const steps = [
     { n:'1', title:'Create your account', body:'Just an email and password — free to start, no card needed.' },
-    { n:'2', title:'Add what you have', body:'Log an expense, connect a stock you follow, or add an account to your net worth.' },
-    { n:'3', title:'See the full picture', body:'Spending, saving, and investing, all in one dashboard that updates as you go.' }
+    { n:'2', title:'Add what you have', body:"An account, an expense, a stock you follow — whatever's most useful to you first." },
+    { n:'3', title:'See the full picture', body:'Spending, bills, net worth, and investing, all in one dashboard that updates as you go.' }
   ];
   const stepsHtml = steps.map(s => `
     <div class="tip-row">
-      <div class="dot" style="background:var(--moss);"></div>
-      <div><div class="tip-title">${s.n}. ${s.title}</div><div class="tip-body">${s.body}</div></div>
+      <div class="tip-icon-badge tip-icon-num">${s.n}</div>
+      <div><div class="tip-title">${s.title}</div><div class="tip-body">${s.body}</div></div>
     </div>`).join('');
 
   document.getElementById('mainArea').innerHTML = `
+    <div style="margin-bottom:16px;">${logoMark(48)}</div>
     <div class="hero-eyebrow">A place to keep track</div>
     <h2 class="hero-headline">Money you can see is money you can control.</h2>
-    <p class="hero-body">Most budgets fail quietly — not from one bad purchase, but from a hundred small ones nobody wrote down. Moneta Compass makes your whole financial picture visible: spending, income, recurring bills, investments, and net worth, all in one place, all free to start.</p>
+    <p class="hero-body">Most budgets fail quietly — not from one bad purchase, but from a hundred small ones nobody wrote down. Moneta Compass makes your whole financial picture visible: accounts, spending, bills, investments, and net worth, all in one place, all free to start.</p>
     <button class="cta" id="ctaStart1">Create your free account</button>
-    <button class="cta" id="tryCalculator" style="background:transparent;color:var(--ink);border:1px solid var(--ink);margin-top:10px;">🌱 Try the Growth Calculator — no sign-up needed</button>
+    <button class="cta" id="tryCalculator" style="background:transparent;color:var(--ink);border:1px solid var(--ink);margin-top:10px;">${TILE_ICONS.growth} Try the Growth Calculator — no sign-up needed</button>
 
     <div class="section-label">What's inside — tap any to learn more</div>
-    <div class="dashboard-grid">${featuresHtml}</div>
-    <div id="featureDetail"></div>
+    <div class="dashboard-grid" id="featureGrid">${featuresHtml}</div>
 
     <div class="section-label">How it works</div>
     ${stepsHtml}
 
-    <div class="section-label">Five habits worth building</div>
+    <div class="section-label">Built for the full picture</div>
     ${tipsHtml}
 
-    <div style="margin-top:36px;padding-top:16px;border-top:1px solid var(--paper-line);text-align:center;">
-      <a href="https://x.com/MonetaCompass" target="_blank" rel="noopener" style="color:var(--ink-soft);font-size:13px;text-decoration:none;">
-        Follow @MonetaCompass on X →
+    <div class="contact-footer">
+      <div class="contact-label">Contact us</div>
+      <a href="https://x.com/MonetaCompass" target="_blank" rel="noopener" class="contact-x-link" aria-label="Moneta Compass on X">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.36 2H21.5l-7.5 8.57L23 22h-6.72l-5.26-6.9L4.98 22H1.84l8.03-9.17L1 2h6.9l4.77 6.31L18.36 2zm-1.18 18h1.85L7.02 3.9H5.03L17.18 20z"/></svg>
       </a>
     </div>
   `;
 
-  document.querySelectorAll('[data-feature]').forEach(el => {
+  let openFeatureIdx = null;
+  const featureGrid = document.getElementById('featureGrid');
+  const tileEls = () => Array.from(featureGrid.querySelectorAll('[data-feature]'));
+
+  function closeFeatureDetail(){
+    openFeatureIdx = null;
+    tileEls().forEach(t => t.style.borderColor = '');
+    const existing = document.getElementById('featureDetailPanel');
+    if(existing) existing.remove();
+  }
+
+  function openFeatureDetail(idx){
+    closeFeatureDetail();
+    openFeatureIdx = idx;
+    const tiles = tileEls();
+    const clickedTile = tiles[idx];
+    clickedTile.style.borderColor = 'var(--moss)';
+
+    // Figure out how many columns are actually showing right now, so the
+    // panel lands after the correct row no matter the screen width.
+    const styles = getComputedStyle(featureGrid);
+    const numCols = styles.gridTemplateColumns.split(' ').length;
+    const rowEnd = Math.min(tiles.length - 1, (Math.floor(idx / numCols) + 1) * numCols - 1);
+
+    const panel = document.createElement('div');
+    panel.id = 'featureDetailPanel';
+    panel.className = 'feature-detail-panel';
+    panel.innerHTML = `
+      <div class="tip-title" style="margin-bottom:6px;">${features[idx].icon} ${features[idx].label}</div>
+      <div style="font-size:13.5px;color:var(--ink-soft);line-height:1.55;">${features[idx].detail}</div>
+    `;
+    tiles[rowEnd].insertAdjacentElement('afterend', panel);
+  }
+
+  tileEls().forEach((el,i) => {
     el.addEventListener('click', () => {
-      const f = features[parseInt(el.getAttribute('data-feature'),10)];
-      document.querySelectorAll('[data-feature]').forEach(t => t.style.borderColor = '');
-      el.style.borderColor = 'var(--moss)';
-      document.getElementById('featureDetail').innerHTML = `
-        <div class="hero-stat" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:-8px;">
-          <div class="label" style="font-size:14px;color:var(--ink);font-weight:600;">${f.icon} ${f.label}</div>
-          <div style="font-size:13.5px;color:var(--ink-soft);line-height:1.5;">${f.detail}</div>
-        </div>`;
+      if(openFeatureIdx === i) closeFeatureDetail();
+      else openFeatureDetail(i);
     });
   });
   document.getElementById('ctaStart1').addEventListener('click', () => renderAuth());
@@ -1130,26 +1393,57 @@ function renderMonths(){
     { label:t('recurring'), onClick:()=>{ view="recurring"; render(); } },
     { label:t('watchlist'), onClick:openWatchlist },
     { label:'Portfolio', onClick:openPortfolio },
+    { label:t('accountsPage'), onClick:()=>{ view="accounts"; render(); } },
     { label:'Net Worth', onClick:()=>{ view="networth"; render(); } },
-    { label:'Growth', onClick:()=>{ view="growth"; render(); } },
+    { label:t('growthCalc'), onClick:()=>{ view="growth"; render(); } },
     { label:t('settings'), onClick:()=>{ view="settings"; render(); } },
     { label:t('logOut'), onClick:logOut }
   ]);
 
+  const mainArea = document.getElementById('mainArea');
+  const allCats = CATEGORY_ORDER.concat(customCategories.filter(c=>!CATEGORY_ORDER.includes(c)));
+  const searchHtml = `
+    <div class="row" style="margin-bottom:18px;">
+      <div class="field">
+        <input type="text" id="txnSearch" placeholder="Search expenses & income by note or category...">
+      </div>
+    </div>
+    <div id="searchResults"></div>
+  `;
+  const budgetSectionHtml = `
+    <details style="margin-bottom:28px;">
+      <summary style="cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--ink-soft);padding:4px 0;">${t('budgetLimits')} ▾</summary>
+      <p class="hero-body" style="font-size:12.5px;margin:8px 0;">Set a monthly ceiling for any category. Leave blank for no limit.</p>
+      <form id="budgetForm">
+        ${allCats.map(cat => `
+          <div class="row">
+            <div class="field" style="flex:0 0 55%;"><label>${escapeHtml(cat)}</label></div>
+            <div class="field">
+              <input type="number" min="0" step="0.01" class="budget-input" data-cat="${escapeHtml(cat)}"
+                value="${categoryBudgets[cat] != null ? categoryBudgets[cat] : ''}" placeholder="No limit">
+            </div>
+          </div>
+        `).join('')}
+        <button type="submit" class="add" style="margin-top:10px;">${t('saveBudgets')}</button>
+      </form>
+    </details>
+  `;
+
   const byMonth = {};
   expenses.forEach(e => { const k=e.date.slice(0,7); (byMonth[k]=byMonth[k]||[]).push(e); });
   const keys = Object.keys(byMonth).sort().reverse();
-  const mainArea = document.getElementById('mainArea');
 
   if(keys.length === 0){
-    mainArea.innerHTML = '<div class="empty">No expenses yet. Tap + to add your first one.</div>';
+    mainArea.innerHTML = searchHtml + budgetSectionHtml + '<div class="empty" id="monthListContainer">No expenses yet. Tap + to add your first one.</div>';
+    wireBudgetForm();
+    wireTxnSearch();
     return;
   }
-  let html = '';
+  let listHtml = '';
   keys.forEach(key => {
     const entries = byMonth[key];
     const total = entries.reduce((s,e)=>s+e.amount,0);
-    html += `
+    listHtml += `
       <div class="month-card" data-month="${key}">
         <div>
           <div class="month-name">${monthLabel(key)}</div>
@@ -1161,9 +1455,78 @@ function renderMonths(){
         </div>
       </div>`;
   });
-  mainArea.innerHTML = html;
+  mainArea.innerHTML = searchHtml + budgetSectionHtml + `<div id="monthListContainer">${listHtml}</div>`;
   mainArea.querySelectorAll('.month-card').forEach(el => {
     el.addEventListener('click', () => { activeMonth = el.getAttribute('data-month'); view="detail"; render(); });
+  });
+  wireBudgetForm();
+  wireTxnSearch();
+}
+
+function wireTxnSearch(){
+  const input = document.getElementById('txnSearch');
+  if(!input) return;
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    const container = document.getElementById('monthListContainer');
+    const results = document.getElementById('searchResults');
+    if(!q){
+      if(container) container.style.display = '';
+      results.innerHTML = '';
+      return;
+    }
+    if(container) container.style.display = 'none';
+
+    const expMatches = expenses.filter(e => e.category.toLowerCase().includes(q) || (e.note||'').toLowerCase().includes(q))
+      .map(e => ({ ...e, kind:'expense' }));
+    const incMatches = incomeEntries.filter(i => i.category.toLowerCase().includes(q) || (i.note||'').toLowerCase().includes(q))
+      .map(i => ({ ...i, kind:'income' }));
+    const all = expMatches.concat(incMatches).sort((a,b) => b.date.localeCompare(a.date));
+
+    if(all.length === 0){
+      results.innerHTML = `<div class="empty">No matches for "${escapeHtml(input.value)}".</div>`;
+      return;
+    }
+    results.innerHTML = all.map(item => {
+      const d = new Date(item.date + "T00:00:00");
+      const dateLabel = d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'});
+      const color = item.kind==='income' ? 'var(--moss)' : (CATEGORY_COLORS[item.category] || CATEGORY_COLORS.Other);
+      const sign = item.kind==='income' ? '+' : '';
+      return `
+        <div class="entry-row" data-jump="${item.date.slice(0,7)}" style="cursor:pointer;">
+          <div class="dot" style="background:${color}"></div>
+          <div class="entry-info">
+            <div class="entry-cat">${escapeHtml(item.category)}</div>
+            <div class="entry-note">${dateLabel}${item.note ? ' · ' + escapeHtml(item.note) : ''}</div>
+          </div>
+          <div class="entry-amount" style="${item.kind==='income'?'color:var(--moss);':''}">${sign}${fmt(item.amount)}</div>
+        </div>`;
+    }).join('');
+    results.querySelectorAll('[data-jump]').forEach(row => {
+      row.addEventListener('click', () => { activeMonth = row.getAttribute('data-jump'); view="detail"; render(); });
+    });
+  });
+}
+
+function wireBudgetForm(){
+  const form = document.getElementById('budgetForm');
+  if(!form) return;
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const inputs = document.querySelectorAll('.budget-input');
+    for(const input of inputs){
+      const cat = input.getAttribute('data-cat');
+      const val = input.value.trim();
+      if(val === ''){
+        delete categoryBudgets[cat];
+        await sb.from('category_budgets').delete().eq('user_id', currentUser.id).eq('category', cat);
+      }else{
+        const num = parseFloat(val);
+        categoryBudgets[cat] = num;
+        await sb.from('category_budgets').upsert({ user_id: currentUser.id, category: cat, monthly_limit: num });
+      }
+    }
+    alert('Budgets saved.');
   });
 }
 
@@ -1266,8 +1629,8 @@ function renderDetail(monthKey){
       const savedClamped = Math.max(0, incomeTotal - total);
       const overspent = Math.max(0, total - incomeTotal);
       const savingsSegments = overspent > 0
-        ? [{ label:'Spent (income)', value:spentClamped, color:'#22281F' }, { label:'Over budget', value:overspent, color:'#A8462F' }]
-        : [{ label:'Spent', value:spentClamped, color:'#22281F' }, { label:'Saved', value:savedClamped, color:'#55694A' }];
+        ? [{ label:'Spent (income)', value:spentClamped, color:'var(--ink)' }, { label:'Over budget', value:overspent, color:'var(--rust)' }]
+        : [{ label:'Spent', value:spentClamped, color:'var(--ink)' }, { label:'Saved', value:savedClamped, color:'var(--moss)' }];
       savingsDonut = `
         <div class="chart-block">
           <div class="chart-title">Spent vs. saved</div>
@@ -1281,6 +1644,39 @@ function renderDetail(monthKey){
     chartsHtml = `<div class="charts-row">${categoryDonut}${savingsDonut}</div>`;
   }
 
+  // Month-over-month analytics
+  let analyticsHtml = '';
+  const analytics = computeAnalytics(monthKey);
+  if(analytics.curTotal > 0 || analytics.prevTotal > 0){
+    const totalDir = analytics.totalChangePct == null ? 'flat' : (analytics.totalChangePct > 0 ? 'up' : (analytics.totalChangePct < 0 ? 'down' : 'flat'));
+    const totalPctText = analytics.totalChangePct == null ? 'No prior month to compare' : `${analytics.totalChangePct>0?'+':''}${analytics.totalChangePct.toFixed(1)}%`;
+    let rows = `
+      <div class="trend-row total">
+        <span>Expenses</span>
+        <span class="trend-pct ${totalDir}">${totalPctText}</span>
+      </div>`;
+    analytics.categoryChanges.slice(0,6).forEach(c => {
+      const dir = c.pct == null ? 'flat' : (c.pct > 0 ? 'up' : (c.pct < 0 ? 'down' : 'flat'));
+      const pctText = c.pct == null ? 'New' : `${c.pct>0?'+':''}${c.pct.toFixed(1)}%`;
+      rows += `
+        <div class="trend-row">
+          <span>${escapeHtml(c.cat)}</span>
+          <span class="trend-pct ${dir}">${pctText}</span>
+        </div>`;
+    });
+
+    let insightsHtml = '';
+    analytics.insights.forEach(ins => {
+      insightsHtml += `<div class="insight-card">You spent ${fmt(ins.diff)} more on <strong>${escapeHtml(ins.cat)}</strong> than your 3-month average (${fmt(ins.avg3mo)}).</div>`;
+    });
+
+    analyticsHtml = `
+      <div class="section-label">${t("monthVsLast")}</div>
+      ${rows}
+      ${insightsHtml}
+    `;
+  }
+
   document.getElementById('mainArea').innerHTML = `
     <div class="networth-summary">
       <div class="nw-card"><div class="label">${t('incomeIn')} ${monthLabel(monthKey)}</div><div class="value" style="color:var(--moss);">${fmt(incomeTotal)}</div></div>
@@ -1288,6 +1684,7 @@ function renderDetail(monthKey){
       <div class="nw-card highlight"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--rust);':''}">${fmt(remaining)}</div></div>
     </div>
     ${chartsHtml}
+    ${analyticsHtml}
     ${budgetHtml}
     ${incomeHtml}
     <div class="section-label">${t('entries')}</div>
@@ -1297,33 +1694,21 @@ function renderDetail(monthKey){
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
 
   document.querySelectorAll('.entry-row[data-income-id]').forEach(row => {
-    row.addEventListener('click', async (e) => {
+    row.addEventListener('click', (e) => {
       if(e.target.closest('.entry-del')) return;
       const id = row.getAttribute('data-income-id');
       const item = incomeEntries.find(i => i.id === id);
       if(!item) return;
-      const input = prompt(`Update this income entry (${item.category})\nCurrent: ${fmt(item.amount)}\n\nEnter the new amount:`);
-      if(input === null) return;
-      const val = parseFloat(input);
-      if(isNaN(val) || val <= 0) return;
-      item.amount = val;
-      render();
-      await sb.from('income_entries').update({ amount: val }).eq('id', id);
+      openEditModal('income', item);
     });
   });
   document.querySelectorAll('.entry-row[data-id]').forEach(row => {
-    row.addEventListener('click', async (e) => {
+    row.addEventListener('click', (e) => {
       if(e.target.closest('.entry-del')) return;
       const id = row.getAttribute('data-id');
       const item = expenses.find(x => x.id === id);
       if(!item) return;
-      const input = prompt(`Update this expense (${item.category})\nCurrent: ${fmt(item.amount)}\n\nEnter the new amount:`);
-      if(input === null) return;
-      const val = parseFloat(input);
-      if(isNaN(val) || val <= 0) return;
-      item.amount = val;
-      render();
-      await sb.from('expenses').update({ amount: val }).eq('id', id);
+      openEditModal('expense', item);
     });
   });
 
@@ -1358,7 +1743,7 @@ function renderDetail(monthKey){
 }
 
 function renderRecurring(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('recurring')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Bills`;
   document.getElementById('pageSub').innerHTML = '';
 
   const mainArea = document.getElementById('mainArea');
@@ -1370,6 +1755,37 @@ function renderRecurring(){
 
   const monthlyTotal = recurringTemplates.reduce((s,tpl) => s + tpl.amount, 0);
 
+  function nextDueDate(tpl){
+    const today = new Date(); today.setHours(0,0,0,0);
+    let mk = currentMonthKey();
+    let day = Math.min(tpl.day, daysInMonth(mk));
+    let due = new Date(Number(mk.split('-')[0]), Number(mk.split('-')[1])-1, day);
+    if(due < today){
+      mk = nextMonthKey(mk);
+      day = Math.min(tpl.day, daysInMonth(mk));
+      due = new Date(Number(mk.split('-')[0]), Number(mk.split('-')[1])-1, day);
+    }
+    return due;
+  }
+
+  const dueSoon = recurringTemplates
+    .map(tpl => ({ tpl, due: nextDueDate(tpl) }))
+    .sort((a,b) => a.due - b.due)
+    .slice(0,6);
+
+  let dueSoonHtml = `<div class="section-label">Due soon</div>`;
+  dueSoon.forEach(({tpl,due}) => {
+    const dateLabel = due.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+    dueSoonHtml += `
+      <div class="trend-row">
+        <span>${escapeHtml(tpl.note || tpl.category)}</span>
+        <span style="display:flex;gap:16px;align-items:center;">
+          <span style="color:var(--ink-soft);font-size:12.5px;">${dateLabel}</span>
+          <span style="font-family:ui-monospace, SF Mono, Menlo, monospace;font-weight:600;">${fmt(tpl.amount)}</span>
+        </span>
+      </div>`;
+  });
+
   const byCategory = {};
   recurringTemplates.forEach(tpl => {
     const cat = tpl.category || 'Other';
@@ -1380,11 +1796,12 @@ function renderRecurring(){
   );
 
   let html = `
-    <div class="total-block">
-      <div class="total-label">${t('committedMonthly')}</div>
+    ${dueSoonHtml}
+    <div class="total-block" style="margin-top:28px;">
+      <div class="total-label">Monthly committed bills</div>
       <div class="total-amount">${fmt(monthlyTotal)}</div>
     </div>
-    <p class="hero-body" style="font-size:12.5px;margin:-10px 0 4px;">Tap any bill to update its amount — handy when rent or a subscription price changes.</p>
+    <p class="hero-body" style="font-size:12.5px;margin:-10px 0 4px;">Tap any bill below to log this month's payment right now. Use ✎ to change the amount instead.</p>
   `;
 
   orderedCats.forEach(cat => {
@@ -1413,7 +1830,6 @@ function renderRecurring(){
   });
 
   mainArea.innerHTML = html;
-  mainArea.insertAdjacentHTML('afterbegin', "<p class=\"hero-body\" style=\"font-size:12.5px;margin:-4px 0 14px;\">Tap any bill to log this month's payment right now — no need to open Add. Use ✎ to change the amount instead.</p>");
 
   mainArea.querySelectorAll('.recur-card').forEach(row => {
     row.addEventListener('click', async (e) => {
@@ -1476,18 +1892,39 @@ function renderNetWorth(){
   document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('netWorth')}`;
   document.getElementById('pageSub').innerHTML = '';
 
-  const totalAssets = netWorthItems.filter(i => ASSET_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
-  const totalLiabilities = netWorthItems.filter(i => LIABILITY_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
+  // Net worth now pulls from three sources so nothing has to be entered twice:
+  // 1) Accounts you've added, 2) your Portfolio's live market value,
+  // 3) manual items for things that aren't accounts (a car, property, etc.)
+  const accountAssets = accounts.filter(a => !ACCOUNT_LIABILITY_TYPES.includes(a.type)).reduce((s,a)=>s+a.balance,0);
+  const accountDebts  = accounts.filter(a =>  ACCOUNT_LIABILITY_TYPES.includes(a.type)).reduce((s,a)=>s+a.balance,0);
+
+  let portfolioValue = 0;
+  portfolio.forEach(p => {
+    const q = quoteCache[p.symbol];
+    if(q && q !== 'error') portfolioValue += (q.price * p.shares) * exchangeRate;
+  });
+
+  const manualAssets = netWorthItems.filter(i => ASSET_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
+  const manualDebts  = netWorthItems.filter(i => LIABILITY_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
+
+  const totalAssets = accountAssets + portfolioValue + manualAssets;
+  const totalLiabilities = accountDebts + manualDebts;
   const netWorth = totalAssets - totalLiabilities;
 
   let chartsHtml = '';
   if(totalAssets > 0 || totalLiabilities > 0){
     let blocks = '';
     if(totalAssets > 0){
-      const assetSegments = ASSET_CATS.map(cat => ({
-        label: cat, value: netWorthItems.filter(i=>i.category===cat).reduce((s,i)=>s+i.balance,0),
-        color: NET_WORTH_COLORS[cat]
-      })).filter(s=>s.value>0);
+      const assetSegments = [];
+      ACCOUNT_TYPES.filter(t => !ACCOUNT_LIABILITY_TYPES.includes(t)).forEach(type => {
+        const v = accounts.filter(a=>a.type===type).reduce((s,a)=>s+a.balance,0);
+        if(v > 0) assetSegments.push({ label:type, value:v, color: NET_WORTH_COLORS[type] || getSymbolColor(type) });
+      });
+      if(portfolioValue > 0) assetSegments.push({ label:'Investments (portfolio)', value:portfolioValue, color:NET_WORTH_COLORS['Investments'] });
+      ASSET_CATS.forEach(cat => {
+        const v = netWorthItems.filter(i=>i.category===cat).reduce((s,i)=>s+i.balance,0);
+        if(v > 0) assetSegments.push({ label:cat+' (manual)', value:v, color: NET_WORTH_COLORS[cat] || getSymbolColor(cat) });
+      });
       blocks += `
         <div class="chart-block">
           <div class="chart-title">Assets breakdown</div>
@@ -1498,10 +1935,15 @@ function renderNetWorth(){
         </div>`;
     }
     if(totalLiabilities > 0){
-      const liabSegments = LIABILITY_CATS.map(cat => ({
-        label: cat, value: netWorthItems.filter(i=>i.category===cat).reduce((s,i)=>s+i.balance,0),
-        color: NET_WORTH_COLORS[cat]
-      })).filter(s=>s.value>0);
+      const liabSegments = [];
+      ACCOUNT_LIABILITY_TYPES.forEach(type => {
+        const v = accounts.filter(a=>a.type===type).reduce((s,a)=>s+a.balance,0);
+        if(v > 0) liabSegments.push({ label:type, value:v, color: NET_WORTH_COLORS[type] || getSymbolColor(type) });
+      });
+      LIABILITY_CATS.forEach(cat => {
+        const v = netWorthItems.filter(i=>i.category===cat).reduce((s,i)=>s+i.balance,0);
+        if(v > 0) liabSegments.push({ label:cat+' (manual)', value:v, color: NET_WORTH_COLORS[cat] || getSymbolColor(cat) });
+      });
       blocks += `
         <div class="chart-block">
           <div class="chart-title">Liabilities breakdown</div>
@@ -1514,6 +1956,12 @@ function renderNetWorth(){
     chartsHtml = `<div class="charts-row">${blocks}</div>`;
   }
 
+  const sourceNote = `
+    <div class="insight-card" style="border-left-color:var(--moss);">
+      Pulling from <strong>${accounts.length}</strong> account${accounts.length===1?'':'s'}${portfolioValue>0?` and your portfolio (${fmt(portfolioValue)})`:''}${netWorthItems.length>0?` plus ${netWorthItems.length} manual item${netWorthItems.length===1?'':'s'}`:''}.
+      Update account balances on the Accounts page — no need to re-enter them here.
+    </div>`;
+
   let html = `
     <div class="networth-summary">
       <div class="nw-card"><div class="label">${t('totalAssets')}</div><div class="value">${fmt(totalAssets)}</div></div>
@@ -1521,7 +1969,9 @@ function renderNetWorth(){
       <div class="nw-card highlight"><div class="label">${t('netWorthLabel')}</div><div class="value">${fmt(netWorth)}</div></div>
     </div>
     ${chartsHtml}
-    <p class="hero-body" style="font-size:12.5px;margin:-4px 0 18px;">Tap any account below to make a payment (debts) or update its balance (assets).</p>
+    ${sourceNote}
+    <div class="section-label">Other assets &amp; debts</div>
+    <p class="hero-body" style="font-size:12.5px;margin:-6px 0 14px;">For things that aren't accounts — a car, property, or anything else you want counted. Tap any to update it.</p>
 
     <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
       <select id="nwCategory">
@@ -1533,8 +1983,8 @@ function renderNetWorth(){
         </optgroup>
       </select>
       <div class="row">
-        <div class="field"><input type="text" id="nwLabel" placeholder="e.g. TD Chequing"></div>
-        <div class="field"><input type="number" id="nwBalance" placeholder="Balance" step="0.01" min="0"></div>
+        <div class="field"><input type="text" id="nwLabel" placeholder="e.g. 2019 Honda Civic"></div>
+        <div class="field"><input type="number" id="nwBalance" placeholder="Value" step="0.01" min="0"></div>
       </div>
       <button type="button" class="add" id="addNwBtn">${t('addItem')}</button>
     </div>
@@ -1624,6 +2074,201 @@ async function addNetWorthItem(){
   renderNetWorth();
 }
 
+/* ================= Accounts ================= */
+const ACCOUNT_ICONS = {
+  "Chequing":"🏦", "Savings":"🏦", "Cash":"💵", "Credit Card":"💳",
+  "Investment":"📈", "Loan":"📄", "Mortgage":"🏠"
+};
+
+function renderAccounts(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('accountsPage')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const totalAssets = accounts.filter(a => !ACCOUNT_LIABILITY_TYPES.includes(a.type)).reduce((s,a)=>s+a.balance,0);
+  const totalLiabilities = accounts.filter(a => ACCOUNT_LIABILITY_TYPES.includes(a.type)).reduce((s,a)=>s+a.balance,0);
+
+  let html = `
+    <div class="networth-summary">
+      <div class="nw-card"><div class="label">Total in accounts</div><div class="value">${fmt(totalAssets)}</div></div>
+      <div class="nw-card"><div class="label">Total owed</div><div class="value">${fmt(totalLiabilities)}</div></div>
+      <div class="nw-card highlight"><div class="label">Net</div><div class="value">${fmt(totalAssets-totalLiabilities)}</div></div>
+    </div>
+    <p class="hero-body" style="font-size:12.5px;margin:-4px 0 18px;">Tap any account to update its balance. All balances here are entered by you — Moneta Compass never connects to your bank.</p>
+
+    <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
+      <div class="row">
+        <div class="field"><input type="text" id="acctName" placeholder="Account name, e.g. TD Chequing"></div>
+        <div class="field" style="flex:0 0 150px;">
+          <select id="acctType">${ACCOUNT_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><input type="text" id="acctInstitution" placeholder="Institution (optional)"></div>
+        <div class="field" style="flex:0 0 120px;"><input type="number" id="acctBalance" placeholder="Balance" step="0.01" min="0"></div>
+      </div>
+      <button type="button" class="add" id="addAcctBtn">Add account</button>
+    </div>
+  `;
+
+  if(accounts.length === 0){
+    html += '<div class="empty">No accounts yet. Add your chequing, savings, credit cards, or loans above — everything here is entered manually, nothing connects to your bank.</div>';
+  }else{
+    ACCOUNT_TYPES.forEach(type => {
+      const items = accounts.filter(a => a.type === type);
+      if(items.length === 0) return;
+      const subtotal = items.reduce((s,a)=>s+a.balance,0);
+      html += `
+        <div class="section-label" style="display:flex;justify-content:space-between;">
+          <span>${ACCOUNT_ICONS[type]||''} ${type}</span><span>${fmt(subtotal)}</span>
+        </div>`;
+      items.forEach(a => {
+        html += `
+          <div class="nw-item-row" data-id="${a.id}" data-type="${a.type}" style="cursor:pointer;">
+            <div>
+              <div class="nw-item-label">${escapeHtml(a.name)}</div>
+              ${a.institution ? `<div class="stock-meta">${escapeHtml(a.institution)}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="nw-item-balance">${fmt(a.balance)}</div>
+              <button class="stock-del" data-id="${a.id}" aria-label="Remove">✕</button>
+            </div>
+          </div>`;
+      });
+    });
+  }
+
+  if(accounts.length >= 2){
+    html += `
+      <div class="section-label">Transfer between accounts</div>
+      <p class="hero-body" style="font-size:12.5px;margin:-4px 0 14px;">Moves money between your own accounts without counting as an expense or income.</p>
+      <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
+        <div class="row">
+          <div class="field">
+            <label style="font-family:var(--font-sans);font-size:11px;color:var(--ink-soft);">From</label>
+            <select id="transferFrom">${accounts.map(a=>`<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('')}</select>
+          </div>
+          <div class="field">
+            <label style="font-family:var(--font-sans);font-size:11px;color:var(--ink-soft);">To</label>
+            <select id="transferTo">${accounts.map(a=>`<option value="${a.id}">${escapeHtml(a.name)}</option>`).join('')}</select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="field"><input type="number" id="transferAmount" placeholder="Amount" step="0.01" min="0.01"></div>
+          <div class="field"><input type="text" id="transferNote" placeholder="Note (optional)"></div>
+        </div>
+        <button type="button" class="add" id="doTransferBtn">Transfer</button>
+      </div>`;
+
+    if(transfers.length > 0){
+      html += `<div class="section-label">Recent transfers</div>`;
+      transfers.slice(0,8).forEach(tr => {
+        const fromAcct = accounts.find(a=>a.id===tr.fromAccountId);
+        const toAcct = accounts.find(a=>a.id===tr.toAccountId);
+        html += `
+          <div class="trend-row">
+            <span>${fromAcct?escapeHtml(fromAcct.name):'Deleted account'} → ${toAcct?escapeHtml(toAcct.name):'Deleted account'}${tr.note?` · ${escapeHtml(tr.note)}`:''}</span>
+            <span style="font-family:ui-monospace, SF Mono, Menlo, monospace;">${fmt(tr.amount)}</span>
+          </div>`;
+      });
+    }
+  }
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('addAcctBtn').addEventListener('click', addAccount);
+  const transferBtn = document.getElementById('doTransferBtn');
+  if(transferBtn) transferBtn.addEventListener('click', doTransfer);
+
+  document.querySelectorAll('#mainArea .nw-item-row').forEach(row => {
+    row.addEventListener('click', async (e) => {
+      if(e.target.closest('.stock-del')) return;
+      const id = row.getAttribute('data-id');
+      const type = row.getAttribute('data-type');
+      const acct = accounts.find(a => a.id === id);
+      if(!acct) return;
+
+      let newBalance;
+      if(ACCOUNT_LIABILITY_TYPES.includes(type)){
+        const input = prompt(`Make a payment toward "${acct.name}"\nCurrent balance: ${fmt(acct.balance)}\n\nHow much are you paying?`);
+        if(input === null) return;
+        const payment = parseFloat(input);
+        if(isNaN(payment) || payment <= 0) return;
+        newBalance = Math.max(0, acct.balance - payment);
+      }else{
+        const input = prompt(`Update balance for "${acct.name}"\nCurrent balance: ${fmt(acct.balance)}\n\nEnter the new balance:`);
+        if(input === null) return;
+        const val = parseFloat(input);
+        if(isNaN(val) || val < 0) return;
+        newBalance = val;
+      }
+
+      acct.balance = newBalance;
+      renderAccounts();
+      await sb.from('accounts').update({ balance: newBalance }).eq('id', id);
+    });
+  });
+  document.querySelectorAll('#mainArea .nw-item-row .stock-del').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      accounts = accounts.filter(a => a.id !== id);
+      render();
+      await sb.from('accounts').delete().eq('id', id);
+    });
+  });
+}
+
+async function addAccount(){
+  const name = document.getElementById('acctName').value.trim();
+  const type = document.getElementById('acctType').value;
+  const institution = document.getElementById('acctInstitution').value.trim();
+  const balance = parseFloat(document.getElementById('acctBalance').value) || 0;
+  if(!name) return;
+
+  const { data, error } = await sb.from('accounts').insert({
+    user_id: currentUser.id, name, type, currency: userSettings.currency, balance, institution: institution || null
+  }).select().single();
+  if(error){ alert(error.message || 'Could not add that account.'); return; }
+
+  accounts.push({ id:data.id, name, type, currency:userSettings.currency, balance, institution });
+  renderAccounts();
+}
+
+async function doTransfer(){
+  const fromId = document.getElementById('transferFrom').value;
+  const toId = document.getElementById('transferTo').value;
+  const amount = parseFloat(document.getElementById('transferAmount').value);
+  const note = document.getElementById('transferNote').value.trim();
+
+  if(!amount || amount <= 0) return;
+  if(fromId === toId){ alert('Pick two different accounts to transfer between.'); return; }
+
+  const fromAcct = accounts.find(a => a.id === fromId);
+  const toAcct = accounts.find(a => a.id === toId);
+  if(!fromAcct || !toAcct) return;
+
+  const date = `${currentMonthKey()}-${pad2(currentDay())}`;
+  const newFromBalance = fromAcct.balance - amount;
+  const newToBalance = toAcct.balance + amount;
+
+  try{
+    const { data, error } = await sb.from('transfers').insert({
+      user_id: currentUser.id, from_account_id: fromId, to_account_id: toId, amount, note: note||null, date
+    }).select().single();
+    if(error) throw error;
+
+    await sb.from('accounts').update({ balance:newFromBalance }).eq('id', fromId);
+    await sb.from('accounts').update({ balance:newToBalance }).eq('id', toId);
+
+    fromAcct.balance = newFromBalance;
+    toAcct.balance = newToBalance;
+    transfers.unshift({ id:data.id, fromAccountId:fromId, toAccountId:toId, amount, note, date });
+    renderAccounts();
+  }catch(err){
+    alert(err.message || 'Could not complete that transfer.');
+  }
+}
+
 /* ================= Growth Calculator ================= */
 function computeGrowth(principal, monthlyContribution, annualRatePct, years, inflationPct){
   const monthlyRate = (annualRatePct/100) / 12;
@@ -1644,7 +2289,7 @@ function computeGrowth(principal, monthlyContribution, annualRatePct, years, inf
 }
 
 function renderGrowthCalculator(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Growth Calculator`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('growthCalc')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   document.getElementById('mainArea').innerHTML = `
@@ -1694,22 +2339,182 @@ function renderGrowthCalculator(){
     const labels = result.nominalByYear.map((_,i) => `Y${i}`);
     document.getElementById('gcChart').innerHTML = lineChartSVG(
       [
-        { label:'Nominal value', color:'#55694A', points:result.nominalByYear },
-        { label:'Inflation-adjusted', color:'#A8462F', points:result.realByYear },
+        { label:'Nominal value', color:'var(--moss)', points:result.nominalByYear },
+        { label:'Inflation-adjusted', color:'var(--rust)', points:result.realByYear },
         { label:'Total contributed', color:'#5B7CA8', points:result.contributedByYear }
       ],
       labels,
       { yFormat: v => fmt(v).replace(/\.00$/,''), tooltipFormat: fmt }
     );
     document.getElementById('gcLegend').innerHTML = `
-      <div class="legend-row"><span class="legend-dot" style="background:#55694A"></span><span class="legend-label">Nominal value</span><span class="legend-value">${fmt(result.finalNominal)}</span></div>
-      <div class="legend-row"><span class="legend-dot" style="background:#A8462F"></span><span class="legend-label">Inflation-adjusted value</span><span class="legend-value">${fmt(result.finalReal)}</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--moss)"></span><span class="legend-label">Nominal value</span><span class="legend-value">${fmt(result.finalNominal)}</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--rust)"></span><span class="legend-label">Inflation-adjusted value</span><span class="legend-value">${fmt(result.finalReal)}</span></div>
       <div class="legend-row"><span class="legend-dot" style="background:#5B7CA8"></span><span class="legend-label">Total contributed</span><span class="legend-value">${fmt(result.totalContributed)}</span></div>
     `;
   }
 
   inputs.forEach(el => el.addEventListener('input', recalc));
   recalc();
+}
+
+function csvEscape(val){
+  const s = String(val == null ? '' : val);
+  if(s.includes(',') || s.includes('"') || s.includes('\n')){
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function exportDataAsCSV(){
+  const lines = [];
+
+  lines.push('EXPENSES');
+  lines.push(['Date','Category','Amount','Note','Recurring'].join(','));
+  expenses.forEach(e => {
+    lines.push([e.date, csvEscape(e.category), e.amount, csvEscape(e.note), e.recurringId ? 'Yes' : 'No'].join(','));
+  });
+  lines.push('');
+
+  lines.push('INCOME');
+  lines.push(['Date','Category','Amount','Note'].join(','));
+  incomeEntries.forEach(i => {
+    lines.push([i.date, csvEscape(i.category), i.amount, csvEscape(i.note)].join(','));
+  });
+  lines.push('');
+
+  lines.push('ACCOUNTS');
+  lines.push(['Name','Type','Institution','Balance'].join(','));
+  accounts.forEach(a => {
+    lines.push([csvEscape(a.name), csvEscape(a.type), csvEscape(a.institution), a.balance].join(','));
+  });
+  lines.push('');
+
+  lines.push('TRANSFERS');
+  lines.push(['Date','From','To','Amount','Note'].join(','));
+  transfers.forEach(tr => {
+    const from = accounts.find(a=>a.id===tr.fromAccountId);
+    const to = accounts.find(a=>a.id===tr.toAccountId);
+    lines.push([tr.date, csvEscape(from?from.name:''), csvEscape(to?to.name:''), tr.amount, csvEscape(tr.note)].join(','));
+  });
+
+  const csvContent = lines.join('\n');
+  const blob = new Blob([csvContent], { type:'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `moneta-compass-export-${currentMonthKey()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function renderAvatarBuilder(cfg){
+  const panel = document.getElementById('avatarBuilderPanel');
+  const swatchRow = (label, id, colors, current) => `
+    <div style="margin-bottom:10px;">
+      <label style="font-family:var(--font-sans);font-size:11px;color:var(--ink-soft);display:block;margin-bottom:6px;">${label}</label>
+      <div style="display:flex;gap:8px;" id="${id}">
+        ${colors.map(c => `<button type="button" data-color="${c}" style="width:28px;height:28px;border-radius:50%;background:${c};border:2px solid ${c===current?'var(--ink)':'transparent'};cursor:pointer;"></button>`).join('')}
+      </div>
+    </div>`;
+  const styleRow = (label, id, options, current) => `
+    <div style="margin-bottom:10px;">
+      <label style="font-family:var(--font-sans);font-size:11px;color:var(--ink-soft);display:block;margin-bottom:6px;">${label}</label>
+      <div style="display:flex;gap:8px;" id="${id}">
+        ${options.map(o => `<button type="button" class="stop-btn" data-style="${o}" style="${o===current?'border-color:var(--moss);color:var(--ink);':''}">${o}</button>`).join('')}
+      </div>
+    </div>`;
+
+  panel.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--paper-line);border-radius:8px;padding:16px;margin-bottom:18px;">
+      <div style="display:flex;justify-content:center;margin-bottom:14px;" id="avatarLivePreview">${avatarSVG(cfg, 100)}</div>
+      ${swatchRow('Skin tone', 'pickSkin', AVATAR_SKIN, cfg.skin)}
+      ${swatchRow('Hair color', 'pickHairColor', AVATAR_HAIR_COLORS, cfg.hairColor)}
+      ${styleRow('Hair style', 'pickHairStyle', AVATAR_HAIR_STYLES, cfg.hairStyle)}
+      ${styleRow('Eyes', 'pickEyeStyle', AVATAR_EYE_STYLES, cfg.eyeStyle)}
+      ${swatchRow('Clothing', 'pickClothing', AVATAR_CLOTHING_COLORS, cfg.clothing)}
+      ${swatchRow('Background', 'pickBg', AVATAR_BG_COLORS, cfg.bg)}
+      <div class="modal-actions" style="margin-top:14px;">
+        <button type="button" class="cancel" id="cancelAvatarBtn">Cancel</button>
+        <button type="button" class="add" id="saveAvatarBtn">Save avatar</button>
+      </div>
+    </div>`;
+
+  function refreshPreview(){ document.getElementById('avatarLivePreview').innerHTML = avatarSVG(cfg, 100); }
+  function wireSwatches(id, key){
+    document.querySelectorAll(`#${id} button`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        cfg[key] = btn.getAttribute('data-color');
+        document.querySelectorAll(`#${id} button`).forEach(b => b.style.borderColor = 'transparent');
+        btn.style.borderColor = 'var(--ink)';
+        refreshPreview();
+      });
+    });
+  }
+  function wireStyles(id, key){
+    document.querySelectorAll(`#${id} button`).forEach(btn => {
+      btn.addEventListener('click', () => {
+        cfg[key] = btn.getAttribute('data-style');
+        document.querySelectorAll(`#${id} button`).forEach(b => { b.style.borderColor=''; b.style.color=''; });
+        btn.style.borderColor = 'var(--moss)'; btn.style.color = 'var(--ink)';
+        refreshPreview();
+      });
+    });
+  }
+  wireSwatches('pickSkin','skin'); wireSwatches('pickHairColor','hairColor');
+  wireSwatches('pickClothing','clothing'); wireSwatches('pickBg','bg');
+  wireStyles('pickHairStyle','hairStyle'); wireStyles('pickEyeStyle','eyeStyle');
+
+  document.getElementById('cancelAvatarBtn').addEventListener('click', () => { panel.innerHTML = ''; });
+  document.getElementById('saveAvatarBtn').addEventListener('click', async () => {
+    const { error } = await sb.from('profiles').update({ avatar_type:'custom', avatar_config:cfg, avatar_path:null }).eq('id', currentUser.id);
+    if(error){ alert(error.message || 'Could not save avatar.'); return; }
+    userProfile.avatarType = 'custom'; userProfile.avatarConfig = cfg; userProfile.avatarPath = null; userProfile.avatarUrl = null;
+    renderSettings();
+  });
+}
+
+async function uploadAvatarFile(file){
+  if(!file.type.startsWith('image/')){ alert('Please choose an image file.'); return; }
+  try{
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          const size = 300;
+          const canvas = document.createElement('canvas');
+          canvas.width = size; canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          const scale = Math.max(size/img.width, size/img.height);
+          const w = img.width*scale, h = img.height*scale;
+          ctx.drawImage(img, (size-w)/2, (size-h)/2, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = reject;
+        img.src = reader.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const path = `${currentUser.id}/avatar.jpg`;
+
+    const { error: upErr } = await sb.storage.from('avatars').upload(path, blob, { contentType:'image/jpeg', upsert:true });
+    if(upErr) throw upErr;
+
+    await sb.from('profiles').update({ avatar_type:'upload', avatar_path:path, avatar_config:null }).eq('id', currentUser.id);
+    const { data: signed } = await sb.storage.from('avatars').createSignedUrl(path, 3600);
+
+    userProfile.avatarType = 'upload'; userProfile.avatarPath = path; userProfile.avatarConfig = null;
+    userProfile.avatarUrl = signed ? signed.signedUrl : null;
+    renderSettings();
+  }catch(err){
+    alert(err.message || 'Could not upload that photo.');
+  }
 }
 
 function renderSettings(){
@@ -1722,7 +2527,35 @@ function renderSettings(){
   ];
   const currencies = ['USD','EUR','GBP','CAD','MXN','IRR'];
 
+  const avatarPreview = userProfile.avatarType === 'upload' && userProfile.avatarUrl
+    ? `<img src="${userProfile.avatarUrl}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;">`
+    : userProfile.avatarType === 'custom' && userProfile.avatarConfig
+      ? avatarSVG(userProfile.avatarConfig, 96)
+      : `<div style="width:96px;height:96px;border-radius:50%;background:var(--card);border:1px solid var(--paper-line);display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;color:var(--ink-soft);">No photo</div>`;
+
   document.getElementById('mainArea').innerHTML = `
+    <div class="section-label">Profile</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+      <div id="avatarPreviewBox">${avatarPreview}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button type="button" class="stop-btn" id="buildAvatarBtn">Create avatar</button>
+        <button type="button" class="stop-btn" id="uploadAvatarBtn">Upload photo</button>
+        ${userProfile.avatarType !== 'none' ? `<button type="button" class="stop-btn" id="removeAvatarBtn">Remove picture</button>` : ''}
+      </div>
+      <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
+    </div>
+    <div id="avatarBuilderPanel"></div>
+
+    <div class="row">
+      <div class="field">
+        <label for="usernameInput">Username</label>
+        <input type="text" id="usernameInput" value="${escapeHtml(userProfile.username||'')}" minlength="3" maxlength="20" pattern="[a-zA-Z0-9_]+">
+      </div>
+    </div>
+    <div class="login-error" id="usernameError"></div>
+    <div class="login-msg" id="usernameMsg"></div>
+    <button type="button" class="add" id="saveUsernameBtn" style="width:100%;margin-bottom:28px;">Save username</button>
+
     <div class="section-label">${t('language')}</div>
     <div class="row">
       <div class="field">
@@ -1741,21 +2574,6 @@ function renderSettings(){
       </div>
     </div>
 
-    <div class="section-label">${t('budgetLimits')}</div>
-    <p class="hero-body" style="font-size:13px;">Set a monthly ceiling for any category. Leave blank for no limit.</p>
-    <form id="budgetForm">
-      ${CATEGORY_ORDER.concat(customCategories.filter(c=>!CATEGORY_ORDER.includes(c))).map(cat => `
-        <div class="row">
-          <div class="field" style="flex:0 0 55%;"><label>${escapeHtml(cat)}</label></div>
-          <div class="field">
-            <input type="number" min="0" step="0.01" class="budget-input" data-cat="${escapeHtml(cat)}"
-              value="${categoryBudgets[cat] != null ? categoryBudgets[cat] : ''}" placeholder="No limit">
-          </div>
-        </div>
-      `).join('')}
-      <button type="submit" class="add" style="margin-top:10px;">${t('saveBudgets')}</button>
-    </form>
-
     <div class="section-label">${t('changePassword')}</div>
     <form id="passwordForm">
       <div class="row">
@@ -1768,17 +2586,69 @@ function renderSettings(){
       <button type="submit" class="add" style="margin-top:8px;">${t('updatePassword')}</button>
     </form>
 
+    <div class="section-label">Export your data</div>
+    <p class="hero-body" style="font-size:13px;">Download everything you've entered as a CSV file — a backup that isn't locked inside this app.</p>
+    <button type="button" class="add" id="exportCsvBtn" style="width:100%;margin-bottom:24px;">Download CSV</button>
+
     <div class="section-label">${t('deleteAccount')}</div>
     <p class="hero-body" style="font-size:13px;">Full self-service account deletion isn't wired up yet — it needs a small server-side piece for safety. For now, contact whoever manages this app's Supabase project to remove your account and data.</p>
 
-    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--paper-line);text-align:center;">
-      <a href="https://x.com/MonetaCompass" target="_blank" rel="noopener" style="color:var(--ink-soft);font-size:13px;text-decoration:none;">
-        Follow @MonetaCompass on X →
+    <div class="contact-footer">
+      <div class="contact-label">Contact us</div>
+      <a href="https://x.com/MonetaCompass" target="_blank" rel="noopener" class="contact-x-link" aria-label="Moneta Compass on X">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.36 2H21.5l-7.5 8.57L23 22h-6.72l-5.26-6.9L4.98 22H1.84l8.03-9.17L1 2h6.9l4.77 6.31L18.36 2zm-1.18 18h1.85L7.02 3.9H5.03L17.18 20z"/></svg>
       </a>
     </div>
   `;
 
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('exportCsvBtn').addEventListener('click', exportDataAsCSV);
+
+  document.getElementById('saveUsernameBtn').addEventListener('click', async () => {
+    const newUsername = document.getElementById('usernameInput').value.trim();
+    const errEl = document.getElementById('usernameError');
+    const msgEl = document.getElementById('usernameMsg');
+    errEl.textContent = ''; msgEl.textContent = '';
+    if(!/^[a-zA-Z0-9_]{3,20}$/.test(newUsername)){
+      errEl.textContent = 'Username must be 3-20 characters: letters, numbers, or underscore only.';
+      return;
+    }
+    if(newUsername === userProfile.username){ msgEl.textContent = 'That\'s already your username.'; return; }
+    const { data: existing } = await sb.from('profiles').select('id').eq('username', newUsername).maybeSingle();
+    if(existing){ errEl.textContent = 'That username is already taken.'; return; }
+
+    const { error } = await sb.from('profiles').update({ username: newUsername }).eq('id', currentUser.id);
+    if(error){ errEl.textContent = error.message; return; }
+    userProfile.username = newUsername;
+    msgEl.textContent = 'Username updated.';
+  });
+
+  document.getElementById('buildAvatarBtn').addEventListener('click', () => {
+    const cfg = Object.assign(defaultAvatarConfig(), userProfile.avatarType==='custom' ? userProfile.avatarConfig : {});
+    renderAvatarBuilder(cfg);
+  });
+
+  document.getElementById('uploadAvatarBtn').addEventListener('click', () => {
+    document.getElementById('avatarFileInput').click();
+  });
+  document.getElementById('avatarFileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    await uploadAvatarFile(file);
+  });
+
+  const removeBtn = document.getElementById('removeAvatarBtn');
+  if(removeBtn){
+    removeBtn.addEventListener('click', async () => {
+      if(userProfile.avatarType === 'upload' && userProfile.avatarPath){
+        try{ await sb.storage.from('avatars').remove([userProfile.avatarPath]); }catch(e){}
+      }
+      await sb.from('profiles').update({ avatar_type:'none', avatar_config:null, avatar_path:null }).eq('id', currentUser.id);
+      userProfile.avatarType = 'none'; userProfile.avatarConfig = null; userProfile.avatarPath = null; userProfile.avatarUrl = null;
+      renderSettings();
+    });
+  }
 
   document.getElementById('languageSelect').addEventListener('change', async (e) => {
     userSettings.language = e.target.value;
@@ -1792,24 +2662,6 @@ function renderSettings(){
     await sb.from('user_settings').update({ currency: userSettings.currency }).eq('user_id', currentUser.id);
     await updateExchangeRate();
     render();
-  });
-
-  document.getElementById('budgetForm').addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    const inputs = document.querySelectorAll('.budget-input');
-    for(const input of inputs){
-      const cat = input.getAttribute('data-cat');
-      const val = input.value.trim();
-      if(val === ''){
-        delete categoryBudgets[cat];
-        await sb.from('category_budgets').delete().eq('user_id', currentUser.id).eq('category', cat);
-      }else{
-        const num = parseFloat(val);
-        categoryBudgets[cat] = num;
-        await sb.from('category_budgets').upsert({ user_id: currentUser.id, category: cat, monthly_limit: num });
-      }
-    }
-    alert('Budgets saved.');
   });
 
   document.getElementById('passwordForm').addEventListener('submit', async (ev) => {
@@ -2081,7 +2933,7 @@ async function addHolding(){
 }
 
 async function fetchStockDetails(symbol){
-  const result = { marketCap:null, weekHigh52:null, weekLow52:null, nextEarnings:null, lastEarnings:null };
+  const result = { marketCap:null, weekHigh52:null, weekLow52:null, nextEarnings:null, lastEarnings:null, ytdReturn:null };
   try{
     const { data, error } = await sb.functions.invoke('finnhub-quote', { body: { endpoint:'metric', symbol } });
     if(error) throw error;
@@ -2089,6 +2941,7 @@ async function fetchStockDetails(symbol){
       result.marketCap = data.metric.marketCapitalization || null;
       result.weekHigh52 = data.metric['52WeekHigh'] || null;
       result.weekLow52 = data.metric['52WeekLow'] || null;
+      result.ytdReturn = data.metric['yearToDatePriceReturnDaily'] != null ? data.metric['yearToDatePriceReturnDaily'] : null;
     }
   }catch(e){}
 
@@ -2165,6 +3018,15 @@ function renderStockDetail(symbol){
       <div class="metric-box">
         <div class="metric-label">Open</div>
         <div class="metric-value">${fmtStock(q.open)}</div>
+      </div>`;
+  }
+  if(d && d.ytdReturn != null){
+    const ytdDir = d.ytdReturn > 0 ? 'up' : (d.ytdReturn < 0 ? 'down' : '');
+    const ytdSign = d.ytdReturn > 0 ? '+' : '';
+    metricsHtml += `
+      <div class="metric-box">
+        <div class="metric-label">YTD</div>
+        <div class="metric-value holding-gain ${ytdDir}" style="font-size:16px;">${ytdSign}${d.ytdReturn.toFixed(2)}%</div>
       </div>`;
   }
   metricsHtml += '</div>';
@@ -2361,6 +3223,7 @@ document.getElementById('category').addEventListener('change', async (e) => {
 });
 
 let entryType = 'expense'; // 'expense' | 'income'
+let editingEntry = null; // { type:'expense'|'income', id } or null when adding new
 
 function setEntryType(newType){
   entryType = newType;
@@ -2368,10 +3231,14 @@ function setEntryType(newType){
   document.getElementById('tabIncome').textContent = t('incomeTab');
   document.getElementById('tabExpense').classList.toggle('active', newType==='expense');
   document.getElementById('tabIncome').classList.toggle('active', newType==='income');
-  document.getElementById('modalTitle').textContent = newType==='expense' ? t('addExpense') : t('addIncome');
-  document.getElementById('addSubmitBtn').textContent = newType==='expense' ? t('addExpense') : t('addIncome');
-  document.getElementById('receiptSection').style.display = newType==='expense' ? 'block' : 'none';
-  document.getElementById('recurringSection').style.display = newType==='expense' ? 'flex' : 'none';
+  document.getElementById('modalTitle').textContent = editingEntry
+    ? (newType==='expense' ? 'Edit expense' : 'Edit income')
+    : (newType==='expense' ? t('addExpense') : t('addIncome'));
+  document.getElementById('addSubmitBtn').textContent = editingEntry ? 'Save changes' : (newType==='expense' ? t('addExpense') : t('addIncome'));
+  document.getElementById('receiptSection').style.display = (newType==='expense' && !editingEntry) ? 'block' : 'none';
+  document.getElementById('recurringSection').style.display = (newType==='expense' && !editingEntry) ? 'flex' : 'none';
+  const tabsEl = document.getElementById('tabExpense').parentElement;
+  if(tabsEl) tabsEl.style.display = editingEntry ? 'none' : 'flex';
   const categorySelect = document.getElementById('category');
   if(newType==='income'){
     categorySelect.innerHTML = INCOME_CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('');
@@ -2383,16 +3250,50 @@ document.getElementById('tabExpense').addEventListener('click', () => setEntryTy
 document.getElementById('tabIncome').addEventListener('click', () => setEntryType('income'));
 
 function openModal(){
+  editingEntry = null;
   document.getElementById('monthPicker').value = (view==="detail" && activeMonth) ? activeMonth : currentMonthKey();
   document.getElementById('dayPicker').value = currentDay();
   document.getElementById('recurringCheck').checked = false;
+  document.getElementById('amount').value = '';
+  document.getElementById('note').value = '';
   setEntryType('expense');
+  const acctSelect = document.getElementById('entryAccount');
+  if(accounts.length === 0){
+    acctSelect.innerHTML = `<option value="">No accounts yet — add one from the Accounts page</option>`;
+  }else{
+    acctSelect.innerHTML = accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)} (${a.type})</option>`).join('');
+  }
   receiptInput.value=''; receiptPreview.src=''; receiptPreview.classList.remove('show'); setReceiptStatus('');
   backdrop.classList.add('open');
   document.getElementById('amount').focus();
 }
+
+function openEditModal(type, entry){
+  editingEntry = { type, id: entry.id };
+  setEntryType(type);
+
+  const acctSelect = document.getElementById('entryAccount');
+  if(accounts.length === 0){
+    acctSelect.innerHTML = `<option value="">No accounts yet — add one from the Accounts page</option>`;
+  }else{
+    acctSelect.innerHTML = accounts.map(a => `<option value="${a.id}">${escapeHtml(a.name)} (${a.type})</option>`).join('');
+  }
+
+  document.getElementById('amount').value = entry.amount;
+  document.getElementById('category').value = entry.category;
+  document.getElementById('monthPicker').value = entry.date.slice(0,7);
+  document.getElementById('dayPicker').value = parseInt(entry.date.slice(8,10),10);
+  document.getElementById('note').value = entry.note || '';
+  if(entry.accountId) acctSelect.value = entry.accountId;
+  document.getElementById('recurringCheck').checked = false;
+
+  backdrop.classList.add('open');
+  document.getElementById('amount').focus();
+}
+
 function closeModal(){
   backdrop.classList.remove('open'); entryForm.reset();
+  editingEntry = null;
   receiptInput.value=''; receiptPreview.src=''; receiptPreview.classList.remove('show'); setReceiptStatus('');
 }
 fabAdd.addEventListener('click', openModal);
@@ -2411,31 +3312,39 @@ entryForm.addEventListener('submit', async (ev) => {
   if(!day || day<1) day=1; if(day>31) day=31;
   const category = document.getElementById('category').value;
   const note = document.getElementById('note').value.trim();
-  const isRecurring = entryType==='expense' && document.getElementById('recurringCheck').checked;
+  const isRecurring = entryType==='expense' && !editingEntry && document.getElementById('recurringCheck').checked;
   const date = `${monthVal}-${pad2(day)}`;
+  const accountId = document.getElementById('entryAccount').value || null;
 
   addSubmitBtn.disabled = true;
   try{
-    if(entryType === 'income'){
+    if(editingEntry){
+      const table = editingEntry.type === 'income' ? 'income_entries' : 'expenses';
+      const { error } = await sb.from(table).update({ amount, category, note, date, account_id: accountId }).eq('id', editingEntry.id);
+      if(error) throw error;
+      const arr = editingEntry.type === 'income' ? incomeEntries : expenses;
+      const item = arr.find(x => x.id === editingEntry.id);
+      if(item){ item.amount=amount; item.category=category; item.note=note; item.date=date; item.accountId=accountId; }
+    }else if(entryType === 'income'){
       const { data, error } = await sb.from('income_entries').insert({
-        user_id: currentUser.id, amount, category, note, date
+        user_id: currentUser.id, amount, category, note, date, account_id: accountId
       }).select().single();
       if(error) throw error;
-      incomeEntries.push({ id:data.id, amount, category, note, date });
+      incomeEntries.push({ id:data.id, amount, category, note, date, accountId });
     }else if(isRecurring){
       const { data, error } = await sb.from('recurring_templates').insert({
-        user_id: currentUser.id, amount, category, note, day, start_month: monthVal, skipped_months: []
+        user_id: currentUser.id, amount, category, note, day, start_month: monthVal, skipped_months: [], account_id: accountId
       }).select().single();
       if(error) throw error;
-      recurringTemplates.push({ id:data.id, amount, category, note, day, startMonth:monthVal, skippedMonths:[] });
+      recurringTemplates.push({ id:data.id, amount, category, note, day, startMonth:monthVal, skippedMonths:[], accountId });
       const newOnes = generateRecurringEntries();
       if(newOnes.length) await insertGeneratedEntries(newOnes);
     }else{
       const { data, error } = await sb.from('expenses').insert({
-        user_id: currentUser.id, amount, category, note, date
+        user_id: currentUser.id, amount, category, note, date, account_id: accountId
       }).select().single();
       if(error) throw error;
-      expenses.push({ id:data.id, amount, category, note, date });
+      expenses.push({ id:data.id, amount, category, note, date, accountId });
     }
     activeMonth = monthVal;
     view = "detail";
