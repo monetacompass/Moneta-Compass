@@ -1913,7 +1913,7 @@ async function addSymbol(){
 
 async function fetchQuote(symbol){
   try{
-    const { data, error } = await sb.functions.invoke('finnhub-quote', { body: { endpoint:'quote', symbol } });
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'quote', symbol } });
     if(error) throw error;
     if(!data || (data.c === 0 && data.d === null)){ quoteCache[symbol] = 'error'; return; }
     quoteCache[symbol] = { price:data.c, change:data.d, changePct:data.dp, high:data.h, low:data.l, open:data.o, prevClose:data.pc };
@@ -2083,7 +2083,7 @@ async function addHolding(){
 async function fetchStockDetails(symbol){
   const result = { marketCap:null, weekHigh52:null, weekLow52:null, nextEarnings:null, lastEarnings:null };
   try{
-    const { data, error } = await sb.functions.invoke('finnhub-quote', { body: { endpoint:'metric', symbol } });
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'metric', symbol } });
     if(error) throw error;
     if(data && data.metric){
       result.marketCap = data.metric.marketCapitalization || null;
@@ -2096,7 +2096,7 @@ async function fetchStockDetails(symbol){
     const today = new Date();
     const future = new Date(); future.setDate(future.getDate() + 90);
     const fmt2 = d => d.toISOString().slice(0,10);
-    const { data, error } = await sb.functions.invoke('finnhub-quote', { body: { endpoint:'calendar', symbol, from:fmt2(today), to:fmt2(future) } });
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'calendar', symbol, from:fmt2(today), to:fmt2(future) } });
     if(error) throw error;
     if(data && data.earningsCalendar && data.earningsCalendar.length){
       result.nextEarnings = data.earningsCalendar[0];
@@ -2104,7 +2104,7 @@ async function fetchStockDetails(symbol){
   }catch(e){}
 
   try{
-    const { data, error } = await sb.functions.invoke('finnhub-quote', { body: { endpoint:'earnings', symbol } });
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'earnings', symbol } });
     if(error) throw error;
     if(data && data.length){
       result.lastEarnings = data[0];
