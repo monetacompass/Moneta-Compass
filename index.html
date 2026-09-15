@@ -16,6 +16,16 @@
     --rust: #A8462F;
     --card: #F6F3EA;
   }
+  html[data-theme="dark"]{
+    --paper: #1C201A;
+    --paper-line: #3A4034;
+    --ink: #EDE8DC;
+    --ink-soft: #A9A392;
+    --moss: #7FA06B;
+    --rust: #E08A6D;
+    --card: #262B22;
+  }
+  html, body{ transition: background 0.2s, color 0.2s; }
   *{box-sizing:border-box;}
   body{
     margin:0;
@@ -301,7 +311,10 @@
       <button id="homeBtn" class="back-btn" aria-label="Home" style="display:none;font-size:15px;">🏠</button>
       <h1 id="pageTitle">Moneta Compass</h1>
     </div>
-    <div id="pageSub"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div id="pageSub"></div>
+      <button id="themeToggle" class="back-btn" aria-label="Toggle dark mode" style="font-size:15px;">🌙</button>
+    </div>
   </div>
   <div id="mainArea"><div class="loading">Loading…</div></div>
   <button class="fab" id="fabAdd" aria-label="Add expense or income" style="display:none;"><span class="fab-icon">✎</span><span>Add</span></button>
@@ -368,7 +381,6 @@
 /* ============ CONFIGURE THIS ============ */
 const SUPABASE_URL = "https://jkugdymqpsmtyhckbndu.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_moIwIQRb_PEtHwuO0ZkqUw_XxcJ8m-A";
-const FINNHUB_API_KEY = "dak4jphr01qrg9hr1gn0dak4jphr01qrg9hr1gng";
 /* ========================================= */
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -542,6 +554,20 @@ function applyDirection(){
   document.documentElement.lang = userSettings.language || 'en';
 }
 
+function applyTheme(){
+  const theme = localStorage.getItem('moneta-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeToggle');
+  if(btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
+}
+function toggleTheme(){
+  const current = localStorage.getItem('moneta-theme') || 'light';
+  localStorage.setItem('moneta-theme', current === 'dark' ? 'light' : 'dark');
+  applyTheme();
+}
+applyTheme();
+document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
 const pad2 = n => String(n).padStart(2,'0');
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const currentMonthKey = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth()+1)}`; };
@@ -628,6 +654,51 @@ function donutLegendHTML(segments, formatFn){
   }).join('');
 }
 
+// Builds a simple multi-series line chart. series: [{label, color, points:[y0,y1,...]}]
+// labels: x-axis labels, one per point index.
+function lineChartSVG(series, labels, opts){
+  opts = opts || {};
+  const width = opts.width || 600, height = opts.height || 240;
+  const padL = 54, padR = 16, padT = 16, padB = 30;
+  const plotW = width - padL - padR, plotH = height - padT - padB;
+
+  let allValues = [];
+  series.forEach(s => allValues = allValues.concat(s.points));
+  const maxVal = Math.max(...allValues, 0);
+  const minVal = Math.min(...allValues, 0);
+  const range = (maxVal - minVal) || 1;
+  const n = labels.length;
+
+  const xFor = i => padL + (n<=1 ? 0 : (i/(n-1)) * plotW);
+  const yFor = v => padT + plotH - ((v - minVal)/range) * plotH;
+
+  let gridLines = '';
+  const gridSteps = 4;
+  for(let g=0; g<=gridSteps; g++){
+    const val = minVal + (range * g/gridSteps);
+    const y = yFor(val);
+    gridLines += `<line x1="${padL}" y1="${y}" x2="${width-padR}" y2="${y}" stroke="var(--paper-line)" stroke-width="1"/>`;
+    gridLines += `<text x="${padL-8}" y="${y+4}" font-size="10" fill="var(--ink-soft)" text-anchor="end">${opts.yFormat ? opts.yFormat(val) : Math.round(val)}</text>`;
+  }
+
+  let xLabels = '';
+  const labelStep = Math.max(1, Math.ceil(n/6));
+  labels.forEach((lab,i) => {
+    if(i % labelStep !== 0 && i !== n-1) return;
+    xLabels += `<text x="${xFor(i)}" y="${height-8}" font-size="10" fill="var(--ink-soft)" text-anchor="middle">${lab}</text>`;
+  });
+
+  let linesHtml = '';
+  series.forEach(s => {
+    const pts = s.points.map((v,i) => `${xFor(i)},${yFor(v)}`).join(' ');
+    linesHtml += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+
+  return `<svg viewBox="0 0 ${width} ${height}" width="100%" style="max-width:${width}px;">
+    ${gridLines}${xLabels}${linesHtml}
+  </svg>`;
+}
+
 /* ================= Auth ================= */
 async function boot(){
   const { data } = await sb.auth.getSession();
@@ -702,7 +773,7 @@ function logOut(){
 
 async function renderAuth(){
   view = "auth";
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backToLanding" aria-label="Back">‹</button> Moneta Compass`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backToLanding" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Moneta Compass`;
   document.getElementById('pageSub').innerHTML = '';
   document.getElementById('fabAdd').style.display = 'none';
 
@@ -832,6 +903,7 @@ function render(){
   else if(view === "portfolio") renderPortfolio();
   else if(view === "portfolioDetail") renderStockDetail(activeSymbol);
   else if(view === "networth") renderNetWorth();
+  else if(view === "growth") renderGrowthCalculator();
 }
 function navBar(items){
   const html = items.map((it,i) => `${i>0?'<span class="navsep">·</span>':''}<button class="navlink" data-nav="${i}">${escapeHtml(it.label)}</button>`).join('');
@@ -867,6 +939,7 @@ function renderHome(){
     { icon:'📈', label:t('watchlist'), sub:`${watchlist.length} tracked`, onClick:openWatchlist },
     { icon:'🧭', label:'Portfolio', sub:`${portfolio.length} holdings`, onClick:openPortfolio },
     { icon:'💰', label:'Net Worth', sub:'Assets & debts', onClick:()=>{ view="networth"; render(); } },
+    { icon:'🌱', label:'Growth Calculator', sub:'Future value & inflation', onClick:()=>{ view="growth"; render(); } },
     { icon:'⚙️', label:t('settings'), sub:'Language, currency, budgets', onClick:()=>{ view="settings"; render(); } }
   ];
   const tilesHtml = tiles.map(tile => `
@@ -988,6 +1061,7 @@ function renderPublicLanding(){
     <h2 class="hero-headline">Money you can see is money you can control.</h2>
     <p class="hero-body">Most budgets fail quietly — not from one bad purchase, but from a hundred small ones nobody wrote down. Moneta Compass makes your whole financial picture visible: spending, income, recurring bills, investments, and net worth, all in one place, all free to start.</p>
     <button class="cta" id="ctaStart1">Create your free account</button>
+    <button class="cta" id="tryCalculator" style="background:transparent;color:var(--ink);border:1px solid var(--ink);margin-top:10px;">🌱 Try the Growth Calculator — no sign-up needed</button>
 
     <div class="section-label">What's inside — tap any to learn more</div>
     <div class="dashboard-grid">${featuresHtml}</div>
@@ -1019,6 +1093,7 @@ function renderPublicLanding(){
     });
   });
   document.getElementById('ctaStart1').addEventListener('click', () => renderAuth());
+  document.getElementById('tryCalculator').addEventListener('click', () => { view = "growth"; render(); });
 }
 
 function renderMonths(){
@@ -1029,6 +1104,7 @@ function renderMonths(){
     { label:t('watchlist'), onClick:openWatchlist },
     { label:'Portfolio', onClick:openPortfolio },
     { label:'Net Worth', onClick:()=>{ view="networth"; render(); } },
+    { label:'Growth', onClick:()=>{ view="growth"; render(); } },
     { label:t('settings'), onClick:()=>{ view="settings"; render(); } },
     { label:t('logOut'), onClick:logOut }
   ]);
@@ -1065,7 +1141,7 @@ function renderMonths(){
 }
 
 function renderDetail(monthKey){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${monthLabel(monthKey)}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${monthLabel(monthKey)}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const entries = expenses.filter(e => e.date.slice(0,7) === monthKey);
@@ -1255,7 +1331,7 @@ function renderDetail(monthKey){
 }
 
 function renderRecurring(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('recurring')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('recurring')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const mainArea = document.getElementById('mainArea');
@@ -1300,8 +1376,9 @@ function renderRecurring(){
             <div class="recur-name">${escapeHtml(tpl.note || tpl.category)}</div>
             <div class="recur-meta">day ${tpl.day} of every month · since ${monthLabel(tpl.startMonth)}</div>
           </div>
-          <div style="display:flex;align-items:center;">
+          <div style="display:flex;align-items:center;gap:6px;">
             <div class="recur-amount">${fmt(tpl.amount)}</div>
+            <button class="stop-btn edit-amount-btn" data-id="${tpl.id}" aria-label="Edit amount" title="Edit amount">✎</button>
             <button class="stop-btn" data-id="${tpl.id}">${t('stop')}</button>
           </div>
         </div>`;
@@ -1309,11 +1386,36 @@ function renderRecurring(){
   });
 
   mainArea.innerHTML = html;
+  mainArea.insertAdjacentHTML('afterbegin', "<p class=\"hero-body\" style=\"font-size:12.5px;margin:-4px 0 14px;\">Tap any bill to log this month's payment right now — no need to open Add. Use ✎ to change the amount instead.</p>");
 
   mainArea.querySelectorAll('.recur-card').forEach(row => {
     row.addEventListener('click', async (e) => {
-      if(e.target.closest('.stop-btn')) return;
+      if(e.target.closest('button')) return;
       const id = row.getAttribute('data-id');
+      const tpl = recurringTemplates.find(t => t.id === id);
+      if(!tpl) return;
+      const today = new Date();
+      const monthVal = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+      const date = `${monthVal}-${pad2(today.getDate())}`;
+      const btnAmount = row.querySelector('.recur-amount');
+      const originalText = btnAmount.textContent;
+      try{
+        const { data, error } = await sb.from('expenses').insert({
+          user_id: currentUser.id, amount: tpl.amount, category: tpl.category, note: tpl.note ? `${tpl.note} (payment)` : 'Payment', date
+        }).select().single();
+        if(error) throw error;
+        expenses.push({ id:data.id, amount:tpl.amount, category:tpl.category, note: tpl.note ? `${tpl.note} (payment)` : 'Payment', date });
+        btnAmount.textContent = 'Paid ✓';
+        setTimeout(() => { btnAmount.textContent = originalText; }, 1500);
+      }catch(err){
+        alert(err.message || 'Could not log that payment.');
+      }
+    });
+  });
+  mainArea.querySelectorAll('.edit-amount-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
       const tpl = recurringTemplates.find(t => t.id === id);
       if(!tpl) return;
       const input = prompt(`Update monthly amount for "${tpl.note || tpl.category}"\nCurrent: ${fmt(tpl.amount)}\n\nEnter the new amount:`);
@@ -1326,7 +1428,7 @@ function renderRecurring(){
     });
   });
 
-  mainArea.querySelectorAll('.stop-btn').forEach(btn => {
+  mainArea.querySelectorAll('.stop-btn:not(.edit-amount-btn)').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const id = btn.getAttribute('data-id');
@@ -1344,7 +1446,7 @@ const NET_WORTH_COLORS = {
 };
 
 function renderNetWorth(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('netWorth')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('netWorth')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const totalAssets = netWorthItems.filter(i => ASSET_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
@@ -1495,8 +1597,90 @@ async function addNetWorthItem(){
   renderNetWorth();
 }
 
+/* ================= Growth Calculator ================= */
+function computeGrowth(principal, monthlyContribution, annualRatePct, years, inflationPct){
+  const monthlyRate = (annualRatePct/100) / 12;
+  const months = years * 12;
+  let balance = principal;
+  const nominalByYear = [Math.round(principal)];
+  for(let m=1; m<=months; m++){
+    balance = balance * (1 + monthlyRate) + monthlyContribution;
+    if(m % 12 === 0) nominalByYear.push(Math.round(balance));
+  }
+  const realByYear = nominalByYear.map((val,i) => Math.round(val / Math.pow(1 + inflationPct/100, i)));
+  const totalContributed = principal + monthlyContribution * months;
+  return { nominalByYear, realByYear, totalContributed, finalNominal: nominalByYear[nominalByYear.length-1], finalReal: realByYear[realByYear.length-1] };
+}
+
+function renderGrowthCalculator(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Growth Calculator`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  document.getElementById('mainArea').innerHTML = `
+    <p class="hero-body" style="font-size:13px;">See what an investment could grow into over time — every number below is yours to change.</p>
+
+    <div class="row">
+      <div class="field"><label>Starting amount</label><input type="number" id="gcPrincipal" value="10000" min="0" step="100"></div>
+      <div class="field"><label>Monthly contribution</label><input type="number" id="gcMonthly" value="200" min="0" step="10"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Annual return rate (%)</label><input type="number" id="gcRate" value="7" min="0" max="100" step="0.1"></div>
+      <div class="field"><label>Years</label><input type="number" id="gcYears" value="20" min="1" max="60" step="1"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Annual inflation rate (%)</label><input type="number" id="gcInflation" value="3" min="0" max="30" step="0.1"></div>
+      <div class="field"></div>
+    </div>
+
+    <div class="networth-summary" id="gcResults" style="margin-top:18px;"></div>
+
+    <div class="section-label">Growth over time</div>
+    <div id="gcChart"></div>
+    <div class="legend-list" id="gcLegend" style="margin-top:8px;"></div>
+
+    <p class="hero-body" style="font-size:12px;margin-top:16px;">This is a projection based on the numbers you enter, not a prediction or investment advice. Real returns and inflation vary year to year and aren't guaranteed.</p>
+  `;
+
+  document.getElementById('backBtn').addEventListener('click', () => { view=currentUser?"months":"home"; render(); });
+
+  const inputs = ['gcPrincipal','gcMonthly','gcRate','gcYears','gcInflation'].map(id => document.getElementById(id));
+  function recalc(){
+    const principal = parseFloat(document.getElementById('gcPrincipal').value) || 0;
+    const monthly = parseFloat(document.getElementById('gcMonthly').value) || 0;
+    const rate = parseFloat(document.getElementById('gcRate').value) || 0;
+    const years = Math.max(1, Math.min(60, parseInt(document.getElementById('gcYears').value) || 1));
+    const inflation = parseFloat(document.getElementById('gcInflation').value) || 0;
+
+    const result = computeGrowth(principal, monthly, rate, years, inflation);
+    const totalGrowth = result.finalNominal - result.totalContributed;
+
+    document.getElementById('gcResults').innerHTML = `
+      <div class="nw-card highlight"><div class="label">Future value (nominal)</div><div class="value">${fmt(result.finalNominal)}</div></div>
+      <div class="nw-card"><div class="label">Future value (inflation-adjusted)</div><div class="value">${fmt(result.finalReal)}</div></div>
+      <div class="nw-card"><div class="label">Total contributed</div><div class="value">${fmt(result.totalContributed)}</div></div>
+    `;
+
+    const labels = result.nominalByYear.map((_,i) => `Y${i}`);
+    document.getElementById('gcChart').innerHTML = lineChartSVG(
+      [
+        { label:'Nominal value', color:'#55694A', points:result.nominalByYear },
+        { label:'Inflation-adjusted', color:'#A8462F', points:result.realByYear }
+      ],
+      labels,
+      { yFormat: v => fmt(v).replace(/\.00$/,'') }
+    );
+    document.getElementById('gcLegend').innerHTML = `
+      <div class="legend-row"><span class="legend-dot" style="background:#55694A"></span><span class="legend-label">Nominal value</span><span class="legend-value">${fmt(result.finalNominal)}</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:#A8462F"></span><span class="legend-label">Inflation-adjusted value</span><span class="legend-value">${fmt(result.finalReal)}</span></div>
+    `;
+  }
+
+  inputs.forEach(el => el.addEventListener('input', recalc));
+  recalc();
+}
+
 function renderSettings(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('settings')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('settings')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const languages = [
@@ -1609,7 +1793,7 @@ function renderSettings(){
 }
 
 function renderWatchlist(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('watchlist')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('watchlist')}`;
   navBar([{ label:t('refreshPrices'), onClick: refreshAllQuotes }]);
 
   const mainArea = document.getElementById('mainArea');
@@ -1696,9 +1880,8 @@ async function addSymbol(){
 
 async function fetchQuote(symbol){
   try{
-    const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_API_KEY}`);
-    if(!res.ok) throw new Error('request failed');
-    const data = await res.json();
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'quote', symbol } });
+    if(error) throw error;
     if(!data || (data.c === 0 && data.d === null)){ quoteCache[symbol] = 'error'; return; }
     quoteCache[symbol] = { price:data.c, change:data.d, changePct:data.dp, high:data.h, low:data.l, open:data.o, prevClose:data.pc };
   }catch(e){
@@ -1734,7 +1917,7 @@ function openPortfolio(){
 }
 
 function renderPortfolio(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('portfolio')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('portfolio')}`;
   document.getElementById('pageSub').innerHTML = '';
   const mainArea = document.getElementById('mainArea');
 
@@ -1867,8 +2050,8 @@ async function addHolding(){
 async function fetchStockDetails(symbol){
   const result = { marketCap:null, weekHigh52:null, weekLow52:null, nextEarnings:null, lastEarnings:null };
   try{
-    const res = await fetch(`https://finnhub.io/api/v1/stock/metric?symbol=${encodeURIComponent(symbol)}&metric=all&token=${FINNHUB_API_KEY}`);
-    const data = await res.json();
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'metric', symbol } });
+    if(error) throw error;
     if(data && data.metric){
       result.marketCap = data.metric.marketCapitalization || null;
       result.weekHigh52 = data.metric['52WeekHigh'] || null;
@@ -1880,16 +2063,16 @@ async function fetchStockDetails(symbol){
     const today = new Date();
     const future = new Date(); future.setDate(future.getDate() + 90);
     const fmt2 = d => d.toISOString().slice(0,10);
-    const res = await fetch(`https://finnhub.io/api/v1/calendar/earnings?from=${fmt2(today)}&to=${fmt2(future)}&symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_API_KEY}`);
-    const data = await res.json();
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'calendar', symbol, from:fmt2(today), to:fmt2(future) } });
+    if(error) throw error;
     if(data && data.earningsCalendar && data.earningsCalendar.length){
       result.nextEarnings = data.earningsCalendar[0];
     }
   }catch(e){}
 
   try{
-    const res = await fetch(`https://finnhub.io/api/v1/stock/earnings?symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_API_KEY}`);
-    const data = await res.json();
+    const { data, error } = await sb.functions.invoke('stock-proxy', { body: { endpoint:'earnings', symbol } });
+    if(error) throw error;
     if(data && data.length){
       result.lastEarnings = data[0];
     }
@@ -1899,7 +2082,7 @@ async function fetchStockDetails(symbol){
 }
 
 function renderStockDetail(symbol){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${escapeHtml(symbol)}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${escapeHtml(symbol)}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const q = quoteCache[symbol];
