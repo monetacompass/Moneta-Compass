@@ -32,7 +32,14 @@
     border-bottom:2px solid var(--ink); padding-bottom:10px; margin-bottom:22px; min-height:30px;
   }
   .masthead h1{ font-size:22px; font-weight:600; letter-spacing:0.3px; margin:0; display:flex; align-items:center; gap:10px; }
-  .back-btn{ background:none; border:none; font-family:inherit; font-size:20px; color:var(--ink); cursor:pointer; padding:0; line-height:1; }
+  .back-btn{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    background:var(--card); border:1px solid var(--paper-line);
+    font-family:inherit; font-size:17px; color:var(--ink); cursor:pointer; padding:0; line-height:1;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  .back-btn:hover{ border-color:var(--moss); background:var(--paper); }
   .navlinks{ display:flex; align-items:center; gap:8px; }
   .navlink{
     font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:11.5px; color:var(--ink-soft);
@@ -291,7 +298,7 @@
 <div class="wrap">
   <div class="masthead" id="masthead">
     <div style="display:flex;align-items:center;gap:10px;">
-      <button id="homeBtn" class="back-btn" aria-label="Home" style="display:none;font-size:20px;">🏠</button>
+      <button id="homeBtn" class="back-btn" aria-label="Home" style="display:none;font-size:15px;">🏠</button>
       <h1 id="pageTitle">Moneta Compass</h1>
     </div>
     <div id="pageSub"></div>
@@ -601,6 +608,13 @@ function donutChartSVG(segments, opts){
   return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${circles}</svg>`;
 }
 
+const STOCK_PALETTE = ["#55694A","#A8462F","#5B7CA8","#B08B2E","#8A5A9E","#3E8E7E","#C0703A","#6B4C3A","#4A7C8C","#8C4A6B"];
+function getSymbolColor(symbol){
+  let hash = 0;
+  for(let i=0;i<symbol.length;i++) hash = (hash * 31 + symbol.charCodeAt(i)) >>> 0;
+  return STOCK_PALETTE[hash % STOCK_PALETTE.length];
+}
+
 function donutLegendHTML(segments, formatFn){
   const total = segments.reduce((s,seg)=>s+seg.value,0);
   return segments.filter(s=>s.value>0).map(seg => {
@@ -688,12 +702,12 @@ function logOut(){
 
 async function renderAuth(){
   view = "auth";
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backToLanding" aria-label="Back">←</button> Moneta Compass`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backToLanding" aria-label="Back">‹</button> Moneta Compass`;
   document.getElementById('pageSub').innerHTML = '';
   document.getElementById('fabAdd').style.display = 'none';
 
   document.getElementById('mainArea').innerHTML = `
-    <p class="login-intro">Sign in with your email — this account isn't tied to Claude, it's just yours.</p>
+    <p class="login-intro">Sign in with your email to save your data and pick up right where you left off.</p>
     <div class="auth-tabs">
       <button type="button" class="auth-tab ${authMode==='login'?'active':''}" id="tabLogin">Log in</button>
       <button type="button" class="auth-tab ${authMode==='signup'?'active':''}" id="tabSignup">Sign up</button>
@@ -874,7 +888,7 @@ function renderHome(){
       const pct = Math.min(100, (spent/limit)*100);
       const over = spent > limit;
       budgetHtml += `
-        <div class="budget-row">
+        <div class="budget-row" data-goto-budget="1" style="cursor:pointer;">
           <div class="budget-top">
             <span>${escapeHtml(cat)}</span>
             <span>${fmt(spent)} / ${fmt(limit)}</span>
@@ -904,15 +918,27 @@ function renderHome(){
     <div class="dashboard-grid">${tilesHtml}</div>
 
     <div class="stat-grid">
-      <div class="stat-card"><div class="label">${t('incomeIn')} ${monthName}</div><div class="value" style="color:var(--moss);">${fmt(monthIncome)}</div></div>
-      <div class="stat-card"><div class="label">${t('spentIn')} ${monthName}</div><div class="value">${fmt(monthTotal)}</div></div>
-      <div class="stat-card"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--rust);':''}">${fmt(remaining)}</div></div>
-      <div class="stat-card"><div class="label">${t('committedMonthly')}</div><div class="value">${fmt(recurringMonthlyTotal)}</div></div>
-      <div class="stat-card"><div class="label">${t('holdingsTracked')}</div><div class="value">${portfolio.length + watchlist.length}</div></div>
+      <div class="stat-card" data-goto="detail" style="cursor:pointer;"><div class="label">${t('incomeIn')} ${monthName}</div><div class="value" style="color:var(--moss);">${fmt(monthIncome)}</div></div>
+      <div class="stat-card" data-goto="detail" style="cursor:pointer;"><div class="label">${t('spentIn')} ${monthName}</div><div class="value">${fmt(monthTotal)}</div></div>
+      <div class="stat-card" data-goto="detail" style="cursor:pointer;"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--rust);':''}">${fmt(remaining)}</div></div>
+      <div class="stat-card" data-goto="recurring" style="cursor:pointer;"><div class="label">${t('committedMonthly')}</div><div class="value">${fmt(recurringMonthlyTotal)}</div></div>
+      <div class="stat-card" data-goto="portfolio" style="cursor:pointer;"><div class="label">${t('holdingsTracked')}</div><div class="value">${portfolio.length + watchlist.length}</div></div>
     </div>
 
     ${budgetHtml}
   `;
+
+  document.querySelectorAll('.stat-card[data-goto]').forEach(el => {
+    el.addEventListener('click', () => {
+      const dest = el.getAttribute('data-goto');
+      if(dest === 'detail'){ activeMonth = monthKey; view = "detail"; render(); }
+      else if(dest === 'recurring'){ view = "recurring"; render(); }
+      else if(dest === 'portfolio'){ openPortfolio(); }
+    });
+  });
+  document.querySelectorAll('[data-goto-budget]').forEach(el => {
+    el.addEventListener('click', () => { activeMonth = monthKey; view = "detail"; render(); });
+  });
 
   document.querySelectorAll('.dashboard-tile').forEach(el => {
     el.addEventListener('click', () => { tiles[parseInt(el.getAttribute('data-idx'),10)].onClick(); });
@@ -926,12 +952,18 @@ function renderPublicLanding(){
   });
 
   const features = [
-    { icon:'📒', label:'Budgeting', sub:'Track spending by month' },
-    { icon:'💵', label:'Income', sub:'Watch your balance in real time' },
-    { icon:'↻', label:'Recurring bills', sub:'Rent, subscriptions, auto-tracked' },
-    { icon:'📈', label:'Stock watchlist', sub:'Live prices you follow' },
-    { icon:'🧭', label:'Portfolio', sub:'Real holdings, real gains' },
-    { icon:'💰', label:'Net worth', sub:'Assets minus debts, at a glance' }
+    { icon:'📒', label:'Budgeting', sub:'Track spending by month',
+      detail:"Log every expense in seconds and see it organized automatically by month and category — with charts showing exactly where your money goes, no spreadsheet required." },
+    { icon:'💵', label:'Income', sub:'Watch your balance in real time',
+      detail:"Log what comes in alongside what goes out. Your remaining balance updates the moment you add an expense, so you always know what's actually left to spend." },
+    { icon:'↻', label:'Recurring bills', sub:'Rent, subscriptions, auto-tracked',
+      detail:"Set up rent, subscriptions, or any regular payment once and it logs itself every month after that. Prices change? Update the amount in one tap without re-entering the whole bill." },
+    { icon:'📈', label:'Stock watchlist', sub:'Live prices you follow',
+      detail:"Follow any publicly traded stock with live prices and daily change, plus full details — market cap, day range, 52-week range — the moment you tap in." },
+    { icon:'🧭', label:'Portfolio', sub:'Real holdings, real gains',
+      detail:"Log the shares you actually own and watch real gains and losses move with the market, alongside upcoming and past earnings for every position." },
+    { icon:'💰', label:'Net worth', sub:'Assets minus debts, at a glance',
+      detail:"Add your cash, accounts, investments, and debts in one place. Pay down a loan or watch an investment grow, and your total net worth updates right there." }
   ];
   const featuresHtml = features.map((f,i) => `
     <div class="dashboard-tile" data-feature="${i}">
@@ -957,17 +989,15 @@ function renderPublicLanding(){
     <p class="hero-body">Most budgets fail quietly — not from one bad purchase, but from a hundred small ones nobody wrote down. Moneta Compass makes your whole financial picture visible: spending, income, recurring bills, investments, and net worth, all in one place, all free to start.</p>
     <button class="cta" id="ctaStart1">Create your free account</button>
 
-    <div class="section-label">What's inside — tap any to get started</div>
+    <div class="section-label">What's inside — tap any to learn more</div>
     <div class="dashboard-grid">${featuresHtml}</div>
+    <div id="featureDetail"></div>
 
     <div class="section-label">How it works</div>
     ${stepsHtml}
 
     <div class="section-label">Five habits worth building</div>
     ${tipsHtml}
-
-    <button class="cta" id="ctaStart2">Get started — it's free</button>
-    <p style="text-align:center;font-size:12px;color:var(--ink-soft);margin-top:10px;">No credit card required.</p>
 
     <div style="margin-top:36px;padding-top:16px;border-top:1px solid var(--paper-line);text-align:center;">
       <a href="https://x.com/MonetaCompass" target="_blank" rel="noopener" style="color:var(--ink-soft);font-size:13px;text-decoration:none;">
@@ -977,11 +1007,18 @@ function renderPublicLanding(){
   `;
 
   document.querySelectorAll('[data-feature]').forEach(el => {
-    el.addEventListener('click', () => renderAuth());
+    el.addEventListener('click', () => {
+      const f = features[parseInt(el.getAttribute('data-feature'),10)];
+      document.querySelectorAll('[data-feature]').forEach(t => t.style.borderColor = '');
+      el.style.borderColor = 'var(--moss)';
+      document.getElementById('featureDetail').innerHTML = `
+        <div class="hero-stat" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:-8px;">
+          <div class="label" style="font-size:14px;color:var(--ink);font-weight:600;">${f.icon} ${f.label}</div>
+          <div style="font-size:13.5px;color:var(--ink-soft);line-height:1.5;">${f.detail}</div>
+        </div>`;
+    });
   });
   document.getElementById('ctaStart1').addEventListener('click', () => renderAuth());
-  document.getElementById('ctaStart2').addEventListener('click', () => renderAuth());
-  document.getElementById('ctaStart').addEventListener('click', () => renderAuth());
 }
 
 function renderMonths(){
@@ -1028,7 +1065,7 @@ function renderMonths(){
 }
 
 function renderDetail(monthKey){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${monthLabel(monthKey)}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${monthLabel(monthKey)}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const entries = expenses.filter(e => e.date.slice(0,7) === monthKey);
@@ -1218,7 +1255,7 @@ function renderDetail(monthKey){
 }
 
 function renderRecurring(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${t('recurring')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('recurring')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const mainArea = document.getElementById('mainArea');
@@ -1301,13 +1338,52 @@ function renderRecurring(){
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
 }
 
+const NET_WORTH_COLORS = {
+  "Cash":"#55694A", "Chequing/Savings":"#5B7CA8", "Investments":"#B08B2E", "TFSA/RRSP":"#8A5A9E",
+  "Credit Cards":"#A8462F", "Loans/Debt":"#6B4C3A"
+};
+
 function renderNetWorth(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${t('netWorth')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('netWorth')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const totalAssets = netWorthItems.filter(i => ASSET_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
   const totalLiabilities = netWorthItems.filter(i => LIABILITY_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
   const netWorth = totalAssets - totalLiabilities;
+
+  let chartsHtml = '';
+  if(totalAssets > 0 || totalLiabilities > 0){
+    let blocks = '';
+    if(totalAssets > 0){
+      const assetSegments = ASSET_CATS.map(cat => ({
+        label: cat, value: netWorthItems.filter(i=>i.category===cat).reduce((s,i)=>s+i.balance,0),
+        color: NET_WORTH_COLORS[cat]
+      })).filter(s=>s.value>0);
+      blocks += `
+        <div class="chart-block">
+          <div class="chart-title">Assets breakdown</div>
+          <div class="chart-block-inner">
+            ${donutChartSVG(assetSegments)}
+            <div class="legend-list">${donutLegendHTML(assetSegments, fmt)}</div>
+          </div>
+        </div>`;
+    }
+    if(totalLiabilities > 0){
+      const liabSegments = LIABILITY_CATS.map(cat => ({
+        label: cat, value: netWorthItems.filter(i=>i.category===cat).reduce((s,i)=>s+i.balance,0),
+        color: NET_WORTH_COLORS[cat]
+      })).filter(s=>s.value>0);
+      blocks += `
+        <div class="chart-block">
+          <div class="chart-title">Liabilities breakdown</div>
+          <div class="chart-block-inner">
+            ${donutChartSVG(liabSegments)}
+            <div class="legend-list">${donutLegendHTML(liabSegments, fmt)}</div>
+          </div>
+        </div>`;
+    }
+    chartsHtml = `<div class="charts-row">${blocks}</div>`;
+  }
 
   let html = `
     <div class="networth-summary">
@@ -1315,7 +1391,8 @@ function renderNetWorth(){
       <div class="nw-card"><div class="label">${t('totalLiabilities')}</div><div class="value">${fmt(totalLiabilities)}</div></div>
       <div class="nw-card highlight"><div class="label">${t('netWorthLabel')}</div><div class="value">${fmt(netWorth)}</div></div>
     </div>
-    <p class="hero-body" style="font-size:12.5px;margin:-14px 0 18px;">Tap any account below to make a payment (debts) or update its balance (assets).</p>
+    ${chartsHtml}
+    <p class="hero-body" style="font-size:12.5px;margin:-4px 0 18px;">Tap any account below to make a payment (debts) or update its balance (assets).</p>
 
     <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
       <select id="nwCategory">
@@ -1419,7 +1496,7 @@ async function addNetWorthItem(){
 }
 
 function renderSettings(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${t('settings')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('settings')}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const languages = [
@@ -1532,7 +1609,7 @@ function renderSettings(){
 }
 
 function renderWatchlist(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${t('watchlist')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('watchlist')}`;
   navBar([{ label:t('refreshPrices'), onClick: refreshAllQuotes }]);
 
   const mainArea = document.getElementById('mainArea');
@@ -1657,7 +1734,7 @@ function openPortfolio(){
 }
 
 function renderPortfolio(){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${t('portfolio')}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${t('portfolio')}`;
   document.getElementById('pageSub').innerHTML = '';
   const mainArea = document.getElementById('mainArea');
 
@@ -1670,6 +1747,24 @@ function renderPortfolio(){
   const totalGain = totalValue - totalCost;
   const totalGainPct = totalCost > 0 ? (totalGain / totalCost) * 100 : 0;
 
+  let chartHtml = '';
+  if(portfolio.length > 0 && anyPriced && totalValue > 0){
+    const segments = portfolio
+      .filter(p => quoteCache[p.symbol] && quoteCache[p.symbol] !== 'error')
+      .map(p => ({ label:p.symbol, value:quoteCache[p.symbol].price * p.shares, color:getSymbolColor(p.symbol) }))
+      .sort((a,b) => b.value - a.value);
+    chartHtml = `
+      <div class="charts-row">
+        <div class="chart-block">
+          <div class="chart-title">Portfolio composition</div>
+          <div class="chart-block-inner">
+            ${donutChartSVG(segments)}
+            <div class="legend-list">${donutLegendHTML(segments, fmtStock)}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
   let html = `
     <div class="add-symbol-row">
       <input type="text" id="holdingSymbol" placeholder="Symbol, e.g. AAPL" maxlength="8" style="text-transform:uppercase;">
@@ -1681,6 +1776,7 @@ function renderPortfolio(){
     <div class="row" style="margin-bottom:18px;">
       <button type="button" class="add" id="addHoldingBtn">${t('addHoldingBtn')}</button>
     </div>
+    ${chartHtml}
   `;
 
   if(portfolio.length > 0 && anyPriced){
@@ -1803,7 +1899,7 @@ async function fetchStockDetails(symbol){
 }
 
 function renderStockDetail(symbol){
-  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">←</button> ${escapeHtml(symbol)}`;
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back">‹</button> ${escapeHtml(symbol)}`;
   document.getElementById('pageSub').innerHTML = '';
 
   const q = quoteCache[symbol];
