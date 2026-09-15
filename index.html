@@ -15,6 +15,7 @@
     --moss: #55694A;
     --rust: #A8462F;
     --card: #F6F3EA;
+    --input-bg: #FFFFFF;
   }
   html[data-theme="dark"]{
     --paper: #1C201A;
@@ -24,6 +25,7 @@
     --moss: #7FA06B;
     --rust: #E08A6D;
     --card: #262B22;
+    --input-bg: #2A2F26;
   }
   html, body{ transition: background 0.2s, color 0.2s; }
   *{box-sizing:border-box;}
@@ -87,17 +89,19 @@
   .tip-title{ font-size:15.5px; margin-bottom:2px; }
   .tip-body{ font-size:13.5px; color:var(--ink-soft); line-height:1.5; }
   .cta{
-    display:block; width:100%; text-align:center; margin-top:28px; padding:14px;
+    display:block; width:100%; text-align:center; margin-top:28px; padding:15px;
     background:var(--ink); color:var(--paper); border:none; font-family:inherit;
-    font-size:15px; font-weight:600; border-radius:2px; cursor:pointer;
+    font-size:15px; font-weight:600; border-radius:8px; cursor:pointer;
+    transition:opacity 0.15s;
   }
+  .cta:hover{ opacity:0.88; }
 
   /* ---- Months list view ---- */
   .month-card{ display:flex; align-items:center; justify-content:space-between; padding:16px 4px; border-bottom:1px solid var(--paper-line); cursor:pointer; }
   .month-card:hover .month-name{ color:var(--moss); }
   .month-name{ font-size:17px; }
   .month-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
-  .month-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:18px; }
+  .month-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:19px; font-weight:600; }
   .chev{ color:var(--ink-soft); margin-left:10px; font-size:14px; }
   .month-row-right{ display:flex; align-items:center; }
 
@@ -105,10 +109,10 @@
   .loading{ text-align:center; color:var(--ink-soft); font-size:13px; padding:20px; }
 
   /* ---- Month detail view ---- */
-  .total-block{ margin-bottom:26px; }
-  .total-label{ font-size:12px; color:var(--ink-soft); margin-bottom:2px; }
-  .total-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:38px; font-weight:600; line-height:1; letter-spacing:-0.5px; }
-  .section-label{ font-size:12px; color:var(--ink-soft); margin: 22px 0 8px; padding-bottom:6px; border-bottom:1px solid var(--paper-line); }
+  .total-block{ margin-bottom:34px; }
+  .total-label{ font-size:13px; color:var(--ink-soft); margin-bottom:6px; }
+  .total-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:48px; font-weight:700; line-height:1; letter-spacing:-1px; }
+  .section-label{ font-size:14px; color:var(--ink); font-weight:600; margin: 34px 0 14px; padding-bottom:8px; border-bottom:1.5px solid var(--paper-line); letter-spacing:0.2px; }
   .day-heading{ font-size:12px; color:var(--ink-soft); margin:16px 0 4px; }
   .entry-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--paper-line); }
   .entry-row .dot{ width:8px;height:8px;border-radius:50%; flex-shrink:0; }
@@ -116,7 +120,7 @@
   .entry-cat{ font-size:14.5px; display:flex; align-items:center; gap:6px; }
   .recur-badge{ font-size:11px; color:var(--ink-soft); }
   .entry-note{ font-size:12px; color:var(--ink-soft); }
-  .entry-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:15px; white-space:nowrap; }
+  .entry-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:16px; font-weight:500; white-space:nowrap; }
   .entry-del{ background:none; border:none; color:var(--ink-soft); font-size:16px; cursor:pointer; padding:4px 2px; line-height:1; }
   .entry-del:hover{ color:var(--rust); }
 
@@ -124,7 +128,7 @@
   .recur-card{ padding:14px 4px; border-bottom:1px solid var(--paper-line); display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .recur-name{ font-size:15.5px; }
   .recur-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
-  .recur-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:15px; margin-right:8px; }
+  .recur-amount{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:17px; font-weight:500; margin-right:8px; }
   .stop-btn{
     background:transparent; border:1px solid var(--paper-line); color:var(--ink-soft);
     font-family:inherit; font-size:11.5px; padding:6px 10px; border-radius:2px; cursor:pointer; white-space:nowrap;
@@ -146,10 +150,10 @@
   .stock-symbol{ font-size:16px; font-weight:600; }
   .stock-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
   .stock-right{ display:flex; align-items:center; gap:10px; }
-  .stock-price{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:16px; text-align:right; }
+  .stock-price{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:19px; font-weight:600; text-align:right; }
   .stock-change{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:12.5px; text-align:right; }
-  .stock-change.up{ color:var(--moss); }
-  .stock-change.down{ color:var(--rust); }
+  .stock-change.up{ color:var(--moss); } .stock-change.up::before{ content:"▲ "; font-size:9px; }
+  .stock-change.down{ color:var(--rust); } .stock-change.down::before{ content:"▼ "; font-size:9px; }
   .stock-del{ background:none; border:none; color:var(--ink-soft); font-size:15px; cursor:pointer; padding:2px 4px; }
   .stock-del:hover{ color:var(--rust); }
   .refresh-link{ font-size:12px; }
@@ -161,26 +165,26 @@
   }
   .holding-symbol{ font-size:16px; font-weight:600; }
   .holding-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
-  .holding-value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:16px; text-align:right; }
+  .holding-value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:18px; font-weight:600; text-align:right; }
   .holding-gain{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:12.5px; text-align:right; }
-  .holding-gain.up{ color:var(--moss); }
-  .holding-gain.down{ color:var(--rust); }
+  .holding-gain.up{ color:var(--moss); } .holding-gain.up::before{ content:"▲ "; font-size:9px; }
+  .holding-gain.down{ color:var(--rust); } .holding-gain.down::before{ content:"▼ "; font-size:9px; }
   .portfolio-total{
-    background:var(--card); border:1px solid var(--paper-line); border-radius:2px;
-    padding:16px; margin-bottom:20px;
+    background:var(--card); border:1px solid var(--paper-line); border-radius:6px;
+    padding:22px 20px; margin-bottom:28px; box-shadow:0 2px 10px rgba(34,40,31,0.06);
   }
-  .portfolio-total .label{ font-size:12px; color:var(--ink-soft); }
-  .portfolio-total .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:30px; margin-top:2px; }
-  .portfolio-total .sub{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:13px; margin-top:4px; }
+  .portfolio-total .label{ font-size:13px; color:var(--ink-soft); }
+  .portfolio-total .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:38px; font-weight:700; margin-top:6px; letter-spacing:-0.5px; }
+  .portfolio-total .sub{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:13px; margin-top:6px; }
 
   /* ---- Stock detail page ---- */
-  .detail-price-block{ margin-bottom:22px; }
-  .detail-price{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:36px; font-weight:600; }
-  .detail-change{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:15px; margin-top:2px; }
+  .detail-price-block{ margin-bottom:28px; }
+  .detail-price{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:48px; font-weight:700; letter-spacing:-1px; }
+  .detail-change{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:15px; margin-top:6px; }
   .metric-grid{
     display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px;
   }
-  .metric-box{ background:var(--card); border:1px solid var(--paper-line); border-radius:2px; padding:12px 14px; }
+  .metric-box{ background:var(--card); border:1px solid var(--paper-line); border-radius:8px; padding:14px 16px; }
   .metric-label{ font-size:11px; color:var(--ink-soft); margin-bottom:3px; }
   .metric-value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:16px; }
   .range-bar{
@@ -208,19 +212,19 @@
   @media (min-width:600px){ .dashboard-grid{ grid-template-columns:repeat(3,1fr); } }
   @media (min-width:1080px){ .dashboard-grid{ grid-template-columns:repeat(5,1fr); } }
   .dashboard-tile{
-    background:var(--card); border:1px solid var(--paper-line); border-radius:4px;
-    padding:20px 14px; text-align:center; cursor:pointer; transition:border-color 0.15s;
+    background:var(--card); border:1px solid var(--paper-line); border-radius:8px;
+    padding:20px 14px; text-align:center; cursor:pointer; transition:border-color 0.15s, transform 0.15s;
   }
-  .dashboard-tile:hover{ border-color:var(--moss); }
+  .dashboard-tile:hover{ border-color:var(--moss); transform:translateY(-1px); }
   .dashboard-tile .tile-icon{ font-size:26px; margin-bottom:8px; display:block; }
   .dashboard-tile .tile-label{ font-size:13.5px; font-weight:600; }
   .dashboard-tile .tile-sub{ font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
 
-  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:32px; }
   @media (min-width:600px){ .stat-grid{ grid-template-columns:repeat(3,1fr); } }
-  .stat-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:2px; padding:14px 16px; }
-  .stat-card .label{ font-size:11.5px; color:var(--ink-soft); }
-  .stat-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:20px; margin-top:3px; }
+  .stat-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:6px; padding:18px 18px; }
+  .stat-card .label{ font-size:12px; color:var(--ink-soft); }
+  .stat-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:23px; font-weight:600; margin-top:6px; }
 
   @media (min-width:720px){
     .hero-headline{ font-size:36px; }
@@ -229,15 +233,15 @@
 
   /* ---- Net worth page ---- */
   .networth-summary{
-    display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:24px;
+    display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:32px;
   }
   @media (max-width:600px){ .networth-summary{ grid-template-columns:1fr; } }
-  .nw-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:2px; padding:14px 16px; }
-  .nw-card.highlight{ background:var(--ink); border-color:var(--ink); }
+  .nw-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:6px; padding:18px 18px; }
+  .nw-card.highlight{ background:var(--ink); border-color:var(--ink); box-shadow:0 4px 16px rgba(34,40,31,0.18); }
   .nw-card.highlight .label{ color:#c9c4b5; }
-  .nw-card.highlight .value{ color:var(--paper); }
-  .nw-card .label{ font-size:11.5px; color:var(--ink-soft); }
-  .nw-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:22px; margin-top:3px; }
+  .nw-card.highlight .value{ color:var(--paper); font-size:30px; }
+  .nw-card .label{ font-size:12px; color:var(--ink-soft); }
+  .nw-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:24px; font-weight:600; margin-top:6px; }
   .nw-item-row{
     display:flex; align-items:center; justify-content:space-between;
     padding:10px 4px; border-bottom:1px solid var(--paper-line);
@@ -285,21 +289,22 @@
   .field label{ font-size:11px; color:var(--ink-soft); }
   input, select{
     font-family:inherit; font-size:15px; padding:8px 9px; border:1px solid var(--paper-line);
-    background:#fff; color:var(--ink); border-radius:2px; width:100%;
+    background:var(--input-bg); color:var(--ink); border-radius:2px; width:100%;
   }
   input:focus, select:focus{ outline:2px solid var(--moss); outline-offset:-1px; }
   .amount-field input{ font-family: ui-monospace, "SF Mono", Menlo, monospace; }
   .checkbox-row{ display:flex; align-items:center; gap:8px; margin-bottom:14px; }
   .checkbox-row input{ width:auto; }
   .checkbox-row label{ font-size:13.5px; color:var(--ink); }
-  .receipt-row{ margin:0 0 14px; padding:12px; border:1px dashed var(--paper-line); background:#fffdf7; border-radius:2px; }
+  .receipt-row{ margin:0 0 14px; padding:12px; border:1px dashed var(--paper-line); background:var(--card); border-radius:2px; }
   .receipt-row button{ width:100%; padding:10px; background:transparent; color:var(--ink); border:1px solid var(--paper-line); font-family:inherit; font-size:13.5px; border-radius:2px; cursor:pointer; }
   .receipt-row input{ margin-top:8px; }
   .receipt-status{ font-size:12px; color:var(--ink-soft); line-height:1.45; margin-top:8px; min-height:18px; }
   .receipt-preview{ display:none; width:100%; max-height:180px; object-fit:contain; margin-top:8px; border:1px solid var(--paper-line); background:#f5f5f5; }
   .receipt-preview.show{ display:block; }
   .modal-actions{ display:flex; gap:10px; margin-top:16px; }
-  button.add{ flex:1; padding:11px; background:var(--ink); color:var(--paper); border:none; font-family:inherit; font-size:14px; font-weight:600; border-radius:2px; cursor:pointer; }
+  button.add{ flex:1; padding:12px; background:var(--ink); color:var(--paper); border:none; font-family:inherit; font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; transition:opacity 0.15s; }
+  button.add:hover{ opacity:0.88; }
   button.add:disabled{ opacity:0.5; cursor:default; }
   button.cancel{ flex:0 0 90px; padding:11px; background:transparent; color:var(--ink-soft); border:1px solid var(--paper-line); font-family:inherit; font-size:14px; border-radius:2px; cursor:pointer; }
 </style>
@@ -604,16 +609,21 @@ function escapeHtml(str){ const div=document.createElement('div'); div.textConte
 // stroke-dasharray circles — no external chart library needed.
 function donutChartSVG(segments, opts){
   opts = opts || {};
-  const size = opts.size || 180;
-  const stroke = opts.stroke || 26;
+  const size = opts.size || 200;
+  const stroke = opts.stroke || 30;
   const radius = (size - stroke) / 2;
   const cx = size / 2, cy = size / 2;
   const circumference = 2 * Math.PI * radius;
   const total = segments.reduce((s,seg) => s + seg.value, 0);
 
+  const centerLabel = opts.centerLabel ? `
+    <text x="${cx}" y="${cy-6}" text-anchor="middle" font-size="11" fill="var(--ink-soft)" font-family="Iowan Old Style, Georgia, serif">${opts.centerLabel}</text>
+    <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)" font-family="ui-monospace, SF Mono, Menlo, monospace">${opts.centerValue||''}</text>` : '';
+
   if(total <= 0){
     return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
       <circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="var(--paper-line)" stroke-width="${stroke}"/>
+      ${centerLabel}
     </svg>`;
   }
 
@@ -631,7 +641,7 @@ function donutChartSVG(segments, opts){
     cumulative += pct;
   });
 
-  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${circles}</svg>`;
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${circles}${centerLabel}</svg>`;
 }
 
 const STOCK_PALETTE = ["#55694A","#A8462F","#5B7CA8","#B08B2E","#8A5A9E","#3E8E7E","#C0703A","#6B4C3A","#4A7C8C","#8C4A6B"];
@@ -658,7 +668,7 @@ function donutLegendHTML(segments, formatFn){
 // labels: x-axis labels, one per point index.
 function lineChartSVG(series, labels, opts){
   opts = opts || {};
-  const width = opts.width || 600, height = opts.height || 240;
+  const width = opts.width || 600, height = opts.height || 260;
   const padL = 54, padR = 16, padT = 16, padB = 30;
   const plotW = width - padL - padR, plotH = height - padT - padB;
 
@@ -689,13 +699,30 @@ function lineChartSVG(series, labels, opts){
   });
 
   let linesHtml = '';
-  series.forEach(s => {
+  series.forEach((s,idx) => {
     const pts = s.points.map((v,i) => `${xFor(i)},${yFor(v)}`).join(' ');
-    linesHtml += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(idx === 0){
+      const areaPts = `${xFor(0)},${yFor(minVal)} ${pts} ${xFor(n-1)},${yFor(minVal)}`;
+      linesHtml += `<polygon points="${areaPts}" fill="${s.color}" opacity="0.10"/>`;
+    }
+    linesHtml += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+  });
+
+  // Interactive hover points: a native tooltip on each point shows the series
+  // name, the x-axis label, and the exact value.
+  const fmtTip = opts.tooltipFormat || (v => Math.round(v));
+  let pointsHtml = '';
+  series.forEach(s => {
+    s.points.forEach((v,i) => {
+      pointsHtml += `<circle cx="${xFor(i)}" cy="${yFor(v)}" r="9" fill="transparent" stroke="none">
+        <title>${s.label} — ${labels[i]}: ${fmtTip(v)}</title>
+      </circle>
+      <circle cx="${xFor(i)}" cy="${yFor(v)}" r="3" fill="${s.color}" style="pointer-events:none;"/>`;
+    });
   });
 
   return `<svg viewBox="0 0 ${width} ${height}" width="100%" style="max-width:${width}px;">
-    ${gridLines}${xLabels}${linesHtml}
+    ${gridLines}${xLabels}${linesHtml}${pointsHtml}
   </svg>`;
 }
 
@@ -705,7 +732,7 @@ async function boot(){
   if(data && data.session && data.session.user){
     currentUser = data.session.user;
     await loadUserData();
-    view = "months";
+    view = "home";
   }else{
     view = "home";
   }
@@ -839,7 +866,7 @@ async function renderAuth(){
         if(data.session){
           currentUser = data.user;
           await loadUserData();
-          view = "months";
+          view = "home";
           render();
         }else{
           msgEl.textContent = 'Check your email to confirm your account, then log in.';
@@ -849,7 +876,7 @@ async function renderAuth(){
         if(error) throw error;
         currentUser = data.user;
         await loadUserData();
-        view = "months";
+        view = "home";
         render();
       }
     }catch(err){
@@ -1228,7 +1255,7 @@ function renderDetail(monthKey){
       <div class="chart-block">
         <div class="chart-title">Where it's going</div>
         <div class="chart-block-inner">
-          ${donutChartSVG(catSegments)}
+          ${donutChartSVG(catSegments, {centerLabel:"Total", centerValue: fmt(catSegments.reduce((s,x)=>s+x.value,0))})}
           <div class="legend-list">${donutLegendHTML(catSegments, fmt)}</div>
         </div>
       </div>`;
@@ -1245,7 +1272,7 @@ function renderDetail(monthKey){
         <div class="chart-block">
           <div class="chart-title">Spent vs. saved</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(savingsSegments)}
+            ${donutChartSVG(savingsSegments, {centerLabel:"Income", centerValue: fmt(incomeTotal)})}
             <div class="legend-list">${donutLegendHTML(savingsSegments, fmt)}</div>
           </div>
         </div>`;
@@ -1465,7 +1492,7 @@ function renderNetWorth(){
         <div class="chart-block">
           <div class="chart-title">Assets breakdown</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(assetSegments)}
+            ${donutChartSVG(assetSegments, {centerLabel:"Assets", centerValue: fmt(totalAssets)})}
             <div class="legend-list">${donutLegendHTML(assetSegments, fmt)}</div>
           </div>
         </div>`;
@@ -1479,7 +1506,7 @@ function renderNetWorth(){
         <div class="chart-block">
           <div class="chart-title">Liabilities breakdown</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(liabSegments)}
+            ${donutChartSVG(liabSegments, {centerLabel:"Debts", centerValue: fmt(totalLiabilities)})}
             <div class="legend-list">${donutLegendHTML(liabSegments, fmt)}</div>
           </div>
         </div>`;
@@ -1603,13 +1630,17 @@ function computeGrowth(principal, monthlyContribution, annualRatePct, years, inf
   const months = years * 12;
   let balance = principal;
   const nominalByYear = [Math.round(principal)];
+  const contributedByYear = [Math.round(principal)];
   for(let m=1; m<=months; m++){
     balance = balance * (1 + monthlyRate) + monthlyContribution;
-    if(m % 12 === 0) nominalByYear.push(Math.round(balance));
+    if(m % 12 === 0){
+      nominalByYear.push(Math.round(balance));
+      contributedByYear.push(Math.round(principal + monthlyContribution * m));
+    }
   }
   const realByYear = nominalByYear.map((val,i) => Math.round(val / Math.pow(1 + inflationPct/100, i)));
   const totalContributed = principal + monthlyContribution * months;
-  return { nominalByYear, realByYear, totalContributed, finalNominal: nominalByYear[nominalByYear.length-1], finalReal: realByYear[realByYear.length-1] };
+  return { nominalByYear, realByYear, contributedByYear, totalContributed, finalNominal: nominalByYear[nominalByYear.length-1], finalReal: realByYear[realByYear.length-1] };
 }
 
 function renderGrowthCalculator(){
@@ -1664,14 +1695,16 @@ function renderGrowthCalculator(){
     document.getElementById('gcChart').innerHTML = lineChartSVG(
       [
         { label:'Nominal value', color:'#55694A', points:result.nominalByYear },
-        { label:'Inflation-adjusted', color:'#A8462F', points:result.realByYear }
+        { label:'Inflation-adjusted', color:'#A8462F', points:result.realByYear },
+        { label:'Total contributed', color:'#5B7CA8', points:result.contributedByYear }
       ],
       labels,
-      { yFormat: v => fmt(v).replace(/\.00$/,'') }
+      { yFormat: v => fmt(v).replace(/\.00$/,''), tooltipFormat: fmt }
     );
     document.getElementById('gcLegend').innerHTML = `
       <div class="legend-row"><span class="legend-dot" style="background:#55694A"></span><span class="legend-label">Nominal value</span><span class="legend-value">${fmt(result.finalNominal)}</span></div>
       <div class="legend-row"><span class="legend-dot" style="background:#A8462F"></span><span class="legend-label">Inflation-adjusted value</span><span class="legend-value">${fmt(result.finalReal)}</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:#5B7CA8"></span><span class="legend-label">Total contributed</span><span class="legend-value">${fmt(result.totalContributed)}</span></div>
     `;
   }
 
@@ -1941,7 +1974,7 @@ function renderPortfolio(){
         <div class="chart-block">
           <div class="chart-title">Portfolio composition</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(segments)}
+            ${donutChartSVG(segments, {centerLabel:"Value", centerValue: fmtStock(totalValue)})}
             <div class="legend-list">${donutLegendHTML(segments, fmtStock)}</div>
           </div>
         </div>
