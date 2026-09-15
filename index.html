@@ -228,6 +228,18 @@
   .nw-item-label{ font-size:14.5px; }
   .nw-item-balance{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:15px; }
 
+  /* ---- Donut charts ---- */
+  .charts-row{ display:flex; flex-wrap:wrap; gap:24px; margin-bottom:24px; }
+  .chart-block{ flex:1; min-width:220px; }
+  .chart-block-inner{ display:flex; align-items:center; gap:18px; }
+  .chart-title{ font-size:12px; color:var(--ink-soft); margin-bottom:10px; }
+  .chart-center-label{ text-align:center; }
+  .legend-list{ flex:1; min-width:0; }
+  .legend-row{ display:flex; align-items:center; gap:8px; padding:5px 0; font-size:12.5px; }
+  .legend-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .legend-label{ flex:1; color:var(--ink); }
+  .legend-value{ color:var(--ink-soft); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:11.5px; white-space:nowrap; }
+
   /* ---- Floating add button ---- */
   .fab{
     position:fixed; right:calc(50% - 240px + 20px); bottom:26px;
@@ -388,6 +400,7 @@ let quoteCache = {};     // symbol -> { price, change, changePct, high, low }
 let portfolio = [];      // [{ id, symbol, shares, costBasis }]
 let detailsCache = {};   // symbol -> { marketCap, weekHigh52, weekLow52, nextEarnings, lastEarnings }
 let activeSymbol = null;
+let detailReturnView = 'portfolio';
 let customCategories = []; // ["Pet Care", ...]
 let categoryBudgets = {};  // { "Food": 400, ... }
 let netWorthItems = [];    // [{ id, category, label, balance }]
@@ -553,6 +566,53 @@ function fmtStock(usdAmount){
 }
 function monthLabel(key){ const [y,m]=key.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}); }
 function escapeHtml(str){ const div=document.createElement('div'); div.textContent=str; return div.innerHTML; }
+
+// Builds a donut chart from segments [{label, value, color}] using stacked
+// stroke-dasharray circles — no external chart library needed.
+function donutChartSVG(segments, opts){
+  opts = opts || {};
+  const size = opts.size || 180;
+  const stroke = opts.stroke || 26;
+  const radius = (size - stroke) / 2;
+  const cx = size / 2, cy = size / 2;
+  const circumference = 2 * Math.PI * radius;
+  const total = segments.reduce((s,seg) => s + seg.value, 0);
+
+  if(total <= 0){
+    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+      <circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="var(--paper-line)" stroke-width="${stroke}"/>
+    </svg>`;
+  }
+
+  let cumulative = 0;
+  let circles = '';
+  segments.forEach(seg => {
+    if(seg.value <= 0) return;
+    const pct = seg.value / total;
+    const dash = pct * circumference;
+    const gap = circumference - dash;
+    const offset = -cumulative * circumference;
+    circles += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${seg.color}" stroke-width="${stroke}"
+      stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${offset}"
+      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`;
+    cumulative += pct;
+  });
+
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${circles}</svg>`;
+}
+
+function donutLegendHTML(segments, formatFn){
+  const total = segments.reduce((s,seg)=>s+seg.value,0);
+  return segments.filter(s=>s.value>0).map(seg => {
+    const pct = total>0 ? ((seg.value/total)*100).toFixed(0) : 0;
+    return `
+      <div class="legend-row">
+        <span class="legend-dot" style="background:${seg.color}"></span>
+        <span class="legend-label">${escapeHtml(seg.label)}</span>
+        <span class="legend-value">${formatFn(seg.value)} · ${pct}%</span>
+      </div>`;
+  }).join('');
+}
 
 /* ================= Auth ================= */
 async function boot(){
@@ -988,7 +1048,7 @@ function renderDetail(monthKey){
       groups[date].forEach(e => {
         const color = CATEGORY_COLORS[e.category] || CATEGORY_COLORS.Other;
         listHtml += `
-          <div class="entry-row" data-id="${e.id}">
+          <div class="entry-row" data-id="${e.id}" style="cursor:pointer;">
             <div class="dot" style="background:${color}"></div>
             <div class="entry-info">
               <div class="entry-cat">${e.category}${e.recurringId ? '<span class="recur-badge">↻</span>' : ''}</div>
@@ -1032,7 +1092,7 @@ function renderDetail(monthKey){
     incomeHtml = `<div class="section-label">Income</div>`;
     monthIncome.forEach(i => {
       incomeHtml += `
-        <div class="entry-row" data-income-id="${i.id}">
+        <div class="entry-row" data-income-id="${i.id}" style="cursor:pointer;">
           <div class="dot" style="background:var(--moss)"></div>
           <div class="entry-info">
             <div class="entry-cat">${escapeHtml(i.category)}</div>
@@ -1044,12 +1104,50 @@ function renderDetail(monthKey){
     });
   }
 
+  // Category breakdown + savings donut charts
+  let chartsHtml = '';
+  if(entries.length > 0){
+    const catSegments = Object.keys(catTotals).map(cat => ({
+      label: cat, value: catTotals[cat], color: CATEGORY_COLORS[cat] || CATEGORY_COLORS.Other
+    })).sort((a,b) => b.value - a.value);
+
+    const categoryDonut = `
+      <div class="chart-block">
+        <div class="chart-title">Where it's going</div>
+        <div class="chart-block-inner">
+          ${donutChartSVG(catSegments)}
+          <div class="legend-list">${donutLegendHTML(catSegments, fmt)}</div>
+        </div>
+      </div>`;
+
+    let savingsDonut = '';
+    if(incomeTotal > 0){
+      const spentClamped = Math.min(total, incomeTotal);
+      const savedClamped = Math.max(0, incomeTotal - total);
+      const overspent = Math.max(0, total - incomeTotal);
+      const savingsSegments = overspent > 0
+        ? [{ label:'Spent (income)', value:spentClamped, color:'#22281F' }, { label:'Over budget', value:overspent, color:'#A8462F' }]
+        : [{ label:'Spent', value:spentClamped, color:'#22281F' }, { label:'Saved', value:savedClamped, color:'#55694A' }];
+      savingsDonut = `
+        <div class="chart-block">
+          <div class="chart-title">Spent vs. saved</div>
+          <div class="chart-block-inner">
+            ${donutChartSVG(savingsSegments)}
+            <div class="legend-list">${donutLegendHTML(savingsSegments, fmt)}</div>
+          </div>
+        </div>`;
+    }
+
+    chartsHtml = `<div class="charts-row">${categoryDonut}${savingsDonut}</div>`;
+  }
+
   document.getElementById('mainArea').innerHTML = `
     <div class="networth-summary">
       <div class="nw-card"><div class="label">${t('incomeIn')} ${monthLabel(monthKey)}</div><div class="value" style="color:var(--moss);">${fmt(incomeTotal)}</div></div>
       <div class="nw-card"><div class="label">${t('spentIn')} ${monthLabel(monthKey)}</div><div class="value">${fmt(total)}</div></div>
       <div class="nw-card highlight"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--rust);':''}">${fmt(remaining)}</div></div>
     </div>
+    ${chartsHtml}
     ${budgetHtml}
     ${incomeHtml}
     <div class="section-label">${t('entries')}</div>
@@ -1057,8 +1155,41 @@ function renderDetail(monthKey){
   `;
 
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+
+  document.querySelectorAll('.entry-row[data-income-id]').forEach(row => {
+    row.addEventListener('click', async (e) => {
+      if(e.target.closest('.entry-del')) return;
+      const id = row.getAttribute('data-income-id');
+      const item = incomeEntries.find(i => i.id === id);
+      if(!item) return;
+      const input = prompt(`Update this income entry (${item.category})\nCurrent: ${fmt(item.amount)}\n\nEnter the new amount:`);
+      if(input === null) return;
+      const val = parseFloat(input);
+      if(isNaN(val) || val <= 0) return;
+      item.amount = val;
+      render();
+      await sb.from('income_entries').update({ amount: val }).eq('id', id);
+    });
+  });
+  document.querySelectorAll('.entry-row[data-id]').forEach(row => {
+    row.addEventListener('click', async (e) => {
+      if(e.target.closest('.entry-del')) return;
+      const id = row.getAttribute('data-id');
+      const item = expenses.find(x => x.id === id);
+      if(!item) return;
+      const input = prompt(`Update this expense (${item.category})\nCurrent: ${fmt(item.amount)}\n\nEnter the new amount:`);
+      if(input === null) return;
+      const val = parseFloat(input);
+      if(isNaN(val) || val <= 0) return;
+      item.amount = val;
+      render();
+      await sb.from('expenses').update({ amount: val }).eq('id', id);
+    });
+  });
+
   document.querySelectorAll('[data-income-id].entry-del').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const id = btn.getAttribute('data-income-id');
       incomeEntries = incomeEntries.filter(i => i.id !== id);
       render();
@@ -1066,7 +1197,8 @@ function renderDetail(monthKey){
     });
   });
   document.querySelectorAll('.entry-del:not([data-income-id])').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const id = btn.getAttribute('data-id');
       const entry = expenses.find(e => e.id === id);
       if(entry && entry.recurringId){
@@ -1112,6 +1244,7 @@ function renderRecurring(){
       <div class="total-label">${t('committedMonthly')}</div>
       <div class="total-amount">${fmt(monthlyTotal)}</div>
     </div>
+    <p class="hero-body" style="font-size:12.5px;margin:-10px 0 4px;">Tap any bill to update its amount — handy when rent or a subscription price changes.</p>
   `;
 
   orderedCats.forEach(cat => {
@@ -1125,7 +1258,7 @@ function renderRecurring(){
       </div>`;
     items.forEach(tpl => {
       html += `
-        <div class="recur-card">
+        <div class="recur-card" data-id="${tpl.id}" style="cursor:pointer;">
           <div>
             <div class="recur-name">${escapeHtml(tpl.note || tpl.category)}</div>
             <div class="recur-meta">day ${tpl.day} of every month · since ${monthLabel(tpl.startMonth)}</div>
@@ -1139,8 +1272,26 @@ function renderRecurring(){
   });
 
   mainArea.innerHTML = html;
+
+  mainArea.querySelectorAll('.recur-card').forEach(row => {
+    row.addEventListener('click', async (e) => {
+      if(e.target.closest('.stop-btn')) return;
+      const id = row.getAttribute('data-id');
+      const tpl = recurringTemplates.find(t => t.id === id);
+      if(!tpl) return;
+      const input = prompt(`Update monthly amount for "${tpl.note || tpl.category}"\nCurrent: ${fmt(tpl.amount)}\n\nEnter the new amount:`);
+      if(input === null) return;
+      const val = parseFloat(input);
+      if(isNaN(val) || val <= 0) return;
+      tpl.amount = val;
+      renderRecurring();
+      await sb.from('recurring_templates').update({ amount: val }).eq('id', id);
+    });
+  });
+
   mainArea.querySelectorAll('.stop-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const id = btn.getAttribute('data-id');
       recurringTemplates = recurringTemplates.filter(rt => rt.id !== id);
       await sb.from('recurring_templates').delete().eq('id', id);
@@ -1409,7 +1560,7 @@ function renderWatchlist(){
         `;
       }
       html += `
-        <div class="stock-row" data-id="${w.id}">
+        <div class="stock-row" data-id="${w.id}" data-symbol="${escapeHtml(w.symbol)}" style="cursor:pointer;">
           <div class="stock-symbol">${escapeHtml(w.symbol)}</div>
           <div class="stock-right">
             <div>${priceHtml}</div>
@@ -1425,8 +1576,19 @@ function renderWatchlist(){
   document.getElementById('addSymbolBtn').addEventListener('click', addSymbol);
   document.getElementById('symbolInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') addSymbol(); });
 
+  mainArea.querySelectorAll('.stock-row').forEach(row => {
+    row.addEventListener('click', (e) => {
+      if(e.target.closest('.stock-del')) return;
+      activeSymbol = row.getAttribute('data-symbol');
+      detailReturnView = 'watchlist';
+      view = "portfolioDetail";
+      render();
+    });
+  });
+
   mainArea.querySelectorAll('.stock-del').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const id = btn.getAttribute('data-id');
       watchlist = watchlist.filter(w => w.id !== id);
       render();
@@ -1573,6 +1735,7 @@ function renderPortfolio(){
     row.addEventListener('click', (e) => {
       if(e.target.closest('.stock-del')) return;
       activeSymbol = row.getAttribute('data-symbol');
+      detailReturnView = 'portfolio';
       view = "portfolioDetail";
       render();
     });
@@ -1728,7 +1891,7 @@ function renderStockDetail(symbol){
     <p class="hero-body" style="font-size:12px;margin-top:18px;">Data from Finnhub. This is factual market data only — not a recommendation to buy, hold, or sell.</p>
   `;
 
-  document.getElementById('backBtn').addEventListener('click', () => { view="portfolio"; render(); });
+  document.getElementById('backBtn').addEventListener('click', () => { view=detailReturnView; render(); });
 
   if(!q || q === 'error') fetchQuote(symbol).then(() => { if(view === "portfolioDetail") renderStockDetail(symbol); });
   if(!d) fetchStockDetails(symbol).then(() => { if(view === "portfolioDetail") renderStockDetail(symbol); });
