@@ -648,7 +648,7 @@ function buildAllTiles(){
   return [
     { key:'accounts', icon:TILE_ICONS.accounts, label:t('accountsPage'), sub:`${accounts.length} linked`, onClick:()=>{ view="accounts"; render(); } },
     { key:'ledger', icon:TILE_ICONS.ledger, label:t('myLedger').replace(' →',''), sub:'Expenses by month', onClick:()=>{ view="months"; render(); } },
-    { key:'bills', icon:TILE_ICONS.bills, label:t('recurring'), sub:`${fmt(recurringMonthlyTotal)}/mo`, onClick:()=>{ view="recurring"; render(); } },
+    { key:'bills', icon:TILE_ICONS.bills, label:t('recurring'), sub:`${fmt(recurringTemplates.reduce((s,tpl)=>s+tpl.amount,0))}/mo`, onClick:()=>{ view="recurring"; render(); } },
     { key:'documents', icon:TILE_ICONS.documents, label:t('documentsLabel'), sub:`${documents.length} ${t('filesTracked')}`, onClick:()=>{ view="documents"; render(); } },
     { key:'watchlist', icon:TILE_ICONS.watchlist, label:t('watchlist'), sub:`${watchlist.length} tracked`, onClick:openWatchlist },
     { key:'portfolio', icon:TILE_ICONS.portfolio, label:'Portfolio', sub:`${portfolio.filter(p=>p.shares>0.00001).length} holdings`, onClick:openPortfolio },
