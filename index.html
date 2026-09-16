@@ -16,6 +16,8 @@
     --rust: #A8462F;
     --card: #F6F3EA;
     --input-bg: #FFFFFF;
+    --on-highlight-soft: #c9c4b5;
+    --on-highlight-danger: #E08A6D;
     --font-serif: "Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;
     --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
@@ -28,7 +30,10 @@
     --rust: #E08A6D;
     --card: #262B22;
     --input-bg: #2A2F26;
+    --on-highlight-soft: #5C5F52;
+    --on-highlight-danger: #A8462F;
   }
+  html[data-theme="dark"] svg.chart-svg{ filter: brightness(1.25) saturate(1.15); }
   html, body{ transition: background 0.2s, color 0.2s; }
   html{ overflow-x:hidden; }
   *{box-sizing:border-box;}
@@ -59,6 +64,29 @@
     transition:border-color 0.15s, background 0.15s;
   }
   .back-btn:hover{ border-color:var(--moss); background:var(--paper); }
+  .account-menu{
+    display:none; position:absolute; top:42px; right:0; z-index:20;
+    background:var(--card); border:1px solid var(--paper-line); border-radius:10px;
+    box-shadow:0 8px 24px rgba(34,40,31,0.18); min-width:200px; overflow:hidden;
+  }
+  html[dir="rtl"] .account-menu{ right:auto; left:0; }
+  .account-menu.open{ display:block; }
+  .account-menu-header{
+    display:flex; align-items:center; gap:10px; padding:14px;
+    border-bottom:1px solid var(--paper-line);
+  }
+  .account-menu-username{ font-family:var(--font-serif); font-size:14px; font-weight:600; }
+  .account-menu-item{
+    display:flex; align-items:center; gap:10px; width:100%; padding:12px 14px;
+    background:none; border:none; text-align:left; cursor:pointer;
+    font-family:var(--font-sans); font-size:13.5px; color:var(--ink);
+    transition:background 0.15s;
+  }
+  html[dir="rtl"] .account-menu-item{ text-align:right; }
+  .account-menu-item:hover{ background:var(--input-bg); }
+  .account-menu-item.danger{ color:var(--rust); }
+  .account-menu-divider{ height:1px; background:var(--paper-line); margin:4px 0; }
+
   .navlinks{
     display:flex; align-items:center; gap:6px; margin-top:12px;
     overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px;
@@ -71,6 +99,28 @@
     transition:border-color 0.15s, color 0.15s;
   }
   .navlink:hover{ border-color:var(--moss); color:var(--ink); }
+
+  details.add-collapsible{ margin-bottom:24px; }
+  details.add-collapsible summary{
+    cursor:pointer; font-family:var(--font-sans); font-size:13px; font-weight:600;
+    color:var(--ink); padding:12px 14px; list-style:none; background:var(--card);
+    border:1px solid var(--paper-line); border-radius:8px; display:flex; align-items:center; gap:8px;
+  }
+  details.add-collapsible summary::-webkit-details-marker{ display:none; }
+  details.add-collapsible summary::before{ content:"+"; font-size:16px; color:var(--moss); }
+  details.add-collapsible[open] summary::before{ content:"–"; }
+  details.add-collapsible[open] summary{ border-radius:8px 8px 0 0; border-bottom:none; }
+  details.add-collapsible .add-collapsible-body{
+    border:1px solid var(--paper-line); border-top:none; border-radius:0 0 8px 8px; padding:16px;
+  }
+
+  .navlink-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:var(--font-sans); font-size:12.5px; font-weight:500; color:var(--ink);
+    background:var(--input-bg); border:1px solid var(--paper-line); border-radius:999px;
+    padding:8px 14px; cursor:pointer; transition:border-color 0.15s, background 0.15s;
+  }
+  .navlink-btn:hover{ border-color:var(--moss); background:var(--card); }
 
   /* ---- Auth view ---- */
   .login-intro{ font-family:var(--font-sans); font-size:15px; line-height:1.55; color:var(--ink-soft); margin:0 0 22px; }
@@ -232,16 +282,16 @@
 
   /* ---- Dashboard tiles (home page) ---- */
   .dashboard-grid{
-    display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:20px 0 28px;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:18px 0 26px;
   }
   @media (min-width:600px){ .dashboard-grid{ grid-template-columns:repeat(3,1fr); } }
-  @media (min-width:1080px){ .dashboard-grid{ grid-template-columns:repeat(5,1fr); } }
+  @media (min-width:1080px){ .dashboard-grid{ grid-template-columns:repeat(4,1fr); } }
   .dashboard-tile{
     background:var(--card); border:1px solid var(--paper-line); border-radius:8px;
-    padding:20px 14px; text-align:center; cursor:pointer; transition:border-color 0.15s, transform 0.15s;
+    padding:16px 12px; text-align:center; cursor:pointer; transition:border-color 0.15s, transform 0.15s;
   }
   .dashboard-tile:hover{ border-color:var(--moss); transform:translateY(-1px); }
-  .dashboard-tile .tile-icon{ display:flex; justify-content:center; margin-bottom:10px; color:var(--ink); }
+  .dashboard-tile .tile-icon{ display:flex; justify-content:center; margin-bottom:8px; color:var(--ink); }
   .dashboard-tile .tile-label{ font-family:var(--font-sans); font-size:13.5px; font-weight:600; }
   .dashboard-tile .tile-sub{ font-family:var(--font-sans); font-size:11.5px; color:var(--ink-soft); margin-top:2px; }
   .feature-detail-panel{
@@ -250,11 +300,6 @@
     padding:16px 18px; margin:2px 0 4px;
   }
 
-  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:32px; }
-  @media (min-width:600px){ .stat-grid{ grid-template-columns:repeat(3,1fr); } }
-  .stat-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:6px; padding:18px 18px; }
-  .stat-card .label{ font-family:var(--font-sans); font-size:12px; color:var(--ink-soft); }
-  .stat-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:23px; font-weight:600; margin-top:6px; }
 
   @media (min-width:720px){
     .hero-headline{ font-size:36px; }
@@ -268,7 +313,7 @@
   @media (max-width:600px){ .networth-summary{ grid-template-columns:1fr; } }
   .nw-card{ background:var(--card); border:1px solid var(--paper-line); border-radius:6px; padding:18px 18px; }
   .nw-card.highlight{ background:var(--ink); border-color:var(--ink); box-shadow:0 4px 16px rgba(34,40,31,0.18); }
-  .nw-card.highlight .label{ color:#c9c4b5; }
+  .nw-card.highlight .label{ color:var(--on-highlight-soft); }
   .nw-card.highlight .value{ color:var(--paper); font-size:30px; }
   .nw-card .label{ font-size:12px; color:var(--ink-soft); }
   .nw-card .value{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:24px; font-weight:600; margin-top:6px; }
@@ -278,6 +323,21 @@
   }
   .nw-item-label{ font-size:14.5px; }
   .nw-item-balance{ font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size:15px; }
+  .type-icon-badge{
+    width:30px; height:30px; border-radius:50%; flex-shrink:0;
+    background:var(--card); border:1px solid var(--paper-line); color:var(--ink-soft);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+  .stock-chip{
+    font-family:var(--font-sans); font-size:12.5px; font-weight:600; color:var(--ink);
+    background:var(--card); border:1px solid var(--paper-line); border-radius:999px;
+    padding:8px 12px; cursor:pointer; transition:border-color 0.15s, background 0.15s;
+  }
+  .stock-chip span{ font-weight:400; color:var(--ink-soft); margin-left:4px; }
+  .stock-chip:hover{ border-color:var(--moss); background:var(--input-bg); }
+  .stock-chip.active{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .stock-chip.active span{ color:var(--paper); opacity:0.75; }
 
   /* ---- Donut charts ---- */
   .charts-row{ display:flex; flex-wrap:wrap; gap:24px; margin-bottom:24px; }
@@ -302,6 +362,9 @@
     background:var(--card); border:1px solid var(--paper-line); border-left:3px solid var(--moss);
     border-radius:6px; padding:12px 16px; margin-bottom:10px; font-size:13.5px; line-height:1.5;
   }
+  .insight-card.high{ border-left-color:var(--rust); }
+  .insight-card.clickable{ cursor:pointer; transition:border-color 0.15s; }
+  .insight-card.clickable:hover{ border-color:var(--moss); }
 
   /* ---- Contact footer ---- */
   .contact-footer{
@@ -318,20 +381,16 @@
 
   /* ---- Floating add button ---- */
   .fab{
-    position:fixed; right:calc(50% - 240px + 20px); bottom:26px;
-    background:var(--ink); color:var(--paper); border:none; border-radius:999px;
-    height:52px; padding:0 22px; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer;
-    box-shadow:0 4px 14px rgba(34,40,31,0.35);
-    display:flex; align-items:center; gap:8px;
+    position:fixed; right:22px; bottom:24px;
+    width:58px; height:58px; border-radius:50%;
+    background:var(--ink); color:var(--paper); border:none; cursor:pointer;
+    box-shadow:0 6px 18px rgba(34,40,31,0.35);
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.15s, box-shadow 0.15s;
   }
-  .fab .fab-icon{ font-size:19px; line-height:1; }
-  @media (max-width: 520px){ .fab{ right:20px; } }
-  @media (min-width:720px){ .fab{ right:calc(50% - 380px + 20px); } }
-  @media (min-width:1080px){ .fab{ right:calc(50% - 520px + 20px); } }
-  html[dir="rtl"] .fab{ right:auto; left:calc(50% - 240px + 20px); }
-  @media (max-width: 520px){ html[dir="rtl"] .fab{ left:20px; } }
-  @media (min-width:720px){ html[dir="rtl"] .fab{ left:calc(50% - 380px + 20px); } }
-  @media (min-width:1080px){ html[dir="rtl"] .fab{ left:calc(50% - 520px + 20px); } }
+  .fab:hover{ transform:translateY(-2px); box-shadow:0 8px 22px rgba(34,40,31,0.4); }
+  .fab:active{ transform:translateY(0); }
+  html[dir="rtl"] .fab{ right:auto; left:22px; }
 
   /* ---- Modal ---- */
   .backdrop{ position:fixed; inset:0; background:rgba(34,40,31,0.45); display:none; align-items:flex-end; justify-content:center; z-index:10; }
@@ -343,6 +402,21 @@
   .row:last-of-type{ margin-bottom:0; }
   .field{ flex:1; display:flex; flex-direction:column; gap:4px; }
   .field label{ font-family:var(--font-sans); font-size:11px; color:var(--ink-soft); }
+  .calendar-grid{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:4px;
+  }
+  .calendar-weekday{
+    font-family:var(--font-sans); font-size:10px; color:var(--ink-soft); text-align:center; padding:2px 0;
+  }
+  .calendar-day{
+    font-family:var(--font-sans); font-size:13px; text-align:center; padding:8px 0;
+    border-radius:8px; cursor:pointer; background:var(--input-bg); border:1px solid var(--paper-line);
+    color:var(--ink); transition:background 0.12s, border-color 0.12s;
+  }
+  .calendar-day:hover{ border-color:var(--moss); }
+  .calendar-day.today{ border-color:var(--moss); font-weight:600; }
+  .calendar-day.selected{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .calendar-day.empty{ background:none; border:none; cursor:default; }
   input, select{
     font-family:var(--font-sans); font-size:15px; padding:9px 11px; border:1px solid var(--paper-line);
     background:var(--input-bg); color:var(--ink); border-radius:6px; width:100%;
@@ -356,7 +430,7 @@
   .receipt-row button{ width:100%; padding:10px; background:transparent; color:var(--ink); border:1px solid var(--paper-line); font-family:inherit; font-size:13.5px; border-radius:2px; cursor:pointer; }
   .receipt-row input{ margin-top:8px; }
   .receipt-status{ font-size:12px; color:var(--ink-soft); line-height:1.45; margin-top:8px; min-height:18px; }
-  .receipt-preview{ display:none; width:100%; max-height:180px; object-fit:contain; margin-top:8px; border:1px solid var(--paper-line); background:#f5f5f5; }
+  .receipt-preview{ display:none; width:100%; max-height:180px; object-fit:contain; margin-top:8px; border:1px solid var(--paper-line); background:var(--input-bg); }
   .receipt-preview.show{ display:block; }
   .modal-actions{ display:flex; gap:10px; margin-top:16px; }
   button.add{ flex:1; padding:12px; background:var(--ink); color:var(--paper); border:none; font-family:var(--font-sans); font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; transition:opacity 0.15s; }
@@ -373,12 +447,18 @@
         <button id="homeBtn" class="back-btn" aria-label="Home" style="display:none;"><svg width="15" height="14" viewBox="0 0 16 16" style="display:block;"><path d="M2 7L8 2L14 7V14H10V9H6V14H2V7Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
         <h1 id="pageTitle">Moneta Compass</h1>
       </div>
-      <button id="themeToggle" class="back-btn" aria-label="Toggle dark mode" style="font-size:15px;flex-shrink:0;">🌙</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <div style="position:relative;">
+          <button id="settingsBtn" class="back-btn" aria-label="Menu" style="display:none;"><svg viewBox="0 0 20 20" width="17" height="17"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M10 2V4M10 16V18M2 10H4M16 10H18M4.8 4.8L6.2 6.2M13.8 13.8L15.2 15.2M15.2 4.8L13.8 6.2M6.2 13.8L4.8 15.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button>
+          <div id="accountMenu" class="account-menu"></div>
+        </div>
+        <button id="themeToggle" class="back-btn" aria-label="Toggle dark mode">🌙</button>
+      </div>
     </div>
     <div id="pageSub"></div>
   </div>
   <div id="mainArea"><div class="loading">Loading…</div></div>
-  <button class="fab" id="fabAdd" aria-label="Add expense or income" style="display:none;"><span class="fab-icon">✎</span><span>Add</span></button>
+  <button class="fab" id="fabAdd" aria-label="Add expense or income" style="display:none;"><svg viewBox="0 0 20 20" width="22" height="22"><path d="M10 3V17M3 10H17" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
 </div>
 
 <div class="backdrop" id="backdrop">
@@ -409,15 +489,17 @@
           <label for="monthPicker">Month</label>
           <input type="month" id="monthPicker" required>
         </div>
-        <div class="field" style="flex:0 0 90px;">
-          <label for="dayPicker">Day</label>
-          <input type="number" id="dayPicker" min="1" max="31" placeholder="1">
-        </div>
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Day</label>
+        <div id="calendarGrid" class="calendar-grid"></div>
+        <input type="hidden" id="dayPicker">
       </div>
       <div class="row">
         <div class="field">
           <label for="note">Note (optional)</label>
-          <input type="text" id="note" placeholder="e.g. groceries">
+          <input type="text" id="note" placeholder="e.g. groceries" list="groceryNameList">
+          <datalist id="groceryNameList">${GROCERY_NAMES.map(n=>`<option value="${n}">`).join('')}</datalist>
         </div>
       </div>
       <div class="row">
@@ -474,6 +556,44 @@ function logoMark(size){
   </svg>`;
 }
 
+// Small (16px) type icons reused across Accounts, Goals, Insurance, and
+// Documents, so every typed list in the app uses the same icon language
+// instead of emoji or plain text.
+const SMALL_ICONS = {
+  bank: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M2 8L10 3L18 8M3 8V15M7 8V15M13 8V15M17 8V15M2 15H18" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  cash: '<svg viewBox="0 0 20 20" width="16" height="16"><rect x="2" y="5" width="16" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>',
+  card: '<svg viewBox="0 0 20 20" width="16" height="16"><rect x="2" y="4.5" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M2 8H18" stroke="currentColor" stroke-width="1.3"/></svg>',
+  chart: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M3 15L8 9L11 12L17 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  doc: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M5 2.5C5 2 5.4 1.5 6 1.5H12L15 4.5V17C15 17.5 14.6 18 14 18H6C5.4 18 5 17.5 5 17V2.5Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
+  house: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M3 9L10 3L17 9V16H3V9Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
+  shield: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 2L16 4.5V9C16 12.5 13.5 15 10 16.5C6.5 15 4 12.5 4 9V4.5L10 2Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
+  car: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M3 12L4.5 7.5C4.8 6.6 5.6 6 6.5 6H13.5C14.4 6 15.2 6.6 15.5 7.5L17 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12H17.5V15H2.5V12Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
+  palm: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 18V9M10 9C10 9 5 7 4 4M10 9C10 9 15 7 16 4M10 9C10 9 4 8 3 10M10 9C10 9 16 8 17 10" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>',
+  sunset: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M4 12C4 8.7 6.7 6 10 6C13.3 6 16 8.7 16 12" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M2 12H18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  chain: '<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="7" cy="10" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="13" cy="10" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>',
+  target: '<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.2" fill="none"/><circle cx="10" cy="10" r="0.9" fill="currentColor"/></svg>',
+  key: '<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="6" cy="10" r="3" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M9 10H17M14 10V13M17 10V13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+  heart: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 17C10 17 3 12.5 3 7.8C3 5.4 4.9 3.8 7 3.8C8.3 3.8 9.4 4.4 10 5.4C10.6 4.4 11.7 3.8 13 3.8C15.1 3.8 17 5.4 17 7.8C17 12.5 10 17 10 17Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
+  receipt: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M5 2H15V18L13 16.5L11 18L9 16.5L7 18L5 16.5V2Z" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linejoin="round"/><path d="M7.5 7H12.5M7.5 10H12.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>',
+  percent: '<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="6" cy="6" r="2" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="14" cy="14" r="2" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M15 5L5 15" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+  folder: '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M2.5 5.5C2.5 4.9 3 4.5 3.5 4.5H8L9.5 6.5H16.5C17 6.5 17.5 7 17.5 7.5V14.5C17.5 15.1 17 15.5 16.5 15.5H3.5C3 15.5 2.5 15.1 2.5 14.5V5.5Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>'
+};
+
+const ACCOUNT_TYPE_ICON_KEY = {
+  "Chequing":"bank", "Savings":"bank", "Cash":"cash", "Credit Card":"card",
+  "Investment":"chart", "Loan":"doc", "Mortgage":"house"
+};
+const GOAL_TYPE_ICON_KEY = {
+  "Emergency Fund":"shield", "Down Payment":"house", "Car":"car", "Vacation":"palm",
+  "Retirement":"sunset", "Debt-Free":"chain", "Custom":"target"
+};
+const INSURANCE_TYPE_ICON_KEY = {
+  "Home":"house", "Auto":"car", "Tenant":"key", "Life":"heart", "Other":"shield"
+};
+const DOCUMENT_CATEGORY_ICON_KEY = {
+  "Receipt":"receipt", "Statement":"doc", "Tax":"percent", "Pay stub":"cash", "Insurance":"shield", "Other":"folder"
+};
+
 const TILE_ICONS = {
   accounts: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M2 8L10 3L18 8M3 8V16M7 8V16M13 8V16M17 8V16M2 16H18" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   ledger: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M10 5C10 4 9 3 7 3H3V15H7C9 15 10 16 10 17M10 5C10 4 11 3 13 3H17V15H13C11 15 10 16 10 17M10 5V17" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -482,7 +602,16 @@ const TILE_ICONS = {
   portfolio: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 8C3 7.4 3.4 7 4 7H16C16.6 7 17 7.4 17 8V15C17 15.6 16.6 16 16 16H4C3.4 16 3 15.6 3 15V8Z M7 7V5C7 4.4 7.4 4 8 4H12C12.6 4 13 4.4 13 5V7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>',
   networth: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M10 3V17M5 6H15M5 6L2 11H8L5 6ZM15 6L12 11H18L15 6Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>',
   growth: '<svg viewBox="0 0 20 20" width="24" height="24"><rect x="3" y="11" width="3" height="6" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="8.5" y="7" width="3" height="10" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="14" y="3" width="3" height="14" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>',
-  settings: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M10 2V4M10 16V18M2 10H4M16 10H18M4.8 4.8L6.2 6.2M13.8 13.8L15.2 15.2M15.2 4.8L13.8 6.2M6.2 13.8L4.8 15.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>'
+  settings: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M10 2V4M10 16V18M2 10H4M16 10H18M4.8 4.8L6.2 6.2M13.8 13.8L15.2 15.2M15.2 4.8L13.8 6.2M6.2 13.8L4.8 15.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  health: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 10H6L7.5 5L10.5 15L12 10H17" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  insurance: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M10 2L17 5V9C17 13.5 14 16.8 10 18C6 16.8 3 13.5 3 9V5L10 2Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/><path d="M7 10L9 12L13.5 7" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  vehicle: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 12L4.5 7.5C4.8 6.6 5.6 6 6.5 6H13.5C14.4 6 15.2 6.6 15.5 7.5L17 12" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12H17.5V15H2.5V12Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/><circle cx="6" cy="15" r="1.3" fill="currentColor"/><circle cx="14" cy="15" r="1.3" fill="currentColor"/></svg>',
+  retirement: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 13C3 8.6 6.1 5 10 5C13.9 5 17 8.6 17 13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M2 13H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 5V2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+  documents: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M5 2.5C5 2 5.4 1.5 6 1.5H12L15 4.5V17C15 17.5 14.6 18 14 18H6C5.4 18 5 17.5 5 17V2.5Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/><path d="M12 1.5V4.5H15" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/><path d="M7.5 9H12.5M7.5 12H12.5M7.5 15H10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  tax: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="6.5" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="13.5" cy="13.5" r="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M15 5L5 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  debt: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M4 10C4 6.7 6.7 4 10 4C13.3 4 16 6.7 16 10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M10 4V10L13 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15L6 12M17 15L14 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>',
+  cashflow: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 11L7 7L10 10L17 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 3H17V7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15H17" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
+  goals: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10" cy="10" r="4.5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10" cy="10" r="1.4" fill="currentColor"/></svg>'
 };
 
 const CATEGORY_COLORS = {
@@ -505,15 +634,60 @@ let expenses = [];
 let recurringTemplates = [];
 let watchlist = [];      // [{ id, symbol }]
 let quoteCache = {};     // symbol -> { price, change, changePct, high, low }
-let portfolio = [];      // [{ id, symbol, shares, costBasis }]
+let portfolio = [];      // [{ id, symbol, shares, costBasis }] — legacy, kept for old code paths
+let investmentTxns = []; // [{ id, symbol, type:'buy'|'sell', shares, price, fees, date, note }]
 let detailsCache = {};   // symbol -> { marketCap, weekHigh52, weekLow52, nextEarnings, lastEarnings }
 let activeSymbol = null;
 let detailReturnView = 'portfolio';
+let guideReturnView = 'home';
+let activeCategory = null;
+
+// Every navigable tile, defined once so both the condensed Home view and
+// the expanded category view stay in sync automatically.
+function buildAllTiles(){
+  return [
+    { key:'accounts', icon:TILE_ICONS.accounts, label:t('accountsPage'), sub:`${accounts.length} linked`, onClick:()=>{ view="accounts"; render(); } },
+    { key:'ledger', icon:TILE_ICONS.ledger, label:t('myLedger').replace(' →',''), sub:'Expenses by month', onClick:()=>{ view="months"; render(); } },
+    { key:'bills', icon:TILE_ICONS.bills, label:t('recurring'), sub:`${fmt(recurringMonthlyTotal)}/mo`, onClick:()=>{ view="recurring"; render(); } },
+    { key:'documents', icon:TILE_ICONS.documents, label:t('documentsLabel'), sub:`${documents.length} ${t('filesTracked')}`, onClick:()=>{ view="documents"; render(); } },
+    { key:'watchlist', icon:TILE_ICONS.watchlist, label:t('watchlist'), sub:`${watchlist.length} tracked`, onClick:openWatchlist },
+    { key:'portfolio', icon:TILE_ICONS.portfolio, label:'Portfolio', sub:`${portfolio.filter(p=>p.shares>0.00001).length} holdings`, onClick:openPortfolio },
+    { key:'networth', icon:TILE_ICONS.networth, label:'Net Worth', sub:'Assets & debts', onClick:()=>{ view="networth"; render(); } },
+    { key:'growth', icon:TILE_ICONS.growth, label:t('growthCalc'), sub:'Future value & inflation', onClick:()=>{ view="growth"; render(); } },
+    { key:'goals', icon:TILE_ICONS.goals, label:t('goalsLabel'), sub:`${financialGoals.length} ${t('activeGoals')}`, onClick:()=>{ view="goals"; render(); } },
+    { key:'debt', icon:TILE_ICONS.debt, label:t('debtPayoffLabel'), sub:t('avalancheVsSnowball'), onClick:()=>{ view="debtplanner"; render(); } },
+    { key:'cashflow', icon:TILE_ICONS.cashflow, label:t('cashFlowLabel'), sub:t('forecast3090'), onClick:()=>{ view="cashflow"; render(); } },
+    { key:'retirement', icon:TILE_ICONS.retirement, label:t('retirementLabel'), sub:t('ageBasedProjections'), onClick:()=>{ view="retirement"; render(); } },
+    { key:'health', icon:TILE_ICONS.health, label:t('healthScoreLabel'), sub:t('howYoureDoing'), onClick:()=>{ view="healthscore"; render(); } },
+    { key:'insurance', icon:TILE_ICONS.insurance, label:t('insuranceLabel'), sub:`${insurancePolicies.length} ${t('policiesTracked')}`, onClick:()=>{ view="insurance"; render(); } },
+    { key:'vehicle', icon:TILE_ICONS.vehicle, label:t('vehiclesLabel'), sub:`${vehicles.length} ${t('vehiclesTracked')}`, onClick:()=>{ view="vehicles"; render(); } },
+    { key:'tax', icon:TILE_ICONS.tax, label:t('taxCenterLabel'), sub:t('incomeGainsDeductions'), onClick:()=>{ view="taxcenter"; render(); } }
+  ];
+}
+
+function buildTileCategories(){
+  return [
+    { key:'money', label:t('moneyCategory'), icon:TILE_ICONS.accounts, tileKeys:['accounts','ledger','bills','documents'] },
+    { key:'investing', label:t('investingCategory'), icon:TILE_ICONS.portfolio, tileKeys:['watchlist','portfolio','networth'] },
+    { key:'planning', label:t('planningCategory'), icon:TILE_ICONS.goals, tileKeys:['growth','goals','debt','cashflow','retirement','tax'] },
+    { key:'protection', label:t('protectionCategory'), icon:TILE_ICONS.insurance, tileKeys:['health','insurance','vehicle'] }
+  ];
+}
 let customCategories = []; // ["Pet Care", ...]
 let categoryBudgets = {};  // { "Food": 400, ... }
 let netWorthItems = [];    // [{ id, category, label, balance }]
+let netWorthSnapshots = []; // [{ id, date, totalAssets, totalLiabilities, netWorth }]
 let accounts = [];         // [{ id, name, type, currency, balance, institution }]
 let transfers = [];        // [{ id, fromAccountId, toAccountId, amount, note, date }]
+let financialGoals = [];   // [{ id, name, goalType, targetAmount, currentAmount, targetDate, monthlyContribution }]
+let insurancePolicies = []; // [{ id, policyType, provider, premium, premiumFrequency, renewalDate, coverageAmount, note }]
+let vehicles = [];          // [{ id, name, currentValue, loanBalance, monthlyPayment, monthlyInsurance, monthlyFuel, monthlyMaintenance }]
+let documents = [];         // [{ id, label, category, storagePath, fileName, uploadedAt }]
+let taxEntries = [];        // [{ id, taxYear, entryType, description, amount }]
+const TAX_ENTRY_TYPES = ["RRSP","FHSA","Deduction","Other"];
+const DOCUMENT_CATEGORIES = ["Receipt","Statement","Tax","Pay stub","Insurance","Other"];
+const INSURANCE_TYPES = ["Home","Auto","Tenant","Life","Other"];
+const GOAL_TYPES = ["Emergency Fund","Down Payment","Car","Vacation","Retirement","Debt-Free","Custom"];
 let userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
 
 const AVATAR_SKIN = ["#F4D3B8","#E8B48C","#C98A5E","#A9704A","#8D5A3A","#5C3A26"];
@@ -561,7 +735,13 @@ const TRANSLATIONS = {
     netWorth: "Net Worth", totalAssets: "Total assets", totalLiabilities: "Total liabilities", netWorthLabel: "Net worth",
     addItem: "Add item", budgetLimits: "Budget limits", saveBudgets: "Save budgets",
     incomeIn: "Income in", spentIn: "Spent in", remaining: "Remaining", committedMonthly: "Committed monthly (recurring)",
-    holdingsTracked: "Holdings tracked"
+    holdingsTracked: "Holdings tracked",
+    goalsLabel: "Goals", debtPayoffLabel: "Debt Payoff", cashFlowLabel: "Cash Flow",
+    healthScoreLabel: "Health Score", insuranceLabel: "Insurance", vehiclesLabel: "Vehicles",
+    retirementLabel: "Retirement", documentsLabel: "Documents", taxCenterLabel: "Tax Center",
+    moneyCategory: "Money", investingCategory: "Investing", planningCategory: "Planning", protectionCategory: "Protection",
+    activeGoals: "active", policiesTracked: "policies", filesTracked: "files", vehiclesTracked: "tracked",
+    avalancheVsSnowball: "Avalanche vs. Snowball", forecast3090: "30/60/90-day forecast", ageBasedProjections: "Age-based projections", howYoureDoing: "How you're doing overall", incomeGainsDeductions: "Income, gains & deductions"
   },
   fr: {
     appName: "Moneta Compass",
@@ -588,7 +768,13 @@ const TRANSLATIONS = {
     netWorth: "Valeur nette", totalAssets: "Total des actifs", totalLiabilities: "Total des dettes", netWorthLabel: "Valeur nette",
     addItem: "Ajouter", budgetLimits: "Limites budgétaires", saveBudgets: "Enregistrer",
     incomeIn: "Revenus en", spentIn: "Dépensé en", remaining: "Restant", committedMonthly: "Engagé chaque mois (récurrent)",
-    holdingsTracked: "Positions suivies"
+    holdingsTracked: "Positions suivies",
+    goalsLabel: "Objectifs", debtPayoffLabel: "Remboursement de dettes", cashFlowLabel: "Trésorerie",
+    healthScoreLabel: "Score financier", insuranceLabel: "Assurance", vehiclesLabel: "Véhicules",
+    retirementLabel: "Retraite", documentsLabel: "Documents", taxCenterLabel: "Centre fiscal",
+    moneyCategory: "Argent", investingCategory: "Investissement", planningCategory: "Planification", protectionCategory: "Protection",
+    activeGoals: "actifs", policiesTracked: "polices", filesTracked: "fichiers", vehiclesTracked: "suivis",
+    avalancheVsSnowball: "Avalanche ou boule de neige", forecast3090: "Prévision sur 30/60/90 jours", ageBasedProjections: "Projections selon l'âge", howYoureDoing: "Comment vous vous en sortez", incomeGainsDeductions: "Revenus, gains et déductions"
   },
   es: {
     appName: "Moneta Compass",
@@ -615,7 +801,13 @@ const TRANSLATIONS = {
     netWorth: "Patrimonio neto", totalAssets: "Total de activos", totalLiabilities: "Total de pasivos", netWorthLabel: "Patrimonio neto",
     addItem: "Añadir", budgetLimits: "Límites de presupuesto", saveBudgets: "Guardar",
     incomeIn: "Ingresos en", spentIn: "Gastado en", remaining: "Restante", committedMonthly: "Comprometido mensual (recurrente)",
-    holdingsTracked: "Posiciones seguidas"
+    holdingsTracked: "Posiciones seguidas",
+    goalsLabel: "Metas", debtPayoffLabel: "Pago de deudas", cashFlowLabel: "Flujo de caja",
+    healthScoreLabel: "Puntuación financiera", insuranceLabel: "Seguros", vehiclesLabel: "Vehículos",
+    retirementLabel: "Jubilación", documentsLabel: "Documentos", taxCenterLabel: "Centro fiscal",
+    moneyCategory: "Dinero", investingCategory: "Inversión", planningCategory: "Planificación", protectionCategory: "Protección",
+    activeGoals: "activas", policiesTracked: "pólizas", filesTracked: "archivos", vehiclesTracked: "en seguimiento",
+    avalancheVsSnowball: "Avalancha o bola de nieve", forecast3090: "Pronóstico a 30/60/90 días", ageBasedProjections: "Proyecciones por edad", howYoureDoing: "Cómo te va en general", incomeGainsDeductions: "Ingresos, ganancias y deducciones"
   },
   fa: {
     appName: "Moneta Compass",
@@ -642,7 +834,13 @@ const TRANSLATIONS = {
     netWorth: "ارزش خالص", totalAssets: "مجموع دارایی‌ها", totalLiabilities: "مجموع بدهی‌ها", netWorthLabel: "ارزش خالص",
     addItem: "افزودن", budgetLimits: "سقف بودجه", saveBudgets: "ذخیره",
     incomeIn: "درآمد در", spentIn: "هزینه در", remaining: "باقی‌مانده", committedMonthly: "تعهد ماهانه (تکرارشونده)",
-    holdingsTracked: "دارایی‌های پیگیری‌شده"
+    holdingsTracked: "دارایی‌های پیگیری‌شده",
+    goalsLabel: "اهداف", debtPayoffLabel: "تسویه بدهی", cashFlowLabel: "جریان نقدی",
+    healthScoreLabel: "امتیاز سلامت مالی", insuranceLabel: "بیمه", vehiclesLabel: "خودروها",
+    retirementLabel: "بازنشستگی", documentsLabel: "اسناد", taxCenterLabel: "مرکز مالیات",
+    moneyCategory: "پول", investingCategory: "سرمایه‌گذاری", planningCategory: "برنامه‌ریزی", protectionCategory: "محافظت",
+    activeGoals: "فعال", policiesTracked: "بیمه‌نامه", filesTracked: "فایل", vehiclesTracked: "پیگیری‌شده",
+    avalancheVsSnowball: "بهمنی در برابر گلوله برفی", forecast3090: "پیش‌بینی ۳۰/۶۰/۹۰ روزه", ageBasedProjections: "پیش‌بینی بر اساس سن", howYoureDoing: "وضعیت کلی شما", incomeGainsDeductions: "درآمد، سود و کسورات"
   }
 };
 function t(key){
@@ -680,6 +878,43 @@ function shiftMonthKey(key, delta){
   while(m > 12){ m -= 12; y++; }
   while(m < 1){ m += 12; y--; }
   return `${y}-${pad2(m)}`;
+}
+
+// Renders a real calendar grid for the month currently selected in
+// #monthPicker, sized to that month's actual day count (28/29/30/31) —
+// so picking a day that doesn't exist (like Feb 31) is never possible.
+// Pass a day to select; if it no longer fits the new month, it clamps
+// down to the last valid day instead of leaving a stale value.
+function renderCalendarGrid(preferredDay){
+  const monthKey = document.getElementById('monthPicker').value || currentMonthKey();
+  const [y, m] = monthKey.split('-').map(Number);
+  const numDays = daysInMonth(monthKey);
+  const firstWeekday = new Date(y, m-1, 1).getDay(); // 0=Sun..6=Sat
+  const todayKey = currentMonthKey();
+  const isCurrentMonth = monthKey === todayKey;
+  const todayNum = currentDay();
+
+  let selectedDay = preferredDay || parseInt(document.getElementById('dayPicker').value,10) || (isCurrentMonth ? todayNum : 1);
+  if(selectedDay > numDays) selectedDay = numDays;
+  if(selectedDay < 1) selectedDay = 1;
+  document.getElementById('dayPicker').value = selectedDay;
+
+  const weekdayLabels = ['S','M','T','W','T','F','S'];
+  let html = weekdayLabels.map(w => `<div class="calendar-weekday">${w}</div>`).join('');
+  for(let i=0; i<firstWeekday; i++) html += `<div class="calendar-day empty"></div>`;
+  for(let day=1; day<=numDays; day++){
+    const isToday = isCurrentMonth && day === todayNum;
+    const isSelected = day === selectedDay;
+    html += `<div class="calendar-day${isToday?' today':''}${isSelected?' selected':''}" data-day="${day}">${day}</div>`;
+  }
+  const grid = document.getElementById('calendarGrid');
+  grid.innerHTML = html;
+  grid.querySelectorAll('.calendar-day[data-day]').forEach(cell => {
+    cell.addEventListener('click', () => {
+      document.getElementById('dayPicker').value = cell.getAttribute('data-day');
+      renderCalendarGrid(parseInt(cell.getAttribute('data-day'),10));
+    });
+  });
 }
 
 // Compares a month's spending to the prior month and a 3-month trailing
@@ -784,6 +1019,39 @@ function avatarSVG(config, size){
   </svg>`;
 }
 
+// Derives current holdings from the full buy/sell transaction log, using
+// the average-cost method: each sell realizes gain/loss against the
+// average cost of shares held at that moment, and reduces the remaining
+// average cost pool proportionally.
+function computeHoldings(){
+  const bySymbol = {};
+  investmentTxns.slice().sort((a,b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).forEach(tx => {
+    if(!bySymbol[tx.symbol]) bySymbol[tx.symbol] = { symbol:tx.symbol, shares:0, totalCost:0, realizedGain:0, dividends:0 };
+    const h = bySymbol[tx.symbol];
+    if(tx.type === 'buy'){
+      h.totalCost += tx.shares * tx.price + (tx.fees||0);
+      h.shares += tx.shares;
+    }else if(tx.type === 'sell'){
+      const avgCost = h.shares > 0 ? h.totalCost / h.shares : 0;
+      const sellShares = Math.min(tx.shares, h.shares);
+      const costOfSold = avgCost * sellShares;
+      const proceeds = sellShares * tx.price - (tx.fees||0);
+      h.realizedGain += proceeds - costOfSold;
+      h.totalCost -= costOfSold;
+      h.shares -= sellShares;
+    }else if(tx.type === 'dividend'){
+      // Dividends are cash received, not a change in shares or cost basis —
+      // "price" holds the total amount received for dividend rows.
+      h.dividends += tx.price;
+    }
+  });
+  return Object.values(bySymbol).map(h => ({
+    symbol: h.symbol, shares: h.shares,
+    costBasis: h.shares > 0.00001 ? h.totalCost / h.shares : 0,
+    realizedGain: h.realizedGain, dividends: h.dividends
+  }));
+}
+
 function donutChartSVG(segments, opts){
   opts = opts || {};
   const size = opts.size || 200;
@@ -794,13 +1062,14 @@ function donutChartSVG(segments, opts){
   const total = segments.reduce((s,seg) => s + seg.value, 0);
   const sorted = [...segments].filter(s=>s.value>0).sort((a,b) => b.value - a.value);
   const gapPx = sorted.length > 1 ? 4 : 0;
+  const fmtTip = opts.tooltipFormat || (v => Math.round(v));
 
   const centerLabel = opts.centerLabel ? `
     <text x="${cx}" y="${cy-8}" text-anchor="middle" font-size="12" fill="var(--ink-soft)" font-family="var(--font-sans)" letter-spacing="0.3px">${opts.centerLabel}</text>
     <text x="${cx}" y="${cy+16}" text-anchor="middle" font-size="21" font-weight="700" fill="var(--ink)" font-family="ui-monospace, SF Mono, Menlo, monospace">${opts.centerValue||''}</text>` : '';
 
   if(total <= 0){
-    return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
+    return `<svg class="chart-svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
       <circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="var(--paper-line)" stroke-width="${stroke}"/>
       ${centerLabel}
     </svg>`;
@@ -815,12 +1084,61 @@ function donutChartSVG(segments, opts){
     const offset = -cumulative * circumference;
     circles += `<circle cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${seg.color}" stroke-width="${stroke}"
       stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${offset}"
-      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="round"/>`;
+      transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt" style="cursor:pointer;">
+      <title>${seg.label}: ${fmtTip(seg.value)} (${(pct*100).toFixed(0)}%)</title>
+    </circle>`;
     cumulative += pct;
   });
 
-  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${circles}${centerLabel}</svg>`;
+  return `<svg class="chart-svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${circles}${centerLabel}</svg>`;
 }
+
+// Curated names for autocomplete as the person types, plus a rough brand
+// color so the initials badge feels distinct per institution. These are
+// generic reference colors, not reproductions of any company's actual
+// logo or trademark — just enough to tell accounts apart at a glance.
+const BANK_NAMES = {
+  "RBC Royal Bank": "#005DAA", "TD Canada Trust": "#54B948", "Scotiabank": "#EC111A",
+  "BMO Bank of Montreal": "#0079C1", "CIBC": "#B10036", "National Bank": "#DA291C",
+  "Tangerine": "#F58220", "Chase": "#117ACA", "Bank of America": "#012169",
+  "Wells Fargo": "#D71E2B", "Citibank": "#003B70", "Capital One": "#004977",
+  "US Bank": "#0C2074", "PNC Bank": "#F4A11C", "HSBC": "#DB0011"
+};
+const INSURANCE_NAMES = {
+  "State Farm": "#D6001C", "GEICO": "#005DAA", "Progressive": "#0057B8",
+  "Allstate": "#0033A0", "Liberty Mutual": "#FFD200", "Farmers": "#004B87",
+  "USAA": "#002F6C", "Nationwide": "#0033A0", "Intact Insurance": "#EC1C2E",
+  "Desjardins Insurance": "#00814F", "TD Insurance": "#54B948", "Aviva": "#E4022D",
+  "The Co-operators": "#00843D", "Belairdirect": "#004C97"
+};
+const GROCERY_NAMES = [
+  "Walmart", "Costco", "Kroger", "Safeway", "Whole Foods", "Trader Joe's", "Publix",
+  "Sobeys", "Loblaws", "No Frills", "Metro", "Save-On-Foods", "Aldi", "Target", "Superstore"
+];
+
+function initialsBadgeHtml(name, colorMap, size){
+  size = size || 30;
+  const trimmed = (name || '').trim();
+  if(!trimmed) return '';
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  const initials = (words.length >= 2 ? words[0][0]+words[1][0] : trimmed.slice(0,2)).toUpperCase();
+  let color = colorMap[trimmed];
+  if(!color){
+    // Unknown name typed freely — pick a deterministic color so the same
+    // name always gets the same badge, without claiming to know their brand.
+    let hash = 0;
+    for(let i=0;i<trimmed.length;i++) hash = trimmed.charCodeAt(i) + ((hash<<5)-hash);
+    color = STOCK_PALETTE[Math.abs(hash) % STOCK_PALETTE.length];
+  }
+  return `<div class="type-icon-badge" style="background:${color};border-color:${color};color:#fff;font-family:var(--font-sans);font-size:${size*0.36}px;font-weight:700;width:${size}px;height:${size}px;">${initials}</div>`;
+}
+
+const POPULAR_STOCKS = [
+  { symbol:"AAPL", name:"Apple" }, { symbol:"MSFT", name:"Microsoft" }, { symbol:"GOOGL", name:"Alphabet" },
+  { symbol:"AMZN", name:"Amazon" }, { symbol:"NVDA", name:"Nvidia" }, { symbol:"META", name:"Meta" },
+  { symbol:"TSLA", name:"Tesla" }, { symbol:"JPM", name:"JPMorgan" }, { symbol:"V", name:"Visa" },
+  { symbol:"WMT", name:"Walmart" }, { symbol:"DIS", name:"Disney" }, { symbol:"NFLX", name:"Netflix" }
+];
 
 const STOCK_PALETTE = ["#55694A","#A8462F","#5B7CA8","#B08B2E","#8A5A9E","#3E8E7E","#C0703A","#6B4C3A","#4A7C8C","#8C4A6B"];
 function getSymbolColor(symbol){
@@ -901,7 +1219,7 @@ function lineChartSVG(series, labels, opts){
     });
   });
 
-  return `<svg viewBox="0 0 ${width} ${height}" width="100%" style="max-width:${width}px;">
+  return `<svg class="chart-svg" viewBox="0 0 ${width} ${height}" width="100%" style="max-width:${width}px;">
     ${gridLines}${xLabels}${linesHtml}${pointsHtml}
   </svg>`;
 }
@@ -936,8 +1254,9 @@ async function loadUserData(){
   const { data: wl } = await sb.from('watchlist_items').select('*').order('created_at', {ascending:true});
   watchlist = (wl||[]).map(w => ({ id:w.id, symbol:w.symbol }));
 
-  const { data: ph } = await sb.from('portfolio_holdings').select('*').order('created_at', {ascending:true});
-  portfolio = (ph||[]).map(p => ({ id:p.id, symbol:p.symbol, shares:Number(p.shares), costBasis:Number(p.cost_basis) }));
+  const { data: itx } = await sb.from('investment_transactions').select('*').order('date', {ascending:true});
+  investmentTxns = (itx||[]).map(x => ({ id:x.id, symbol:x.symbol, type:x.type, shares:Number(x.shares), price:Number(x.price), fees:Number(x.fees||0), date:x.date, note:x.note||'' }));
+  portfolio = computeHoldings();
 
   const { data: cc } = await sb.from('custom_categories').select('*').order('created_at', {ascending:true});
   customCategories = (cc||[]).map(c => c.name);
@@ -960,11 +1279,19 @@ async function loadUserData(){
   const { data: nw } = await sb.from('net_worth_items').select('*').order('created_at', {ascending:true});
   netWorthItems = (nw||[]).map(x => ({ id:x.id, category:x.category, label:x.label, balance:Number(x.balance) }));
 
+  const { data: nws } = await sb.from('net_worth_snapshots').select('*').order('snapshot_date', {ascending:true});
+  netWorthSnapshots = (nws||[]).map(x => ({ id:x.id, date:x.snapshot_date, totalAssets:Number(x.total_assets), totalLiabilities:Number(x.total_liabilities), netWorth:Number(x.net_worth) }));
+
   const { data: inc } = await sb.from('income_entries').select('*').order('date', {ascending:false});
   incomeEntries = (inc||[]).map(x => ({ id:x.id, amount:Number(x.amount), category:x.category, note:x.note||'', date:x.date, accountId:x.account_id||null }));
 
   const { data: acc } = await sb.from('accounts').select('*').order('created_at', {ascending:true});
-  accounts = (acc||[]).map(a => ({ id:a.id, name:a.name, type:a.type, currency:a.currency, balance:Number(a.balance), institution:a.institution||'' }));
+  accounts = (acc||[]).map(a => ({
+    id:a.id, name:a.name, type:a.type, currency:a.currency, balance:Number(a.balance), institution:a.institution||'',
+    interestRate: a.interest_rate!=null ? Number(a.interest_rate) : null,
+    minimumPayment: a.minimum_payment!=null ? Number(a.minimum_payment) : null,
+    creditLimit: a.credit_limit!=null ? Number(a.credit_limit) : null
+  }));
 
   const { data: tr } = await sb.from('transfers').select('*').order('date', {ascending:false}).limit(50);
   transfers = (tr||[]).map(x => ({ id:x.id, fromAccountId:x.from_account_id, toAccountId:x.to_account_id, amount:Number(x.amount), note:x.note||'', date:x.date }));
@@ -981,6 +1308,31 @@ async function loadUserData(){
   }else{
     userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
   }
+
+  const { data: goals } = await sb.from('financial_goals').select('*').order('created_at', {ascending:true});
+  financialGoals = (goals||[]).map(g => ({
+    id:g.id, name:g.name, goalType:g.goal_type, targetAmount:Number(g.target_amount),
+    currentAmount:Number(g.current_amount), targetDate:g.target_date, monthlyContribution:Number(g.monthly_contribution||0)
+  }));
+
+  const { data: ins } = await sb.from('insurance_policies').select('*').order('created_at', {ascending:true});
+  insurancePolicies = (ins||[]).map(p => ({
+    id:p.id, policyType:p.policy_type, provider:p.provider||'', premium:Number(p.premium),
+    premiumFrequency:p.premium_frequency, renewalDate:p.renewal_date, coverageAmount:p.coverage_amount!=null?Number(p.coverage_amount):null, note:p.note||''
+  }));
+
+  const { data: veh } = await sb.from('vehicles').select('*').order('created_at', {ascending:true});
+  vehicles = (veh||[]).map(v => ({
+    id:v.id, name:v.name, currentValue:Number(v.current_value), loanBalance:Number(v.loan_balance),
+    monthlyPayment:Number(v.monthly_payment), monthlyInsurance:Number(v.monthly_insurance),
+    monthlyFuel:Number(v.monthly_fuel), monthlyMaintenance:Number(v.monthly_maintenance)
+  }));
+
+  const { data: docs } = await sb.from('documents').select('*').order('uploaded_at', {ascending:false});
+  documents = (docs||[]).map(d => ({ id:d.id, label:d.label, category:d.category, storagePath:d.storage_path, fileName:d.file_name, uploadedAt:d.uploaded_at }));
+
+  const { data: tax } = await sb.from('tax_entries').select('*').order('created_at', {ascending:true});
+  taxEntries = (tax||[]).map(t => ({ id:t.id, taxYear:t.tax_year, entryType:t.entry_type, description:t.description||'', amount:Number(t.amount) }));
 }
 
 function logOut(){
@@ -990,9 +1342,15 @@ function logOut(){
   portfolio = []; detailsCache = {}; activeSymbol = null; activeMonth = null;
   customCategories = []; categoryBudgets = {};
   netWorthItems = [];
+  netWorthSnapshots = [];
   incomeEntries = [];
   accounts = [];
   transfers = [];
+  financialGoals = [];
+  insurancePolicies = [];
+  vehicles = [];
+  documents = [];
+  taxEntries = [];
   userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
   userSettings = { language: 'en', currency: 'USD' };
   applyDirection();
@@ -1150,6 +1508,10 @@ function render(){
   const homeBtn = document.getElementById('homeBtn');
   homeBtn.style.display = (currentUser && view !== 'home' && view !== 'auth') ? 'inline-flex' : 'none';
   homeBtn.onclick = () => { view = "home"; render(); };
+  const settingsBtn = document.getElementById('settingsBtn');
+  settingsBtn.style.display = (currentUser && view !== 'auth') ? 'inline-flex' : 'none';
+  settingsBtn.onclick = (e) => { e.stopPropagation(); toggleAccountMenu(); };
+  buildAccountMenu();
   if(view === "home") renderHome();
   else if(view === "months") renderMonths();
   else if(view === "detail") renderDetail(activeMonth);
@@ -1160,8 +1522,65 @@ function render(){
   else if(view === "portfolioDetail") renderStockDetail(activeSymbol);
   else if(view === "networth") renderNetWorth();
   else if(view === "growth") renderGrowthCalculator();
+  else if(view === "goals") renderGoals();
+  else if(view === "debtplanner") renderDebtPlanner();
+  else if(view === "cashflow") renderCashFlow();
+  else if(view === "healthscore") renderHealthScore();
+  else if(view === "insurance") renderInsurance();
+  else if(view === "vehicles") renderVehicles();
+  else if(view === "retirement") renderRetirement();
+  else if(view === "documents") renderDocuments();
+  else if(view === "guide") renderGuide();
+  else if(view === "category") renderCategory();
+  else if(view === "taxcenter") renderTaxCenter();
   else if(view === "accounts") renderAccounts();
 }
+function buildAccountMenu(){
+  const menu = document.getElementById('accountMenu');
+  const avatarSmall = userProfile.avatarType === 'upload' && userProfile.avatarUrl
+    ? `<img src="${userProfile.avatarUrl}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+    : userProfile.avatarType === 'custom' && userProfile.avatarConfig
+      ? avatarSVG(userProfile.avatarConfig, 32)
+      : `<div style="width:32px;height:32px;border-radius:50%;background:var(--input-bg);border:1px solid var(--paper-line);flex-shrink:0;"></div>`;
+
+  menu.innerHTML = `
+    <div class="account-menu-header">
+      ${avatarSmall}
+      <div class="account-menu-username">${userProfile.username ? '@'+escapeHtml(userProfile.username) : 'Account'}</div>
+    </div>
+    <button class="account-menu-item" data-menu-action="settings">${TILE_ICONS.settings} Settings</button>
+    <button class="account-menu-item" data-menu-action="guide">
+      <svg viewBox="0 0 20 20" width="18" height="18"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M7.8 8C7.8 6.8 8.8 6 10 6C11.2 6 12.2 6.8 12.2 8C12.2 9.2 10 9.5 10 11.2" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/><circle cx="10" cy="13.8" r="0.9" fill="currentColor"/></svg>
+      Guide
+    </button>
+    <div class="account-menu-divider"></div>
+    <button class="account-menu-item danger" data-menu-action="logout">
+      <svg viewBox="0 0 20 20" width="18" height="18"><path d="M8 3H4.5C3.7 3 3 3.7 3 4.5V15.5C3 16.3 3.7 17 4.5 17H8" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M13 6L17 10L13 14M17 10H8" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Log out
+    </button>
+  `;
+
+  menu.querySelectorAll('[data-menu-action]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.getAttribute('data-menu-action');
+      menu.classList.remove('open');
+      if(action === 'settings'){ view = "settings"; render(); }
+      else if(action === 'guide'){ guideReturnView = view; view = "guide"; render(); }
+      else if(action === 'logout'){ logOut(); }
+    });
+  });
+}
+
+function toggleAccountMenu(){
+  document.getElementById('accountMenu').classList.toggle('open');
+}
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('accountMenu');
+  if(menu && menu.classList.contains('open') && !menu.contains(e.target)){
+    menu.classList.remove('open');
+  }
+});
+
 function navBar(items){
   const html = items.map((it,i) => `<button class="navlink" data-nav="${i}">${escapeHtml(it.label)}</button>`).join('');
   document.getElementById('pageSub').innerHTML = `<div class="navlinks">${html}</div>`;
@@ -1169,6 +1588,86 @@ function navBar(items){
     const idx = parseInt(btn.getAttribute('data-nav'),10);
     btn.addEventListener('click', items[idx].onClick);
   });
+}
+
+// Pulls together anything worth a glance from data that already exists
+// across the app — no new storage, just surfacing what's already there.
+function computeAlerts(){
+  const alerts = [];
+  const nowKey = currentMonthKey();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  recurringTemplates.forEach(tpl => {
+    let mk = nowKey;
+    let day = Math.min(tpl.day, daysInMonth(mk));
+    let due = new Date(Number(mk.split('-')[0]), Number(mk.split('-')[1])-1, day);
+    if(due < today){
+      mk = nextMonthKey(mk);
+      day = Math.min(tpl.day, daysInMonth(mk));
+      due = new Date(Number(mk.split('-')[0]), Number(mk.split('-')[1])-1, day);
+    }
+    const daysUntil = Math.round((due - today) / 86400000);
+    if(daysUntil <= 5){
+      const when = daysUntil===0 ? 'today' : daysUntil===1 ? 'tomorrow' : `in ${daysUntil} days`;
+      alerts.push({ severity: daysUntil<=1?'high':'medium', text:`${tpl.note||tpl.category} bill due ${when} (${fmt(tpl.amount)})`, onClick:()=>{ view="recurring"; render(); } });
+    }
+  });
+
+  const monthEntries = expenses.filter(e => e.date.slice(0,7) === nowKey);
+  const catTotals = {};
+  monthEntries.forEach(e => { catTotals[e.category] = (catTotals[e.category]||0) + e.amount; });
+  Object.keys(categoryBudgets).forEach(cat => {
+    const limit = categoryBudgets[cat];
+    const spent = catTotals[cat] || 0;
+    if(limit > 0 && spent > limit){
+      const overPct = ((spent-limit)/limit) * 100;
+      alerts.push({ severity: overPct>50?'high':'medium', text:`${cat} is over budget: ${fmt(spent)} of ${fmt(limit)}`, onClick:()=>{ activeMonth=nowKey; view="detail"; render(); } });
+    }
+  });
+
+  insurancePolicies.forEach(p => {
+    if(!p.renewalDate) return;
+    const days = Math.round((new Date(p.renewalDate+'T00:00:00') - today) / 86400000);
+    if(days <= 30){
+      const text = days < 0 ? `${p.policyType} insurance renewal overdue — check if it renewed` : `${p.policyType} insurance renews in ${days} day${days===1?'':'s'}`;
+      alerts.push({ severity: days<=7?'high':'medium', text, onClick:()=>{ view="insurance"; render(); } });
+    }
+  });
+
+  financialGoals.forEach(g => {
+    if(!g.targetDate) return;
+    const proj = projectedCompletionDate(g);
+    if(proj.done || proj.months == null) return;
+    if(proj.date > new Date(g.targetDate+'T00:00:00')){
+      alerts.push({ severity:'medium', text:`"${g.name}" is projected to finish after your target date`, onClick:()=>{ view="goals"; render(); } });
+    }
+  });
+
+  accounts.filter(a => a.type==='Credit Card' && a.creditLimit>0).forEach(a => {
+    const util = (a.balance/a.creditLimit) * 100;
+    if(util > 30){
+      alerts.push({ severity: util>50?'high':'medium', text:`${a.name} is at ${util.toFixed(0)}% credit utilization`, onClick:()=>{ view="accounts"; render(); } });
+    }
+  });
+
+  const priorMonths = [1,2,3].map(n => shiftMonthKey(nowKey, -n));
+  let incomeSum=0, expenseSum=0, monthsData=0;
+  priorMonths.forEach(mk => {
+    const inc = incomeEntries.filter(i=>i.date.slice(0,7)===mk).reduce((s,i)=>s+i.amount,0);
+    const exp = expenses.filter(e=>e.date.slice(0,7)===mk).reduce((s,e)=>s+e.amount,0);
+    if(inc>0 || exp>0){ incomeSum+=inc; expenseSum+=exp; monthsData++; }
+  });
+  if(monthsData > 0){
+    const avgIncome = incomeSum/monthsData, avgExpense = expenseSum/monthsData;
+    const dailyNet = (avgIncome-avgExpense)/30;
+    const liquid = accounts.filter(a => ["Chequing","Savings","Cash"].includes(a.type)).reduce((s,a)=>s+a.balance,0);
+    if(liquid + dailyNet*90 < 0){
+      alerts.push({ severity:'high', text:`Projected cash goes negative within 90 days at your current pace`, onClick:()=>{ view="cashflow"; render(); } });
+    }
+  }
+
+  alerts.sort((a,b) => (a.severity==='high'?0:1) - (b.severity==='high'?0:1));
+  return alerts;
 }
 
 function renderHome(){
@@ -1190,29 +1689,25 @@ function renderHome(){
   const monthIncome = incomeEntries.filter(i => i.date.slice(0,7) === monthKey).reduce((s,i)=>s+i.amount,0);
   const remaining = monthIncome - monthTotal;
 
-  const tiles = [
-    { icon:TILE_ICONS.accounts, label:t('accountsPage'), sub:`${accounts.length} linked`, onClick:()=>{ view="accounts"; render(); } },
-    { icon:TILE_ICONS.ledger, label:t('myLedger').replace(' →',''), sub:'Expenses by month', onClick:()=>{ view="months"; render(); } },
-    { icon:TILE_ICONS.bills, label:t('recurring'), sub:`${fmt(recurringMonthlyTotal)}/mo`, onClick:()=>{ view="recurring"; render(); } },
-    { icon:TILE_ICONS.watchlist, label:t('watchlist'), sub:`${watchlist.length} tracked`, onClick:openWatchlist },
-    { icon:TILE_ICONS.portfolio, label:'Portfolio', sub:`${portfolio.length} holdings`, onClick:openPortfolio },
-    { icon:TILE_ICONS.networth, label:'Net Worth', sub:'Assets & debts', onClick:()=>{ view="networth"; render(); } },
-    { icon:TILE_ICONS.growth, label:t('growthCalc'), sub:'Future value & inflation', onClick:()=>{ view="growth"; render(); } },
-    { icon:TILE_ICONS.settings, label:t('settings'), sub:'Language, currency, password', onClick:()=>{ view="settings"; render(); } }
-  ];
-  const tilesHtml = tiles.map(tile => `
-    <div class="dashboard-tile" data-idx="${tiles.indexOf(tile)}">
-      <span class="tile-icon">${tile.icon}</span>
-      <div class="tile-label">${escapeHtml(tile.label)}</div>
-      <div class="tile-sub">${escapeHtml(tile.sub)}</div>
-    </div>`).join('');
+  const allTiles = buildAllTiles();
+  const tilesByKey = Object.fromEntries(allTiles.map(t => [t.key, t]));
+  const categoryTilesHtml = buildTileCategories().map((cat,i) => {
+    const members = cat.tileKeys.map(k => tilesByKey[k]).filter(Boolean);
+    const preview = members.map(m => m.label).join(' · ');
+    return `
+      <div class="dashboard-tile" data-cat-idx="${i}">
+        <span class="tile-icon">${cat.icon}</span>
+        <div class="tile-label">${cat.label}</div>
+        <div class="tile-sub">${escapeHtml(preview)}</div>
+      </div>`;
+  }).join('');
 
   const isBrandNew = expenses.length===0 && incomeEntries.length===0 && recurringTemplates.length===0
     && watchlist.length===0 && portfolio.length===0 && netWorthItems.length===0;
   const welcomeHint = isBrandNew ? `
     <div class="hero-stat" style="flex-direction:column;align-items:flex-start;gap:6px;">
       <div class="label" style="font-size:13px;color:var(--ink);font-weight:600;">Welcome! Let's get your first entry in.</div>
-      <div style="font-size:13px;color:var(--ink-soft);">Tap "Add" below to log an expense or income, or pick any tile above to explore that section first.</div>
+      <div style="font-size:13px;color:var(--ink-soft);">Tap + below to log an expense or income, pick any tile above to explore, or check the <a href="#" id="guideLink" style="color:var(--moss);">Guide</a> for a one-line map of everything.</div>
     </div>` : '';
 
   // One consolidated "This month" summary — replaces the old 5-card stat
@@ -1230,7 +1725,7 @@ function renderHome(){
     if(monthTotal > 0){
       chartBlock = `
         <div class="chart-block-inner">
-          ${donutChartSVG(catSegments, { centerLabel:'Spent', centerValue: fmt(monthTotal) })}
+          ${donutChartSVG(catSegments, { centerLabel:'Spent', centerValue: fmt(monthTotal), tooltipFormat: fmt })}
           <div class="legend-list">${donutLegendHTML(catSegments, fmt, 4)}</div>
         </div>`;
     }else{
@@ -1241,7 +1736,7 @@ function renderHome(){
       <div class="section-label">This month — ${monthName}</div>
       <div class="networth-summary" style="grid-template-columns:1fr 1fr;margin-bottom:20px;">
         <div class="nw-card" data-goto="detail" style="cursor:pointer;"><div class="label" style="color:var(--moss);">${t('incomeIn')}</div><div class="value" style="font-size:19px;">${fmt(monthIncome)}</div></div>
-        <div class="nw-card highlight" data-goto="detail" style="cursor:pointer;"><div class="label">${t('remaining')}</div><div class="value" style="font-size:19px;${remaining<0?'color:#E08A6D;':''}">${fmt(remaining)}</div></div>
+        <div class="nw-card highlight" data-goto="detail" style="cursor:pointer;"><div class="label">${t('remaining')}</div><div class="value" style="font-size:19px;${remaining<0?'color:var(--on-highlight-danger);':''}">${fmt(remaining)}</div></div>
       </div>
       ${chartBlock}
     `;
@@ -1253,6 +1748,17 @@ function renderHome(){
       ? avatarSVG(userProfile.avatarConfig, 40)
       : '';
 
+  const alerts = isBrandNew ? [] : computeAlerts();
+  let alertsHtml = '';
+  if(alerts.length > 0){
+    const shown = alerts.slice(0, 4);
+    alertsHtml = `
+      <div class="section-label">Needs attention</div>
+      ${shown.map((a,i) => `<div class="insight-card ${a.severity} clickable" data-alert="${i}">${escapeHtml(a.text)}</div>`).join('')}
+      ${alerts.length > shown.length ? `<p class="hero-body" style="font-size:12px;margin:-4px 0 20px;">+${alerts.length - shown.length} more — check the relevant section.</p>` : ''}
+    `;
+  }
+
   document.getElementById('mainArea').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
       ${avatarSmall}
@@ -1260,19 +1766,29 @@ function renderHome(){
     </div>
     <h2 class="hero-headline">Here's where things stand.</h2>
     ${welcomeHint}
+    ${alertsHtml}
 
-    <div class="dashboard-grid">${tilesHtml}</div>
+    <div class="dashboard-grid">${categoryTilesHtml}</div>
 
     ${thisMonthHtml}
   `;
+
+  document.querySelectorAll('[data-alert]').forEach(el => {
+    el.addEventListener('click', () => { alerts[parseInt(el.getAttribute('data-alert'),10)].onClick(); });
+  });
 
   document.querySelectorAll('[data-goto="detail"]').forEach(el => {
     el.addEventListener('click', () => { activeMonth = monthKey; view = "detail"; render(); });
   });
 
   document.querySelectorAll('.dashboard-tile').forEach(el => {
-    el.addEventListener('click', () => { tiles[parseInt(el.getAttribute('data-idx'),10)].onClick(); });
+    el.addEventListener('click', () => {
+      activeCategory = parseInt(el.getAttribute('data-cat-idx'),10);
+      view = "category"; render();
+    });
   });
+  const guideLink = document.getElementById('guideLink');
+  if(guideLink) guideLink.addEventListener('click', (e) => { e.preventDefault(); guideReturnView = "home"; view = "guide"; render(); });
 }
 
 function renderPublicLanding(){
@@ -1283,21 +1799,35 @@ function renderPublicLanding(){
 
   const features = [
     { icon:TILE_ICONS.accounts, label:'Accounts', sub:'Chequing, cards, loans — all in one place',
-      detail:"Add every account you have — chequing, savings, credit cards, loans, mortgages — and see exactly what you hold and what you owe, all entered by you, never connected to your bank." },
+      detail:"Add every account you have — chequing, savings, credit cards, loans, mortgages, investment accounts — and see exactly what you hold and what you owe, all entered by you, never connected to your bank." },
     { icon:TILE_ICONS.ledger, label:'Budgeting', sub:'Track spending by month',
-      detail:"Log every expense in seconds and see it organized automatically by month and category — with charts showing exactly where your money goes, no spreadsheet required." },
+      detail:"Log every expense in seconds and see it organized automatically by month and category — with charts, month-over-month trends, and search across everything you've ever logged." },
     { icon:'<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 13L7 9L10 11L17 4M12 4H17V9" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17H17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>', label:'Income', sub:'Watch your balance in real time',
       detail:"Log what comes in alongside what goes out. Your remaining balance updates the moment you add an expense, so you always know what's actually left to spend." },
     { icon:TILE_ICONS.bills, label:'Bills', sub:'Rent, subscriptions, auto-tracked',
       detail:"Set up rent, subscriptions, or any regular payment once and it logs itself every month after that, with a due-soon list so nothing catches you off guard." },
     { icon:TILE_ICONS.watchlist, label:'Stock watchlist', sub:'Live prices you follow',
-      detail:"Follow any publicly traded stock with live prices and daily change, plus full details — market cap, day range, 52-week range, YTD — the moment you tap in." },
-    { icon:TILE_ICONS.portfolio, label:'Portfolio', sub:'Real holdings, real gains',
-      detail:"Log the shares you actually own and watch real gains and losses move with the market, alongside upcoming and past earnings for every position." },
+      detail:"Follow any publicly traded stock with live prices and daily change, plus full details — market cap, day range, 52-week range, YTD. Popular stocks are one tap away to add." },
+    { icon:TILE_ICONS.portfolio, label:'Portfolio', sub:'Real buy/sell history',
+      detail:"Log every actual buy, sell, and dividend — average cost, unrealized gains, realized gains from past sales, and total dividend income are all calculated from your real transaction history, not a single number you type in." },
     { icon:TILE_ICONS.networth, label:'Net worth', sub:'Assets minus debts, at a glance',
-      detail:"Every account and investment feeds one number: total assets minus total liabilities. Pay down a loan or watch an investment grow, and it updates right there." },
+      detail:"Every account and investment feeds one number automatically: total assets minus total liabilities. Pay down a loan or watch an investment grow, and it updates right there." },
     { icon:TILE_ICONS.growth, label:'Growth Calculator', sub:'Future value & inflation',
-      detail:"Project what an investment could grow into — every input adjustable, inflation included, with a live chart showing nominal value, real value, and what you actually contributed." }
+      detail:"Project what an investment could grow into — every input adjustable, inflation included, with a live chart showing nominal value, real value, and what you actually contributed." },
+    { icon:TILE_ICONS.goals, label:'Financial Goals', sub:'Emergency fund, a trip, anything',
+      detail:"Set a target for an emergency fund, a down payment, a vacation, or anything custom, with a monthly contribution and a projected date you'll actually get there." },
+    { icon:TILE_ICONS.debt, label:'Debt Payoff Planner', sub:'Avalanche vs. Snowball',
+      detail:"Compares paying off highest-interest debt first against smallest-balance first, showing months to debt-free and total interest for each so you can see the real trade-off." },
+    { icon:TILE_ICONS.cashflow, label:'Cash Flow Forecast', sub:'30/60/90-day projection',
+      detail:"Projects your liquid cash forward using your real average income and spending, so you can see whether you're headed for trouble before it happens." },
+    { icon:TILE_ICONS.health, label:'Financial Health Score', sub:'One transparent number',
+      detail:"A 0–100 score built from your savings rate, emergency fund, debt load, cash flow trend, and investing — every part explained, nothing hidden." },
+    { icon:TILE_ICONS.insurance, label:'Insurance', sub:'Policies & renewal reminders',
+      detail:"Track home, auto, tenant, and life insurance policies with provider, premium, and coverage — flagged automatically when a renewal is coming up." },
+    { icon:TILE_ICONS.vehicle, label:'Vehicle Finance', sub:'True cost of ownership',
+      detail:"Track a vehicle's value against its loan to see your real equity, plus payment, insurance, fuel, and maintenance rolled into one true monthly cost." },
+    { icon:TILE_ICONS.tax, label:'Tax Center', sub:'Income, gains & deductions',
+      detail:"Income, capital gains, and dividends are pulled automatically from what you've already logged. Add RRSP/FHSA contributions and deductions, then get a simple estimated-tax figure using your own rate — not a substitute for filing software, but a clear picture ahead of time." }
   ];
   const featuresHtml = features.map((f,i) => `
     <div class="dashboard-tile" data-feature="${i}">
@@ -1321,7 +1851,7 @@ function renderPublicLanding(){
     <div style="margin-bottom:16px;">${logoMark(48)}</div>
     <div class="hero-eyebrow">A place to keep track</div>
     <h2 class="hero-headline">Money you can see is money you can control.</h2>
-    <p class="hero-body">Most budgets fail quietly — not from one bad purchase, but from a hundred small ones nobody wrote down. Moneta Compass makes your whole financial picture visible: accounts, spending, bills, investments, and net worth, all in one place, all free to start.</p>
+    <p class="hero-body">Most budgets fail quietly — not from one bad purchase, but from a hundred small ones nobody wrote down. Moneta Compass makes your whole financial picture visible: accounts, spending, bills, investments, net worth, goals, debt payoff, and a transparent health score — all in one place, all free to start.</p>
     <button class="cta" id="ctaStart1">Create your free account</button>
     <button class="cta" id="tryCalculator" style="background:transparent;color:var(--ink);border:1px solid var(--ink);margin-top:10px;">${TILE_ICONS.growth} Try the Growth Calculator — no sign-up needed</button>
 
@@ -1396,6 +1926,15 @@ function renderMonths(){
     { label:t('accountsPage'), onClick:()=>{ view="accounts"; render(); } },
     { label:'Net Worth', onClick:()=>{ view="networth"; render(); } },
     { label:t('growthCalc'), onClick:()=>{ view="growth"; render(); } },
+    { label:t('goalsLabel'), onClick:()=>{ view="goals"; render(); } },
+    { label:t('debtPayoffLabel'), onClick:()=>{ view="debtplanner"; render(); } },
+    { label:t('cashFlowLabel'), onClick:()=>{ view="cashflow"; render(); } },
+    { label:t('healthScoreLabel'), onClick:()=>{ view="healthscore"; render(); } },
+    { label:t('insuranceLabel'), onClick:()=>{ view="insurance"; render(); } },
+    { label:t('vehiclesLabel'), onClick:()=>{ view="vehicles"; render(); } },
+    { label:t('taxCenterLabel'), onClick:()=>{ view="taxcenter"; render(); } },
+    { label:'Retirement', onClick:()=>{ view="retirement"; render(); } },
+    { label:t('documentsLabel'), onClick:()=>{ view="documents"; render(); } },
     { label:t('settings'), onClick:()=>{ view="settings"; render(); } },
     { label:t('logOut'), onClick:logOut }
   ]);
@@ -1618,7 +2157,7 @@ function renderDetail(monthKey){
       <div class="chart-block">
         <div class="chart-title">Where it's going</div>
         <div class="chart-block-inner">
-          ${donutChartSVG(catSegments, {centerLabel:"Total", centerValue: fmt(catSegments.reduce((s,x)=>s+x.value,0))})}
+          ${donutChartSVG(catSegments, {centerLabel:"Total", centerValue: fmt(catSegments.reduce((s,x)=>s+x.value,0)), tooltipFormat: fmt})}
           <div class="legend-list">${donutLegendHTML(catSegments, fmt)}</div>
         </div>
       </div>`;
@@ -1635,7 +2174,7 @@ function renderDetail(monthKey){
         <div class="chart-block">
           <div class="chart-title">Spent vs. saved</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(savingsSegments, {centerLabel:"Income", centerValue: fmt(incomeTotal)})}
+            ${donutChartSVG(savingsSegments, {centerLabel:"Income", centerValue: fmt(incomeTotal), tooltipFormat: fmt})}
             <div class="legend-list">${donutLegendHTML(savingsSegments, fmt)}</div>
           </div>
         </div>`;
@@ -1681,10 +2220,16 @@ function renderDetail(monthKey){
     <div class="networth-summary">
       <div class="nw-card"><div class="label">${t('incomeIn')} ${monthLabel(monthKey)}</div><div class="value" style="color:var(--moss);">${fmt(incomeTotal)}</div></div>
       <div class="nw-card"><div class="label">${t('spentIn')} ${monthLabel(monthKey)}</div><div class="value">${fmt(total)}</div></div>
-      <div class="nw-card highlight"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--rust);':''}">${fmt(remaining)}</div></div>
+      <div class="nw-card highlight"><div class="label">${t('remaining')}</div><div class="value" style="${remaining<0?'color:var(--on-highlight-danger);':''}">${fmt(remaining)}</div></div>
     </div>
-    ${chartsHtml}
-    ${analyticsHtml}
+    ${(chartsHtml || analyticsHtml) ? `
+    <details class="add-collapsible">
+      <summary>Charts &amp; insights</summary>
+      <div class="add-collapsible-body">
+        ${chartsHtml}
+        ${analyticsHtml}
+      </div>
+    </details>` : ''}
     ${budgetHtml}
     ${incomeHtml}
     <div class="section-label">${t('entries')}</div>
@@ -1888,6 +2433,22 @@ const NET_WORTH_COLORS = {
   "Credit Cards":"#A8462F", "Loans/Debt":"#6B4C3A"
 };
 
+async function saveNetWorthSnapshot(dateISO, totalAssets, totalLiabilities, netWorth){
+  try{
+    const { data, error } = await sb.from('net_worth_snapshots').upsert({
+      user_id: currentUser.id, snapshot_date: dateISO,
+      total_assets: totalAssets, total_liabilities: totalLiabilities, net_worth: netWorth
+    }, { onConflict: 'user_id,snapshot_date' }).select().single();
+    if(error) throw error;
+    netWorthSnapshots = netWorthSnapshots.filter(s => s.date !== dateISO);
+    netWorthSnapshots.push({ id:data.id, date:dateISO, totalAssets, totalLiabilities, netWorth });
+    netWorthSnapshots.sort((a,b) => a.date.localeCompare(b.date));
+    if(view === "networth") renderNetWorth();
+  }catch(e){
+    // Silent — a missed snapshot isn't worth interrupting the page for.
+  }
+}
+
 function renderNetWorth(){
   document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('netWorth')}`;
   document.getElementById('pageSub').innerHTML = '';
@@ -1929,7 +2490,7 @@ function renderNetWorth(){
         <div class="chart-block">
           <div class="chart-title">Assets breakdown</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(assetSegments, {centerLabel:"Assets", centerValue: fmt(totalAssets)})}
+            ${donutChartSVG(assetSegments, {centerLabel:"Assets", centerValue: fmt(totalAssets), tooltipFormat: fmt})}
             <div class="legend-list">${donutLegendHTML(assetSegments, fmt)}</div>
           </div>
         </div>`;
@@ -1948,7 +2509,7 @@ function renderNetWorth(){
         <div class="chart-block">
           <div class="chart-title">Liabilities breakdown</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(liabSegments, {centerLabel:"Debts", centerValue: fmt(totalLiabilities)})}
+            ${donutChartSVG(liabSegments, {centerLabel:"Debts", centerValue: fmt(totalLiabilities), tooltipFormat: fmt})}
             <div class="legend-list">${donutLegendHTML(liabSegments, fmt)}</div>
           </div>
         </div>`;
@@ -1962,6 +2523,49 @@ function renderNetWorth(){
       Update account balances on the Accounts page — no need to re-enter them here.
     </div>`;
 
+  // Auto-snapshot: once per day, the first time this page is opened, today's
+  // totals are saved so a real trend builds up over time — no manual step.
+  const todayISO = new Date().toISOString().slice(0,10);
+  const hasTodaySnapshot = netWorthSnapshots.some(s => s.date === todayISO);
+  const hasAnyData = totalAssets > 0 || totalLiabilities > 0;
+  if(hasAnyData && !hasTodaySnapshot){
+    saveNetWorthSnapshot(todayISO, totalAssets, totalLiabilities, netWorth);
+  }
+
+  let historyHtml = '';
+  const chartPoints = netWorthSnapshots.slice();
+  if(hasAnyData && !hasTodaySnapshot){
+    chartPoints.push({ date:todayISO, totalAssets, totalLiabilities, netWorth });
+  }
+  if(chartPoints.length >= 2){
+    const showYear = chartPoints.length > 1 &&
+      (new Date(chartPoints[chartPoints.length-1].date) - new Date(chartPoints[0].date)) / 86400000 > 200;
+    const labels = chartPoints.map(s => new Date(s.date+'T00:00:00').toLocaleDateString(undefined, showYear?{month:'short',year:'2-digit'}:{month:'short',day:'numeric'}));
+    historyHtml = `
+      <div class="section-label">History</div>
+      <div id="nwHistoryChart">${lineChartSVG(
+        [
+          { label:'Assets', color:'var(--moss)', points:chartPoints.map(s=>s.totalAssets) },
+          { label:'Liabilities', color:'var(--rust)', points:chartPoints.map(s=>s.totalLiabilities) },
+          { label:'Net worth', color:'#5B7CA8', points:chartPoints.map(s=>s.netWorth) }
+        ],
+        labels,
+        { yFormat: v => fmt(v).replace(/\.00$/,''), tooltipFormat: fmt }
+      )}</div>
+      <div class="legend-list" style="margin-top:8px;">
+        <div class="legend-row"><span class="legend-dot" style="background:var(--moss)"></span><span class="legend-label">Assets</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:var(--rust)"></span><span class="legend-label">Liabilities</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#5B7CA8"></span><span class="legend-label">Net worth</span></div>
+      </div>
+      <p class="hero-body" style="font-size:12px;margin-top:8px;">One point is saved automatically each day you check in — visit regularly to build a fuller trend.</p>
+    `;
+  }else if(hasAnyData){
+    historyHtml = `
+      <div class="section-label">History</div>
+      <p class="hero-body" style="font-size:12.5px;">Today's snapshot has been saved. Come back another day to start seeing a trend here.</p>
+    `;
+  }
+
   let html = `
     <div class="networth-summary">
       <div class="nw-card"><div class="label">${t('totalAssets')}</div><div class="value">${fmt(totalAssets)}</div></div>
@@ -1969,10 +2573,14 @@ function renderNetWorth(){
       <div class="nw-card highlight"><div class="label">${t('netWorthLabel')}</div><div class="value">${fmt(netWorth)}</div></div>
     </div>
     ${chartsHtml}
+    ${historyHtml}
     ${sourceNote}
     <div class="section-label">Other assets &amp; debts</div>
     <p class="hero-body" style="font-size:12.5px;margin:-6px 0 14px;">For things that aren't accounts — a car, property, or anything else you want counted. Tap any to update it.</p>
 
+    <details class="add-collapsible">
+      <summary>Add an asset or debt</summary>
+      <div class="add-collapsible-body">
     <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
       <select id="nwCategory">
         <optgroup label="Assets">
@@ -1988,6 +2596,8 @@ function renderNetWorth(){
       </div>
       <button type="button" class="add" id="addNwBtn">${t('addItem')}</button>
     </div>
+      </div>
+    </details>
   `;
 
   const allCats = ASSET_CATS.concat(LIABILITY_CATS);
@@ -2075,11 +2685,6 @@ async function addNetWorthItem(){
 }
 
 /* ================= Accounts ================= */
-const ACCOUNT_ICONS = {
-  "Chequing":"🏦", "Savings":"🏦", "Cash":"💵", "Credit Card":"💳",
-  "Investment":"📈", "Loan":"📄", "Mortgage":"🏠"
-};
-
 function renderAccounts(){
   document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('accountsPage')}`;
   document.getElementById('pageSub').innerHTML = '';
@@ -2095,6 +2700,9 @@ function renderAccounts(){
     </div>
     <p class="hero-body" style="font-size:12.5px;margin:-4px 0 18px;">Tap any account to update its balance. All balances here are entered by you — Moneta Compass never connects to your bank.</p>
 
+    <details class="add-collapsible">
+      <summary>Add an account</summary>
+      <div class="add-collapsible-body">
     <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
       <div class="row">
         <div class="field"><input type="text" id="acctName" placeholder="Account name, e.g. TD Chequing"></div>
@@ -2103,11 +2711,14 @@ function renderAccounts(){
         </div>
       </div>
       <div class="row">
-        <div class="field"><input type="text" id="acctInstitution" placeholder="Institution (optional)"></div>
+        <div class="field"><input type="text" id="acctInstitution" placeholder="Institution (optional)" list="bankNameList"></div>
+        <datalist id="bankNameList">${Object.keys(BANK_NAMES).map(n=>`<option value="${n}">`).join('')}</datalist>
         <div class="field" style="flex:0 0 120px;"><input type="number" id="acctBalance" placeholder="Balance" step="0.01" min="0"></div>
       </div>
       <button type="button" class="add" id="addAcctBtn">Add account</button>
     </div>
+      </div>
+    </details>
   `;
 
   if(accounts.length === 0){
@@ -2117,19 +2728,33 @@ function renderAccounts(){
       const items = accounts.filter(a => a.type === type);
       if(items.length === 0) return;
       const subtotal = items.reduce((s,a)=>s+a.balance,0);
+      const typeIcon = SMALL_ICONS[ACCOUNT_TYPE_ICON_KEY[type]] || '';
       html += `
-        <div class="section-label" style="display:flex;justify-content:space-between;">
-          <span>${ACCOUNT_ICONS[type]||''} ${type}</span><span>${fmt(subtotal)}</span>
+        <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="display:flex;align-items:center;gap:8px;">${typeIcon}${type}</span><span>${fmt(subtotal)}</span>
         </div>`;
       items.forEach(a => {
+        let utilizationHtml = '';
+        if(a.type === 'Credit Card' && a.creditLimit && a.creditLimit > 0){
+          const util = Math.min(100, (a.balance / a.creditLimit) * 100);
+          utilizationHtml = `
+            <div class="budget-track" style="margin-top:6px;"><div class="budget-fill ${util>30?'over':'ok'}" style="width:${util}%;"></div></div>
+            <div class="stock-meta" style="margin-top:2px;">${util.toFixed(0)}% of ${fmt(a.creditLimit)} limit</div>`;
+        }
         html += `
           <div class="nw-item-row" data-id="${a.id}" data-type="${a.type}" style="cursor:pointer;">
-            <div>
-              <div class="nw-item-label">${escapeHtml(a.name)}</div>
-              ${a.institution ? `<div class="stock-meta">${escapeHtml(a.institution)}</div>` : ''}
+            <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">
+              ${a.institution ? initialsBadgeHtml(a.institution, BANK_NAMES) : `<div class="type-icon-badge">${typeIcon}</div>`}
+              <div style="flex:1;min-width:0;">
+                <div class="nw-item-label">${escapeHtml(a.name)}</div>
+                ${a.institution ? `<div class="stock-meta">${escapeHtml(a.institution)}</div>` : ''}
+                ${a.interestRate!=null ? `<div class="stock-meta">${a.interestRate}% APR${a.minimumPayment!=null ? ` · ${fmt(a.minimumPayment)} min/mo` : ''}</div>` : ''}
+                ${utilizationHtml}
+              </div>
             </div>
-            <div style="display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;">
               <div class="nw-item-balance">${fmt(a.balance)}</div>
+              ${ACCOUNT_LIABILITY_TYPES.includes(a.type) ? `<button class="stop-btn edit-amount-btn" data-edit-id="${a.id}" aria-label="Edit details" title="Edit rate/limit">✎</button>` : ''}
               <button class="stock-del" data-id="${a.id}" aria-label="Remove">✕</button>
             </div>
           </div>`;
@@ -2139,8 +2764,10 @@ function renderAccounts(){
 
   if(accounts.length >= 2){
     html += `
-      <div class="section-label">Transfer between accounts</div>
-      <p class="hero-body" style="font-size:12.5px;margin:-4px 0 14px;">Moves money between your own accounts without counting as an expense or income.</p>
+      <details class="add-collapsible">
+        <summary>Transfer between accounts</summary>
+        <div class="add-collapsible-body">
+      <p class="hero-body" style="font-size:12.5px;margin:0 0 14px;">Moves money between your own accounts without counting as an expense or income.</p>
       <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
         <div class="row">
           <div class="field">
@@ -2157,7 +2784,9 @@ function renderAccounts(){
           <div class="field"><input type="text" id="transferNote" placeholder="Note (optional)"></div>
         </div>
         <button type="button" class="add" id="doTransferBtn">Transfer</button>
-      </div>`;
+      </div>
+        </div>
+      </details>`;
 
     if(transfers.length > 0){
       html += `<div class="section-label">Recent transfers</div>`;
@@ -2181,7 +2810,7 @@ function renderAccounts(){
 
   document.querySelectorAll('#mainArea .nw-item-row').forEach(row => {
     row.addEventListener('click', async (e) => {
-      if(e.target.closest('.stock-del')) return;
+      if(e.target.closest('.stock-del') || e.target.closest('.edit-amount-btn')) return;
       const id = row.getAttribute('data-id');
       const type = row.getAttribute('data-type');
       const acct = accounts.find(a => a.id === id);
@@ -2207,6 +2836,37 @@ function renderAccounts(){
       await sb.from('accounts').update({ balance: newBalance }).eq('id', id);
     });
   });
+  document.querySelectorAll('#mainArea .edit-amount-btn[data-edit-id]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-edit-id');
+      const acct = accounts.find(a => a.id === id);
+      if(!acct) return;
+
+      const rateInput = prompt(`Interest rate (APR %) for "${acct.name}":`, acct.interestRate!=null ? acct.interestRate : '');
+      if(rateInput === null) return;
+      const rate = rateInput.trim() === '' ? null : parseFloat(rateInput);
+
+      const paymentInput = prompt(`Minimum monthly payment for "${acct.name}":`, acct.minimumPayment!=null ? acct.minimumPayment : '');
+      if(paymentInput === null) return;
+      const minPayment = paymentInput.trim() === '' ? null : parseFloat(paymentInput);
+
+      let creditLimit = acct.creditLimit;
+      if(acct.type === 'Credit Card'){
+        const limitInput = prompt(`Credit limit for "${acct.name}" (used to show utilization %):`, acct.creditLimit!=null ? acct.creditLimit : '');
+        if(limitInput === null) return;
+        creditLimit = limitInput.trim() === '' ? null : parseFloat(limitInput);
+      }
+
+      acct.interestRate = (rate!=null && !isNaN(rate)) ? rate : null;
+      acct.minimumPayment = (minPayment!=null && !isNaN(minPayment)) ? minPayment : null;
+      acct.creditLimit = (creditLimit!=null && !isNaN(creditLimit)) ? creditLimit : null;
+      renderAccounts();
+      await sb.from('accounts').update({
+        interest_rate: acct.interestRate, minimum_payment: acct.minimumPayment, credit_limit: acct.creditLimit
+      }).eq('id', id);
+    });
+  });
   document.querySelectorAll('#mainArea .nw-item-row .stock-del').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -2230,7 +2890,7 @@ async function addAccount(){
   }).select().single();
   if(error){ alert(error.message || 'Could not add that account.'); return; }
 
-  accounts.push({ id:data.id, name, type, currency:userSettings.currency, balance, institution });
+  accounts.push({ id:data.id, name, type, currency:userSettings.currency, balance, institution, interestRate:null, minimumPayment:null, creditLimit:null });
   renderAccounts();
 }
 
@@ -2296,15 +2956,15 @@ function renderGrowthCalculator(){
     <p class="hero-body" style="font-size:13px;">See what an investment could grow into over time — every number below is yours to change.</p>
 
     <div class="row">
-      <div class="field"><label>Starting amount</label><input type="number" id="gcPrincipal" value="10000" min="0" step="100"></div>
-      <div class="field"><label>Monthly contribution</label><input type="number" id="gcMonthly" value="200" min="0" step="10"></div>
+      <div class="field"><label>Starting amount</label><input type="number" id="gcPrincipal" min="0" step="100"></div>
+      <div class="field"><label>Monthly contribution</label><input type="number" id="gcMonthly" min="0" step="10"></div>
     </div>
     <div class="row">
-      <div class="field"><label>Annual return rate (%)</label><input type="number" id="gcRate" value="7" min="0" max="100" step="0.1"></div>
-      <div class="field"><label>Years</label><input type="number" id="gcYears" value="20" min="1" max="60" step="1"></div>
+      <div class="field"><label>Annual return rate (%)</label><input type="number" id="gcRate" min="0" max="100" step="0.1"></div>
+      <div class="field"><label>Years</label><input type="number" id="gcYears" min="1" max="60" step="1"></div>
     </div>
     <div class="row">
-      <div class="field"><label>Annual inflation rate (%)</label><input type="number" id="gcInflation" value="3" min="0" max="30" step="0.1"></div>
+      <div class="field"><label>Annual inflation rate (%)</label><input type="number" id="gcInflation" min="0" max="30" step="0.1"></div>
       <div class="field"></div>
     </div>
 
@@ -2319,13 +2979,26 @@ function renderGrowthCalculator(){
 
   document.getElementById('backBtn').addEventListener('click', () => { view=currentUser?"months":"home"; render(); });
 
-  const inputs = ['gcPrincipal','gcMonthly','gcRate','gcYears','gcInflation'].map(id => document.getElementById(id));
+  const GC_DEFAULTS = { gcPrincipal:10000, gcMonthly:200, gcRate:7, gcYears:20, gcInflation:3 };
+  let savedGcValues = {};
+  try{ savedGcValues = JSON.parse(localStorage.getItem('moneta-growth-calc') || '{}'); }catch(e){}
+  Object.keys(GC_DEFAULTS).forEach(id => {
+    document.getElementById(id).value = savedGcValues[id] != null ? savedGcValues[id] : GC_DEFAULTS[id];
+  });
+
+  const inputs = Object.keys(GC_DEFAULTS).map(id => document.getElementById(id));
   function recalc(){
     const principal = parseFloat(document.getElementById('gcPrincipal').value) || 0;
     const monthly = parseFloat(document.getElementById('gcMonthly').value) || 0;
     const rate = parseFloat(document.getElementById('gcRate').value) || 0;
     const years = Math.max(1, Math.min(60, parseInt(document.getElementById('gcYears').value) || 1));
     const inflation = parseFloat(document.getElementById('gcInflation').value) || 0;
+
+    try{
+      localStorage.setItem('moneta-growth-calc', JSON.stringify({
+        gcPrincipal:principal, gcMonthly:monthly, gcRate:rate, gcYears:years, gcInflation:inflation
+      }));
+    }catch(e){}
 
     const result = computeGrowth(principal, monthly, rate, years, inflation);
     const totalGrowth = result.finalNominal - result.totalContributed;
@@ -2355,6 +3028,1137 @@ function renderGrowthCalculator(){
 
   inputs.forEach(el => el.addEventListener('input', recalc));
   recalc();
+}
+
+/* ================= Financial Goals ================= */
+function projectedCompletionDate(goal){
+  const remaining = goal.targetAmount - goal.currentAmount;
+  if(remaining <= 0) return { done:true };
+  if(!goal.monthlyContribution || goal.monthlyContribution <= 0) return { done:false, months:null };
+  const months = Math.ceil(remaining / goal.monthlyContribution);
+  const d = new Date();
+  d.setMonth(d.getMonth() + months);
+  return { done:false, months, date:d };
+}
+
+let editingGoalId = null;
+
+function renderGoals(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('goalsLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const editingGoal = editingGoalId ? financialGoals.find(g => g.id === editingGoalId) : null;
+
+  let html = `
+    <details class="add-collapsible" id="goalFormDetails" ${editingGoal ? 'open' : ''}>
+      <summary>${editingGoal ? `Edit "${escapeHtml(editingGoal.name)}"` : 'Add a goal'}</summary>
+      <div class="add-collapsible-body">
+    <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
+      <div class="row">
+        <div class="field"><input type="text" id="goalName" placeholder="Goal name, e.g. New car" value="${editingGoal?escapeHtml(editingGoal.name):''}"></div>
+        <div class="field" style="flex:0 0 150px;">
+          <select id="goalType">${GOAL_TYPES.map(t=>`<option value="${t}" ${editingGoal&&editingGoal.goalType===t?'selected':''}>${t}</option>`).join('')}</select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="field"><input type="number" id="goalTarget" placeholder="Target amount" step="0.01" min="0.01" value="${editingGoal?editingGoal.targetAmount:''}"></div>
+        <div class="field"><input type="number" id="goalCurrent" placeholder="Already saved (optional)" step="0.01" min="0" value="${editingGoal?editingGoal.currentAmount:''}"></div>
+      </div>
+      <div class="row">
+        <div class="field"><input type="number" id="goalMonthly" placeholder="Monthly contribution (optional)" step="0.01" min="0" value="${editingGoal&&editingGoal.monthlyContribution?editingGoal.monthlyContribution:''}"></div>
+        <div class="field"><input type="date" id="goalDate" value="${editingGoal&&editingGoal.targetDate?editingGoal.targetDate:''}"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" class="add" id="addGoalBtn" style="flex:1;">${editingGoal ? 'Save changes' : 'Add goal'}</button>
+        ${editingGoal ? `<button type="button" class="cancel" id="cancelGoalEditBtn">${t('cancel')}</button>` : ''}
+      </div>
+    </div>
+      </div>
+    </details>
+  `;
+
+  if(financialGoals.length === 0){
+    html += '<div class="empty">No goals yet. Add one above — Emergency Fund, a car, a trip, anything you\'re saving toward.</div>';
+  }else{
+    financialGoals.forEach(g => {
+      const pct = g.targetAmount > 0 ? Math.min(100, (g.currentAmount/g.targetAmount)*100) : 0;
+      const proj = projectedCompletionDate(g);
+      let projText;
+      if(proj.done) projText = 'Goal reached! 🎉';
+      else if(proj.months == null) projText = 'Add a monthly contribution to see a projected date';
+      else projText = `About ${proj.months} month${proj.months===1?'':'s'} away (${proj.date.toLocaleDateString(undefined,{month:'short', year:'numeric'})})`;
+
+      html += `
+        <div class="section-label" style="display:flex;justify-content:space-between;border-bottom:none;margin-bottom:6px;align-items:center;">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="type-icon-badge" style="width:26px;height:26px;">${SMALL_ICONS[GOAL_TYPE_ICON_KEY[g.goalType]]||''}</span>
+            ${escapeHtml(g.name)} <span style="text-transform:none;font-weight:400;color:var(--ink-soft);">· ${escapeHtml(g.goalType)}</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <button class="stop-btn edit-amount-btn" data-edit-id="${g.id}" aria-label="Edit goal" title="Edit all details">✎</button>
+            <button class="stock-del" data-id="${g.id}" aria-label="Delete goal">✕</button>
+          </span>
+        </div>
+        <div class="budget-row" data-id="${g.id}" style="cursor:pointer;">
+          <div class="budget-top">
+            <span>${fmt(g.currentAmount)} of ${fmt(g.targetAmount)}</span>
+            <span>${pct.toFixed(0)}%</span>
+          </div>
+          <div class="budget-track"><div class="budget-fill ${proj.done?'ok':(pct>0?'ok':'over')}" style="width:${pct}%;"></div></div>
+        </div>
+        <p class="hero-body" style="font-size:12px;margin:4px 0 20px;">${projText}${g.targetDate ? ` · target date: ${new Date(g.targetDate+'T00:00:00').toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'})}` : ''}</p>
+      `;
+    });
+  }
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('addGoalBtn').addEventListener('click', addGoal);
+  const cancelBtn = document.getElementById('cancelGoalEditBtn');
+  if(cancelBtn) cancelBtn.addEventListener('click', () => { editingGoalId = null; renderGoals(); });
+
+  document.querySelectorAll('.budget-row[data-id]').forEach(row => {
+    row.addEventListener('click', async () => {
+      const id = row.getAttribute('data-id');
+      const goal = financialGoals.find(g => g.id === id);
+      if(!goal) return;
+      const input = prompt(`How much have you saved toward "${goal.name}" now?\nCurrent: ${fmt(goal.currentAmount)} of ${fmt(goal.targetAmount)}`);
+      if(input === null) return;
+      const val = parseFloat(input);
+      if(isNaN(val) || val < 0) return;
+      goal.currentAmount = val;
+      renderGoals();
+      await sb.from('financial_goals').update({ current_amount: val }).eq('id', id);
+    });
+  });
+  document.querySelectorAll('[data-edit-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingGoalId = btn.getAttribute('data-edit-id');
+      renderGoals();
+      document.getElementById('goalFormDetails').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+  document.querySelectorAll('.stock-del[data-id]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      if(editingGoalId === id) editingGoalId = null;
+      financialGoals = financialGoals.filter(g => g.id !== id);
+      render();
+      await sb.from('financial_goals').delete().eq('id', id);
+    });
+  });
+}
+
+async function addGoal(){
+  const name = document.getElementById('goalName').value.trim();
+  const goalType = document.getElementById('goalType').value;
+  const targetAmount = parseFloat(document.getElementById('goalTarget').value);
+  const currentAmount = parseFloat(document.getElementById('goalCurrent').value) || 0;
+  const monthlyContribution = parseFloat(document.getElementById('goalMonthly').value) || 0;
+  const targetDate = document.getElementById('goalDate').value || null;
+  if(!name || !targetAmount || targetAmount <= 0) return;
+
+  if(editingGoalId){
+    const { error } = await sb.from('financial_goals').update({
+      name, goal_type:goalType, target_amount:targetAmount, current_amount:currentAmount,
+      target_date:targetDate, monthly_contribution:monthlyContribution
+    }).eq('id', editingGoalId);
+    if(error){ alert(error.message || 'Could not save changes.'); return; }
+
+    const g = financialGoals.find(x => x.id === editingGoalId);
+    if(g){ g.name=name; g.goalType=goalType; g.targetAmount=targetAmount; g.currentAmount=currentAmount; g.targetDate=targetDate; g.monthlyContribution=monthlyContribution; }
+    editingGoalId = null;
+    renderGoals();
+    return;
+  }
+
+  const { data, error } = await sb.from('financial_goals').insert({
+    user_id: currentUser.id, name, goal_type:goalType, target_amount:targetAmount,
+    current_amount:currentAmount, target_date:targetDate, monthly_contribution:monthlyContribution
+  }).select().single();
+  if(error){ alert(error.message || 'Could not add that goal.'); return; }
+
+  financialGoals.push({ id:data.id, name, goalType, targetAmount, currentAmount, targetDate, monthlyContribution });
+  renderGoals();
+}
+
+/* ================= Debt Payoff Planner ================= */
+function simulatePayoff(debts, extraMonthly, strategy){
+  let items = debts.map(d => ({ ...d }));
+  if(strategy === 'avalanche') items.sort((a,b) => b.rate - a.rate);
+  else items.sort((a,b) => a.balance - b.balance);
+
+  let months = 0, totalInterest = 0;
+  const maxMonths = 600;
+  while(items.some(d => d.balance > 0.01) && months < maxMonths){
+    months++;
+    items.forEach(d => {
+      if(d.balance <= 0) return;
+      const monthlyRate = (d.rate/100) / 12;
+      const interest = d.balance * monthlyRate;
+      totalInterest += interest;
+      d.balance += interest;
+    });
+    const rolledMin = items.filter(d => d.balance <= 0).reduce((s,d) => s + d.minPayment, 0);
+    let pool = extraMonthly + rolledMin;
+    items.forEach(d => {
+      if(d.balance <= 0) return;
+      const pay = Math.min(d.minPayment, d.balance);
+      d.balance -= pay;
+    });
+    for(const d of items){
+      if(pool <= 0) break;
+      if(d.balance <= 0) continue;
+      const pay = Math.min(pool, d.balance);
+      d.balance -= pay;
+      pool -= pay;
+    }
+  }
+  const neverPaysOff = items.some(d => d.balance > 0.01);
+  return { months, totalInterest, neverPaysOff };
+}
+
+function renderDebtPlanner(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('debtPayoffLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const debtAccounts = accounts.filter(a => ACCOUNT_LIABILITY_TYPES.includes(a.type) && a.balance > 0);
+  const ready = debtAccounts.filter(a => a.interestRate != null && a.minimumPayment != null);
+  const missingInfo = debtAccounts.filter(a => a.interestRate == null || a.minimumPayment == null);
+
+  let html = `<p class="hero-body" style="font-size:13px;">Compares two payoff orders: <strong>Avalanche</strong> (highest interest rate first — saves the most money) vs. <strong>Snowball</strong> (smallest balance first — clears accounts faster for momentum). Add extra you can put toward debt each month beyond your minimums.</p>`;
+
+  if(debtAccounts.length === 0){
+    html += `<div class="empty">No debt accounts yet. Add a Credit Card, Loan, or Mortgage on the Accounts page first.</div>`;
+  }else if(missingInfo.length > 0){
+    html += `<div class="insight-card" style="border-left-color:var(--rust);">
+      Missing interest rate and/or minimum payment for: ${missingInfo.map(a=>escapeHtml(a.name)).join(', ')}.
+      Go to Accounts and tap the ✎ next to each to fill those in — the planner needs both to run the comparison.
+    </div>`;
+  }
+
+  if(ready.length > 0){
+    html += `
+      <div class="row">
+        <div class="field"><label>Extra payment per month (beyond minimums)</label><input type="number" id="debtExtra" value="0" min="0" step="10"></div>
+      </div>
+      <div id="debtResults"></div>
+    `;
+  }
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+
+  if(ready.length > 0){
+    const debts = ready.map(a => ({ name:a.name, balance:a.balance, rate:a.interestRate, minPayment:a.minimumPayment }));
+    function recalcDebt(){
+      const extra = parseFloat(document.getElementById('debtExtra').value) || 0;
+      const avalanche = simulatePayoff(debts, extra, 'avalanche');
+      const snowball = simulatePayoff(debts, extra, 'snowball');
+      const savings = snowball.totalInterest - avalanche.totalInterest;
+      const eitherNeverPaysOff = avalanche.neverPaysOff || snowball.neverPaysOff;
+
+      document.getElementById('debtResults').innerHTML = `
+        ${eitherNeverPaysOff ? `<div class="insight-card" style="border-left-color:var(--rust);">At these minimum payments and this extra amount, at least one debt's interest is growing faster than it's being paid down — it wouldn't actually be paid off within 50 years. Try increasing the extra payment above.</div>` : ''}
+        <div class="charts-row">
+          <div class="chart-block">
+            <div class="chart-title">Avalanche (highest rate first)</div>
+            <div class="nw-card" style="margin-top:8px;">
+              <div class="label">Debt-free in</div><div class="value">${avalanche.neverPaysOff ? 'Never at this rate' : avalanche.months + ' mo'}</div>
+              <div class="label" style="margin-top:8px;">Total interest paid</div><div class="value" style="font-size:20px;">${avalanche.neverPaysOff ? '—' : fmt(avalanche.totalInterest)}</div>
+            </div>
+          </div>
+          <div class="chart-block">
+            <div class="chart-title">Snowball (smallest balance first)</div>
+            <div class="nw-card" style="margin-top:8px;">
+              <div class="label">Debt-free in</div><div class="value">${snowball.neverPaysOff ? 'Never at this rate' : snowball.months + ' mo'}</div>
+              <div class="label" style="margin-top:8px;">Total interest paid</div><div class="value" style="font-size:20px;">${snowball.neverPaysOff ? '—' : fmt(snowball.totalInterest)}</div>
+            </div>
+          </div>
+        </div>
+        ${(!eitherNeverPaysOff && savings > 1) ? `<div class="insight-card">Avalanche saves you ${fmt(savings)} in interest compared to Snowball for these balances — Snowball may still feel more motivating if you want quick wins first.</div>` : ''}
+        <p class="hero-body" style="font-size:12px;">This assumes your interest rates and minimum payments stay constant and you make payments every month without missing one. Real terms can change — check your actual statements.</p>
+      `;
+    }
+    document.getElementById('debtExtra').addEventListener('input', recalcDebt);
+    recalcDebt();
+  }
+}
+
+/* ================= Cash Flow Forecast ================= */
+function renderCashFlow(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('cashFlowLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const liquidBalance = accounts
+    .filter(a => ["Chequing","Savings","Cash"].includes(a.type))
+    .reduce((s,a) => s + a.balance, 0);
+
+  const nowKey = currentMonthKey();
+  const priorMonths = [1,2,3].map(n => shiftMonthKey(nowKey, -n));
+  let incomeSum = 0, expenseSum = 0, monthsWithData = 0;
+  priorMonths.forEach(mk => {
+    const inc = incomeEntries.filter(i => i.date.slice(0,7)===mk).reduce((s,i)=>s+i.amount,0);
+    const exp = expenses.filter(e => e.date.slice(0,7)===mk).reduce((s,e)=>s+e.amount,0);
+    if(inc > 0 || exp > 0){ incomeSum += inc; expenseSum += exp; monthsWithData++; }
+  });
+  if(monthsWithData === 0){
+    const inc = incomeEntries.filter(i => i.date.slice(0,7)===nowKey).reduce((s,i)=>s+i.amount,0);
+    const exp = expenses.filter(e => e.date.slice(0,7)===nowKey).reduce((s,e)=>s+e.amount,0);
+    incomeSum = inc; expenseSum = exp; monthsWithData = 1;
+  }
+  const avgMonthlyIncome = incomeSum / monthsWithData;
+  const avgMonthlyExpense = expenseSum / monthsWithData;
+  const dailyNet = (avgMonthlyIncome - avgMonthlyExpense) / 30;
+
+  const day30 = liquidBalance + dailyNet*30;
+  const day60 = liquidBalance + dailyNet*60;
+  const day90 = liquidBalance + dailyNet*90;
+
+  const chart = lineChartSVG(
+    [{ label:'Projected balance', color: dailyNet>=0 ? 'var(--moss)' : 'var(--rust)', points:[liquidBalance, day30, day60, day90] }],
+    ['Today','30 days','60 days','90 days'],
+    { yFormat: v => fmt(v).replace(/\.00$/,''), tooltipFormat: fmt }
+  );
+
+  document.getElementById('mainArea').innerHTML = `
+    <p class="hero-body" style="font-size:13px;">Projects your liquid cash (Chequing, Savings, Cash accounts) forward using your average income and spending from the last ${monthsWithData} month${monthsWithData===1?'':'s'}. This is an estimate, not a guarantee — one big expense or a late paycheck changes everything.</p>
+
+    <div class="networth-summary">
+      <div class="nw-card"><div class="label">Cash today</div><div class="value">${fmt(liquidBalance)}</div></div>
+      <div class="nw-card"><div class="label">Avg. monthly income</div><div class="value" style="color:var(--moss);">${fmt(avgMonthlyIncome)}</div></div>
+      <div class="nw-card"><div class="label">Avg. monthly spending</div><div class="value">${fmt(avgMonthlyExpense)}</div></div>
+    </div>
+
+    <div class="section-label">Projected cash on hand</div>
+    <div id="cashFlowChart">${chart}</div>
+    <div class="legend-list" style="margin-top:10px;">
+      <div class="legend-row"><span class="legend-label">In 30 days</span><span class="legend-value">${fmt(day30)}</span></div>
+      <div class="legend-row"><span class="legend-label">In 60 days</span><span class="legend-value">${fmt(day60)}</span></div>
+      <div class="legend-row"><span class="legend-label">In 90 days</span><span class="legend-value">${fmt(day90)}</span></div>
+    </div>
+    ${day90 < 0 ? `<div class="insight-card" style="border-left-color:var(--rust);margin-top:14px;">At this rate, your projected cash goes negative within 90 days. Worth reviewing spending or income soon.</div>` : ''}
+  `;
+
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+}
+
+/* ================= Financial Health Score ================= */
+function computeHealthScore(){
+  const monthKey = currentMonthKey();
+  const priorMonths = [1,2,3].map(n => shiftMonthKey(monthKey, -n));
+  let incomeSum = 0, expenseSum = 0, monthsData = 0;
+  priorMonths.forEach(mk => {
+    const inc = incomeEntries.filter(i => i.date.slice(0,7)===mk).reduce((s,i)=>s+i.amount,0);
+    const exp = expenses.filter(e => e.date.slice(0,7)===mk).reduce((s,e)=>s+e.amount,0);
+    if(inc > 0 || exp > 0){ incomeSum += inc; expenseSum += exp; monthsData++; }
+  });
+  if(monthsData === 0){
+    incomeSum = incomeEntries.filter(i => i.date.slice(0,7)===monthKey).reduce((s,i)=>s+i.amount,0);
+    expenseSum = expenses.filter(e => e.date.slice(0,7)===monthKey).reduce((s,e)=>s+e.amount,0);
+    monthsData = 1;
+  }
+  const avgIncome = incomeSum / monthsData;
+  const avgExpense = expenseSum / monthsData;
+
+  const savingsRate = avgIncome > 0 ? (avgIncome-avgExpense)/avgIncome : null;
+  let savingsScore, savingsNote;
+  if(savingsRate == null){ savingsScore = null; savingsNote = "Not enough income data logged yet to calculate this."; }
+  else if(savingsRate >= 0.2){ savingsScore = 100; savingsNote = `Saving about ${(savingsRate*100).toFixed(0)}% of income — excellent.`; }
+  else if(savingsRate >= 0.1){ savingsScore = 75; savingsNote = `Saving about ${(savingsRate*100).toFixed(0)}% of income — solid.`; }
+  else if(savingsRate >= 0){ savingsScore = 45; savingsNote = `Saving about ${(savingsRate*100).toFixed(0)}% of income — there's room to grow this.`; }
+  else { savingsScore = 10; savingsNote = `Spending is outpacing income by about ${Math.abs(savingsRate*100).toFixed(0)}%.`; }
+
+  const liquid = accounts.filter(a => ["Chequing","Savings","Cash"].includes(a.type)).reduce((s,a)=>s+a.balance,0);
+  const runwayMonths = avgExpense > 0 ? liquid/avgExpense : null;
+  let efScore, efNote;
+  if(runwayMonths == null){ efScore = null; efNote = "Not enough spending data logged yet to calculate this."; }
+  else if(runwayMonths >= 6){ efScore = 100; efNote = `${runwayMonths.toFixed(1)} months of expenses covered by liquid savings — excellent buffer.`; }
+  else if(runwayMonths >= 3){ efScore = 75; efNote = `${runwayMonths.toFixed(1)} months covered — a good buffer.`; }
+  else if(runwayMonths >= 1){ efScore = 45; efNote = `${runwayMonths.toFixed(1)} months covered — on the thin side.`; }
+  else { efScore = 15; efNote = `Under a month of expenses sitting in liquid accounts.`; }
+
+  const totalLiabilities = accounts.filter(a => ACCOUNT_LIABILITY_TYPES.includes(a.type)).reduce((s,a)=>s+a.balance,0)
+    + netWorthItems.filter(i => LIABILITY_CATS.includes(i.category)).reduce((s,i)=>s+i.balance,0);
+  const annualIncome = avgIncome * 12;
+  const debtToIncome = annualIncome > 0 ? totalLiabilities/annualIncome : null;
+  let debtScore, debtNote;
+  if(totalLiabilities === 0){ debtScore = 100; debtNote = "No tracked debt — excellent."; }
+  else if(debtToIncome == null){ debtScore = 50; debtNote = `${fmt(totalLiabilities)} in tracked debt (not enough income data to compare against).`; }
+  else if(debtToIncome < 0.2){ debtScore = 90; debtNote = `Tracked debt is about ${(debtToIncome*100).toFixed(0)}% of annual income — low.`; }
+  else if(debtToIncome < 0.5){ debtScore = 65; debtNote = `Tracked debt is about ${(debtToIncome*100).toFixed(0)}% of annual income — moderate.`; }
+  else if(debtToIncome < 1){ debtScore = 35; debtNote = `Tracked debt is about ${(debtToIncome*100).toFixed(0)}% of annual income — high.`; }
+  else { debtScore = 10; debtNote = `Tracked debt exceeds a full year of income.`; }
+
+  const dailyNet = (avgIncome-avgExpense)/30;
+  let cfScore, cfNote;
+  if(dailyNet > 0){ cfScore = 90; cfNote = "Trending positive — more coming in than going out."; }
+  else if(dailyNet === 0){ cfScore = 50; cfNote = "Roughly breaking even."; }
+  else { cfScore = 20; cfNote = "Trending negative — spending is outpacing income lately."; }
+
+  const hasInvesting = accounts.some(a => a.type === 'Investment') || portfolio.some(p => p.shares > 0.00001);
+  const investScore = hasInvesting ? 90 : 30;
+  const investNote = hasInvesting ? "You have money working in investments." : "No investment accounts or stock holdings tracked yet.";
+
+  const parts = [
+    { label:'Savings rate', score:savingsScore, note:savingsNote },
+    { label:'Emergency fund', score:efScore, note:efNote },
+    { label:'Debt load', score:debtScore, note:debtNote },
+    { label:'Cash flow trend', score:cfScore, note:cfNote },
+    { label:'Investing', score:investScore, note:investNote }
+  ];
+  const valid = parts.filter(p => p.score != null);
+  const overall = valid.length > 0 ? Math.round(valid.reduce((s,p)=>s+p.score,0)/valid.length) : null;
+  return { overall, parts };
+}
+
+function renderHealthScore(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('healthScoreLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const { overall, parts } = computeHealthScore();
+  let scoreLabel = 'Not enough data yet';
+  if(overall != null){
+    if(overall >= 80) scoreLabel = 'Excellent';
+    else if(overall >= 60) scoreLabel = 'Good';
+    else if(overall >= 40) scoreLabel = 'Fair';
+    else scoreLabel = 'Needs attention';
+  }
+
+  const partsHtml = parts.map(p => {
+    if(p.score == null){
+      return `<div class="budget-row"><div class="budget-top"><span>${p.label}</span><span style="color:var(--ink-soft);">No data</span></div><p class="hero-body" style="font-size:12px;margin:4px 0 16px;">${p.note}</p></div>`;
+    }
+    const cls = p.score >= 60 ? 'ok' : 'over';
+    return `
+      <div class="budget-row">
+        <div class="budget-top"><span>${p.label}</span><span>${p.score}/100</span></div>
+        <div class="budget-track"><div class="budget-fill ${cls}" style="width:${p.score}%;"></div></div>
+      </div>
+      <p class="hero-body" style="font-size:12px;margin:4px 0 16px;">${p.note}</p>`;
+  }).join('');
+
+  const weakest = parts.filter(p => p.score != null).sort((a,b)=>a.score-b.score).slice(0,2);
+  const recsHtml = weakest.filter(p => p.score < 70).map(p =>
+    `<div class="insight-card">Lowest area: <strong>${p.label}</strong>. ${p.note}</div>`
+  ).join('');
+
+  document.getElementById('mainArea').innerHTML = `
+    <p class="hero-body" style="font-size:13px;">A transparent score built from your own data — savings rate, emergency fund coverage, debt load, cash flow trend, and whether you're investing. Nothing here is hidden math; each piece is explained below.</p>
+
+    <div class="nw-card highlight" style="text-align:center;margin-bottom:24px;">
+      <div class="label">Overall score</div>
+      <div class="value" style="font-size:44px;color:${overall!=null?'var(--paper)':'var(--on-highlight-soft)'};">${overall != null ? overall : '—'}</div>
+      <div class="sub" style="color:var(--on-highlight-soft);font-weight:600;">${scoreLabel}</div>
+    </div>
+
+    <div class="section-label">Breakdown</div>
+    ${partsHtml}
+
+    ${recsHtml ? `<div class="section-label">Worth focusing on</div>${recsHtml}` : ''}
+  `;
+
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+}
+
+/* ================= Insurance ================= */
+let editingInsuranceId = null;
+
+function renderInsurance(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('insuranceLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const totalPremiumMonthly = insurancePolicies.reduce((s,p) => s + (p.premiumFrequency === 'Yearly' ? p.premium/12 : p.premium), 0);
+  const editingIns = editingInsuranceId ? insurancePolicies.find(p => p.id === editingInsuranceId) : null;
+
+  let html = `
+    <div class="total-block">
+      <div class="total-label">Total premiums (per month equivalent)</div>
+      <div class="total-amount">${fmt(totalPremiumMonthly)}</div>
+    </div>
+    <details class="add-collapsible" id="insFormDetails" ${editingIns ? 'open' : ''}>
+      <summary>${editingIns ? `Edit ${escapeHtml(editingIns.policyType)} policy` : 'Add a policy'}</summary>
+      <div class="add-collapsible-body">
+        <div class="row">
+          <div class="field"><select id="insType">${INSURANCE_TYPES.map(t=>`<option value="${t}" ${editingIns&&editingIns.policyType===t?'selected':''}>${t}</option>`).join('')}</select></div>
+          <div class="field"><input type="text" id="insProvider" placeholder="Provider (optional)" list="insuranceNameList" value="${editingIns?escapeHtml(editingIns.provider||''):''}"></div>
+          <datalist id="insuranceNameList">${Object.keys(INSURANCE_NAMES).map(n=>`<option value="${n}">`).join('')}</datalist>
+        </div>
+        <div class="row">
+          <div class="field"><input type="number" id="insPremium" placeholder="Premium amount" step="0.01" min="0" value="${editingIns?editingIns.premium:''}"></div>
+          <div class="field"><select id="insFrequency"><option value="Monthly" ${editingIns&&editingIns.premiumFrequency==='Monthly'?'selected':''}>Monthly</option><option value="Yearly" ${editingIns&&editingIns.premiumFrequency==='Yearly'?'selected':''}>Yearly</option></select></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Renewal date (optional)</label><input type="date" id="insRenewal" value="${editingIns&&editingIns.renewalDate?editingIns.renewalDate:''}"></div>
+          <div class="field"><input type="number" id="insCoverage" placeholder="Coverage amount (optional)" step="0.01" min="0" value="${editingIns&&editingIns.coverageAmount?editingIns.coverageAmount:''}"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="add" id="addInsBtn" style="flex:1;">${editingIns ? 'Save changes' : 'Add policy'}</button>
+          ${editingIns ? `<button type="button" class="cancel" id="cancelInsEditBtn">${t('cancel')}</button>` : ''}
+        </div>
+      </div>
+    </details>
+  `;
+
+  if(insurancePolicies.length === 0){
+    html += '<div class="empty">No policies yet. Add home, auto, tenant, or life insurance above to track premiums and renewal dates.</div>';
+  }else{
+    insurancePolicies.forEach(p => {
+      let renewalNote = '';
+      if(p.renewalDate){
+        const days = Math.round((new Date(p.renewalDate+'T00:00:00') - new Date()) / 86400000);
+        const soon = days <= 30;
+        const overdue = days < 0;
+        const statusText = overdue ? ' — overdue, check if it renewed' : (soon ? ' — coming up soon' : '');
+        renewalNote = `<div class="stock-meta" style="${soon?'color:var(--rust);':''}">Renews ${new Date(p.renewalDate+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}${statusText}</div>`;
+      }
+      html += `
+        <div class="nw-item-row" data-id="${p.id}" style="cursor:pointer;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            ${p.provider ? initialsBadgeHtml(p.provider, INSURANCE_NAMES) : `<div class="type-icon-badge">${SMALL_ICONS[INSURANCE_TYPE_ICON_KEY[p.policyType]]||''}</div>`}
+            <div>
+              <div class="nw-item-label">${escapeHtml(p.policyType)}${p.provider?` · ${escapeHtml(p.provider)}`:''}</div>
+              <div class="stock-meta">${fmt(p.premium)} / ${p.premiumFrequency.toLowerCase()}${p.coverageAmount?` · ${fmt(p.coverageAmount)} coverage`:''}</div>
+              ${renewalNote}
+            </div>
+          </div>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <button class="stop-btn edit-amount-btn" data-edit-id="${p.id}" aria-label="Edit policy" title="Edit all details">✎</button>
+            <button class="stock-del" data-id="${p.id}" aria-label="Remove">✕</button>
+          </span>
+        </div>`;
+    });
+  }
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('addInsBtn').addEventListener('click', addInsurancePolicy);
+  const cancelBtn = document.getElementById('cancelInsEditBtn');
+  if(cancelBtn) cancelBtn.addEventListener('click', () => { editingInsuranceId = null; renderInsurance(); });
+
+  document.querySelectorAll('#mainArea .nw-item-row').forEach(row => {
+    row.addEventListener('click', async (e) => {
+      if(e.target.closest('.stock-del') || e.target.closest('.edit-amount-btn')) return;
+      const id = row.getAttribute('data-id');
+      const p = insurancePolicies.find(x => x.id === id);
+      if(!p) return;
+      const input = prompt(`Update premium for ${p.policyType}${p.provider?' ('+p.provider+')':''}:`, p.premium);
+      if(input === null) return;
+      const val = parseFloat(input);
+      if(isNaN(val) || val < 0) return;
+      p.premium = val;
+      renderInsurance();
+      await sb.from('insurance_policies').update({ premium: val }).eq('id', id);
+    });
+  });
+  document.querySelectorAll('[data-edit-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingInsuranceId = btn.getAttribute('data-edit-id');
+      renderInsurance();
+      document.getElementById('insFormDetails').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+  document.querySelectorAll('#mainArea .stock-del').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      if(editingInsuranceId === id) editingInsuranceId = null;
+      insurancePolicies = insurancePolicies.filter(p => p.id !== id);
+      render();
+      await sb.from('insurance_policies').delete().eq('id', id);
+    });
+  });
+}
+
+async function addInsurancePolicy(){
+  const policyType = document.getElementById('insType').value;
+  const provider = document.getElementById('insProvider').value.trim();
+  const premium = parseFloat(document.getElementById('insPremium').value);
+  const premiumFrequency = document.getElementById('insFrequency').value;
+  const renewalDate = document.getElementById('insRenewal').value || null;
+  const coverageAmount = parseFloat(document.getElementById('insCoverage').value) || null;
+  if(!premium || premium <= 0) return;
+
+  if(editingInsuranceId){
+    const { error } = await sb.from('insurance_policies').update({
+      policy_type:policyType, provider:provider||null, premium, premium_frequency:premiumFrequency,
+      renewal_date:renewalDate, coverage_amount:coverageAmount
+    }).eq('id', editingInsuranceId);
+    if(error){ alert(error.message || 'Could not save changes.'); return; }
+
+    const p = insurancePolicies.find(x => x.id === editingInsuranceId);
+    if(p){ p.policyType=policyType; p.provider=provider; p.premium=premium; p.premiumFrequency=premiumFrequency; p.renewalDate=renewalDate; p.coverageAmount=coverageAmount; }
+    editingInsuranceId = null;
+    renderInsurance();
+    return;
+  }
+
+  const { data, error } = await sb.from('insurance_policies').insert({
+    user_id: currentUser.id, policy_type:policyType, provider:provider||null, premium, premium_frequency:premiumFrequency,
+    renewal_date:renewalDate, coverage_amount:coverageAmount
+  }).select().single();
+  if(error){ alert(error.message || 'Could not add that policy.'); return; }
+
+  insurancePolicies.push({ id:data.id, policyType, provider, premium, premiumFrequency, renewalDate, coverageAmount, note:'' });
+  renderInsurance();
+}
+
+/* ================= Vehicle Finance ================= */
+let editingVehicleId = null;
+
+function renderVehicles(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('vehiclesLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const editingVeh = editingVehicleId ? vehicles.find(v => v.id === editingVehicleId) : null;
+
+  let html = `
+    <details class="add-collapsible" id="vehFormDetails" ${editingVeh ? 'open' : ''}>
+      <summary>${editingVeh ? `Edit "${escapeHtml(editingVeh.name)}"` : 'Add a vehicle'}</summary>
+      <div class="add-collapsible-body">
+        <div class="row">
+          <div class="field"><input type="text" id="vehName" placeholder="e.g. 2021 Honda Civic" value="${editingVeh?escapeHtml(editingVeh.name):''}"></div>
+        </div>
+        <div class="row">
+          <div class="field"><input type="number" id="vehValue" placeholder="Current value" step="0.01" min="0" value="${editingVeh?editingVeh.currentValue:''}"></div>
+          <div class="field"><input type="number" id="vehLoan" placeholder="Loan balance (0 if owned outright)" step="0.01" min="0" value="${editingVeh?editingVeh.loanBalance:''}"></div>
+        </div>
+        <div class="row">
+          <div class="field"><input type="number" id="vehPayment" placeholder="Monthly payment" step="0.01" min="0" value="${editingVeh?editingVeh.monthlyPayment:''}"></div>
+          <div class="field"><input type="number" id="vehInsurance" placeholder="Monthly insurance" step="0.01" min="0" value="${editingVeh?editingVeh.monthlyInsurance:''}"></div>
+        </div>
+        <div class="row">
+          <div class="field"><input type="number" id="vehFuel" placeholder="Monthly fuel (avg)" step="0.01" min="0" value="${editingVeh?editingVeh.monthlyFuel:''}"></div>
+          <div class="field"><input type="number" id="vehMaintenance" placeholder="Monthly maintenance (avg)" step="0.01" min="0" value="${editingVeh?editingVeh.monthlyMaintenance:''}"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="add" id="addVehBtn" style="flex:1;">${editingVeh ? 'Save changes' : 'Add vehicle'}</button>
+          ${editingVeh ? `<button type="button" class="cancel" id="cancelVehEditBtn">${t('cancel')}</button>` : ''}
+        </div>
+      </div>
+    </details>
+  `;
+
+  if(vehicles.length === 0){
+    html += '<div class="empty">No vehicles yet. Add one above to track its value, loan, and true monthly cost.</div>';
+  }else{
+    vehicles.forEach(v => {
+      const equity = v.currentValue - v.loanBalance;
+      const totalMonthly = v.monthlyPayment + v.monthlyInsurance + v.monthlyFuel + v.monthlyMaintenance;
+      html += `
+        <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>${escapeHtml(v.name)}</span>
+          <span style="display:flex;align-items:center;gap:8px;">
+            <button class="stop-btn edit-amount-btn" data-edit-id="${v.id}" aria-label="Edit vehicle" title="Edit all details">✎</button>
+            <button class="stock-del" data-id="${v.id}" aria-label="Remove">✕</button>
+          </span>
+        </div>
+        <div class="networth-summary" style="margin-bottom:10px;">
+          <div class="nw-card" data-field="loanBalance" data-id="${v.id}" style="cursor:pointer;"><div class="label">Loan balance</div><div class="value">${fmt(v.loanBalance)}</div></div>
+          <div class="nw-card"><div class="label">Equity</div><div class="value">${fmt(equity)}</div></div>
+          <div class="nw-card"><div class="label">Total monthly cost</div><div class="value">${fmt(totalMonthly)}</div></div>
+        </div>
+        <p class="hero-body" style="font-size:12px;margin:0 0 20px;">${fmt(v.monthlyPayment)} payment · ${fmt(v.monthlyInsurance)} insurance · ${fmt(v.monthlyFuel)} fuel · ${fmt(v.monthlyMaintenance)} maintenance. Tap "Loan balance" to update just that, or ✎ to edit everything.</p>
+      `;
+    });
+  }
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('addVehBtn').addEventListener('click', addVehicle);
+  const cancelBtn = document.getElementById('cancelVehEditBtn');
+  if(cancelBtn) cancelBtn.addEventListener('click', () => { editingVehicleId = null; renderVehicles(); });
+
+  document.querySelectorAll('.nw-card[data-field="loanBalance"]').forEach(card => {
+    card.addEventListener('click', async () => {
+      const id = card.getAttribute('data-id');
+      const v = vehicles.find(x => x.id === id);
+      if(!v) return;
+      const input = prompt(`Update loan balance for ${v.name}:`, v.loanBalance);
+      if(input === null) return;
+      const val = parseFloat(input);
+      if(isNaN(val) || val < 0) return;
+      v.loanBalance = val;
+      renderVehicles();
+      await sb.from('vehicles').update({ loan_balance: val }).eq('id', id);
+    });
+  });
+  document.querySelectorAll('[data-edit-id]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingVehicleId = btn.getAttribute('data-edit-id');
+      renderVehicles();
+      document.getElementById('vehFormDetails').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+  document.querySelectorAll('#mainArea .stock-del').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      if(editingVehicleId === id) editingVehicleId = null;
+      vehicles = vehicles.filter(v => v.id !== id);
+      render();
+      await sb.from('vehicles').delete().eq('id', id);
+    });
+  });
+}
+
+async function addVehicle(){
+  const name = document.getElementById('vehName').value.trim();
+  const currentValue = parseFloat(document.getElementById('vehValue').value) || 0;
+  const loanBalance = parseFloat(document.getElementById('vehLoan').value) || 0;
+  const monthlyPayment = parseFloat(document.getElementById('vehPayment').value) || 0;
+  const monthlyInsurance = parseFloat(document.getElementById('vehInsurance').value) || 0;
+  const monthlyFuel = parseFloat(document.getElementById('vehFuel').value) || 0;
+  const monthlyMaintenance = parseFloat(document.getElementById('vehMaintenance').value) || 0;
+  if(!name) return;
+
+  if(editingVehicleId){
+    const { error } = await sb.from('vehicles').update({
+      name, current_value:currentValue, loan_balance:loanBalance, monthly_payment:monthlyPayment,
+      monthly_insurance:monthlyInsurance, monthly_fuel:monthlyFuel, monthly_maintenance:monthlyMaintenance
+    }).eq('id', editingVehicleId);
+    if(error){ alert(error.message || 'Could not save changes.'); return; }
+
+    const v = vehicles.find(x => x.id === editingVehicleId);
+    if(v){ v.name=name; v.currentValue=currentValue; v.loanBalance=loanBalance; v.monthlyPayment=monthlyPayment; v.monthlyInsurance=monthlyInsurance; v.monthlyFuel=monthlyFuel; v.monthlyMaintenance=monthlyMaintenance; }
+    editingVehicleId = null;
+    renderVehicles();
+    return;
+  }
+
+  const { data, error } = await sb.from('vehicles').insert({
+    user_id: currentUser.id, name, current_value:currentValue, loan_balance:loanBalance,
+    monthly_payment:monthlyPayment, monthly_insurance:monthlyInsurance, monthly_fuel:monthlyFuel, monthly_maintenance:monthlyMaintenance
+  }).select().single();
+  if(error){ alert(error.message || 'Could not add that vehicle.'); return; }
+
+  vehicles.push({ id:data.id, name, currentValue, loanBalance, monthlyPayment, monthlyInsurance, monthlyFuel, monthlyMaintenance });
+  renderVehicles();
+}
+
+/* ================= Retirement Planning ================= */
+function renderRetirement(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('retirementLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  document.getElementById('mainArea').innerHTML = `
+    <p class="hero-body" style="font-size:13px;">Projects your retirement savings under three scenarios so you can see a realistic range, not just one guess.</p>
+    <div class="row">
+      <div class="field"><label>Current age</label><input type="number" id="retCurrentAge" min="0" max="100" step="1"></div>
+      <div class="field"><label>Retirement age</label><input type="number" id="retTargetAge" min="0" max="100" step="1"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Current investments</label><input type="number" id="retCurrent" min="0" step="100"></div>
+      <div class="field"><label>Monthly contribution</label><input type="number" id="retMonthly" min="0" step="10"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Expected annual return (%)</label><input type="number" id="retRate" min="0" max="30" step="0.1"></div>
+      <div class="field"><label>Annual inflation (%)</label><input type="number" id="retInflation" min="0" max="30" step="0.1"></div>
+    </div>
+
+    <div id="retResults"></div>
+    <div class="section-label">Projected growth (Expected scenario)</div>
+    <div id="retChart"></div>
+    <div class="legend-list" id="retLegend" style="margin-top:8px;"></div>
+
+    <p class="hero-body" style="font-size:12px;margin-top:16px;">Conservative and Optimistic use the expected return minus/plus 2 percentage points. These are projections based on the numbers you enter, not guarantees — real markets are far less smooth than this chart.</p>
+  `;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+
+  const RET_DEFAULTS = { retCurrentAge:30, retTargetAge:65, retCurrent:20000, retMonthly:400, retRate:7, retInflation:3 };
+  let saved = {};
+  try{ saved = JSON.parse(localStorage.getItem('moneta-retirement') || '{}'); }catch(e){}
+  Object.keys(RET_DEFAULTS).forEach(id => {
+    document.getElementById(id).value = saved[id] != null ? saved[id] : RET_DEFAULTS[id];
+  });
+
+  const inputs = Object.keys(RET_DEFAULTS).map(id => document.getElementById(id));
+  function recalc(){
+    const currentAge = parseInt(document.getElementById('retCurrentAge').value) || 0;
+    const targetAge = parseInt(document.getElementById('retTargetAge').value) || 0;
+    const current = parseFloat(document.getElementById('retCurrent').value) || 0;
+    const monthly = parseFloat(document.getElementById('retMonthly').value) || 0;
+    const rate = parseFloat(document.getElementById('retRate').value) || 0;
+    const inflation = parseFloat(document.getElementById('retInflation').value) || 0;
+    const years = Math.max(1, targetAge - currentAge);
+
+    try{
+      localStorage.setItem('moneta-retirement', JSON.stringify({
+        retCurrentAge:currentAge, retTargetAge:targetAge, retCurrent:current, retMonthly:monthly, retRate:rate, retInflation:inflation
+      }));
+    }catch(e){}
+
+    const conservative = computeGrowth(current, monthly, Math.max(0, rate-2), years, inflation);
+    const expected = computeGrowth(current, monthly, rate, years, inflation);
+    const optimistic = computeGrowth(current, monthly, rate+2, years, inflation);
+
+    document.getElementById('retResults').innerHTML = `
+      <div class="section-label">At age ${targetAge} (in ${years} years)</div>
+      <div class="charts-row">
+        <div class="chart-block"><div class="chart-title">Conservative (${Math.max(0,rate-2).toFixed(1)}%)</div>
+          <div class="nw-card" style="margin-top:8px;"><div class="label">Nominal</div><div class="value" style="font-size:19px;">${fmt(conservative.finalNominal)}</div>
+          <div class="label" style="margin-top:8px;">Inflation-adjusted</div><div class="value" style="font-size:16px;">${fmt(conservative.finalReal)}</div></div>
+        </div>
+        <div class="chart-block"><div class="chart-title">Expected (${rate.toFixed(1)}%)</div>
+          <div class="nw-card highlight" style="margin-top:8px;"><div class="label">Nominal</div><div class="value" style="font-size:19px;">${fmt(expected.finalNominal)}</div>
+          <div class="label" style="margin-top:8px;">Inflation-adjusted</div><div class="value" style="font-size:16px;">${fmt(expected.finalReal)}</div></div>
+        </div>
+        <div class="chart-block"><div class="chart-title">Optimistic (${(rate+2).toFixed(1)}%)</div>
+          <div class="nw-card" style="margin-top:8px;"><div class="label">Nominal</div><div class="value" style="font-size:19px;">${fmt(optimistic.finalNominal)}</div>
+          <div class="label" style="margin-top:8px;">Inflation-adjusted</div><div class="value" style="font-size:16px;">${fmt(optimistic.finalReal)}</div></div>
+        </div>
+      </div>
+    `;
+
+    const labels = expected.nominalByYear.map((_,i) => `Age ${currentAge+i}`);
+    document.getElementById('retChart').innerHTML = lineChartSVG(
+      [
+        { label:'Nominal value', color:'var(--moss)', points:expected.nominalByYear },
+        { label:'Inflation-adjusted', color:'var(--rust)', points:expected.realByYear },
+        { label:'Total contributed', color:'#5B7CA8', points:expected.contributedByYear }
+      ],
+      labels,
+      { yFormat: v => fmt(v).replace(/\.00$/,''), tooltipFormat: fmt }
+    );
+    document.getElementById('retLegend').innerHTML = `
+      <div class="legend-row"><span class="legend-dot" style="background:var(--moss)"></span><span class="legend-label">Nominal value</span><span class="legend-value">${fmt(expected.finalNominal)}</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:var(--rust)"></span><span class="legend-label">Inflation-adjusted value</span><span class="legend-value">${fmt(expected.finalReal)}</span></div>
+      <div class="legend-row"><span class="legend-dot" style="background:#5B7CA8"></span><span class="legend-label">Total contributed</span><span class="legend-value">${fmt(expected.totalContributed)}</span></div>
+    `;
+  }
+  inputs.forEach(el => el.addEventListener('input', recalc));
+  recalc();
+}
+
+/* ================= Documents Vault ================= */
+function renderDocuments(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('documentsLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  let html = `
+    <p class="hero-body" style="font-size:13px;">Store receipts, statements, tax documents, and other financial files privately — only you can access these, the same way your profile picture is stored.</p>
+    <details class="add-collapsible">
+      <summary>Upload a document</summary>
+      <div class="add-collapsible-body">
+        <div class="row">
+          <div class="field"><input type="text" id="docLabel" placeholder="Label, e.g. March hydro bill"></div>
+          <div class="field" style="flex:0 0 140px;"><select id="docCategory">${DOCUMENT_CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div>
+        </div>
+        <div class="row">
+          <div class="field"><input type="file" id="docFileInput"></div>
+        </div>
+        <button type="button" class="add" id="uploadDocBtn">Upload</button>
+        <div class="login-msg" id="docUploadStatus"></div>
+      </div>
+    </details>
+  `;
+
+  if(documents.length === 0){
+    html += '<div class="empty">No documents yet. Upload a receipt, statement, or tax document above.</div>';
+  }else{
+    DOCUMENT_CATEGORIES.forEach(cat => {
+      const items = documents.filter(d => d.category === cat);
+      if(items.length === 0) return;
+      const catIcon = SMALL_ICONS[DOCUMENT_CATEGORY_ICON_KEY[cat]] || '';
+      html += `<div class="section-label" style="display:flex;align-items:center;gap:8px;">${catIcon}${cat}</div>`;
+      items.forEach(d => {
+        const dateLabel = new Date(d.uploadedAt).toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'});
+        html += `
+          <div class="trend-row" data-id="${d.id}">
+            <span>${escapeHtml(d.label)} <span style="color:var(--ink-soft);">· ${dateLabel}</span></span>
+            <span style="display:flex;align-items:center;gap:14px;">
+              <button class="navlink" data-download="${d.id}">Open</button>
+              <button class="stock-del" data-delete="${d.id}" aria-label="Delete">✕</button>
+            </span>
+          </div>`;
+      });
+    });
+  }
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('uploadDocBtn').addEventListener('click', uploadDocument);
+
+  document.querySelectorAll('[data-download]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-download');
+      const doc = documents.find(d => d.id === id);
+      if(!doc) return;
+      try{
+        const { data, error } = await sb.storage.from('documents').createSignedUrl(doc.storagePath, 300);
+        if(error) throw error;
+        window.open(data.signedUrl, '_blank');
+      }catch(err){ alert(err.message || 'Could not open that file.'); }
+    });
+  });
+  document.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-delete');
+      const doc = documents.find(d => d.id === id);
+      if(!doc) return;
+      try{ await sb.storage.from('documents').remove([doc.storagePath]); }catch(e){}
+      await sb.from('documents').delete().eq('id', id);
+      documents = documents.filter(d => d.id !== id);
+      renderDocuments();
+    });
+  });
+}
+
+async function uploadDocument(){
+  const label = document.getElementById('docLabel').value.trim();
+  const category = document.getElementById('docCategory').value;
+  const fileInput = document.getElementById('docFileInput');
+  const file = fileInput.files[0];
+  const statusEl = document.getElementById('docUploadStatus');
+  if(!label || !file){ statusEl.textContent = 'Add a label and choose a file first.'; return; }
+
+  statusEl.textContent = 'Uploading...';
+  try{
+    const ext = file.name.includes('.') ? file.name.split('.').pop() : 'dat';
+    const path = `${currentUser.id}/${Date.now()}.${ext}`;
+    const { error: upErr } = await sb.storage.from('documents').upload(path, file);
+    if(upErr) throw upErr;
+
+    const { data, error } = await sb.from('documents').insert({
+      user_id: currentUser.id, label, category, storage_path:path, file_name:file.name
+    }).select().single();
+    if(error) throw error;
+
+    documents.unshift({ id:data.id, label, category, storagePath:path, fileName:file.name, uploadedAt:data.uploaded_at });
+    renderDocuments();
+  }catch(err){
+    statusEl.textContent = err.message || 'Upload failed.';
+  }
+}
+
+/* ================= Guide ================= */
+function renderCategory(){
+  const cat = buildTileCategories()[activeCategory];
+  if(!cat){ view = "home"; render(); return; }
+
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${cat.label}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const allTiles = buildAllTiles();
+  const tilesByKey = Object.fromEntries(allTiles.map(t => [t.key, t]));
+  const members = cat.tileKeys.map(k => tilesByKey[k]).filter(Boolean);
+  const tilesHtml = members.map((tile,i) => `
+    <div class="dashboard-tile" data-idx="${i}">
+      <span class="tile-icon">${tile.icon}</span>
+      <div class="tile-label">${escapeHtml(tile.label)}</div>
+      <div class="tile-sub">${escapeHtml(tile.sub)}</div>
+    </div>`).join('');
+
+  document.getElementById('mainArea').innerHTML = `<div class="dashboard-grid">${tilesHtml}</div>`;
+  document.getElementById('backBtn').addEventListener('click', () => { view = "home"; render(); });
+  document.querySelectorAll('.dashboard-tile').forEach(el => {
+    el.addEventListener('click', () => { members[parseInt(el.getAttribute('data-idx'),10)].onClick(); });
+  });
+}
+
+function renderGuide(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Guide`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const items = [
+    { icon:TILE_ICONS.accounts, label:'Accounts', body:'Add your chequing, savings, cards, and loans. Everything else builds on this.' },
+    { icon:TILE_ICONS.ledger, label:'Ledger', body:'Log expenses and income by month. Search, budgets, and charts all live here.' },
+    { icon:TILE_ICONS.bills, label:'Bills', body:'Recurring payments log themselves each month — see what\'s due soon.' },
+    { icon:TILE_ICONS.watchlist, label:'Watchlist', body:'Follow stock prices without owning them.' },
+    { icon:TILE_ICONS.portfolio, label:'Portfolio', body:'Log buys, sells, and dividends — average cost and gains are calculated for you.' },
+    { icon:TILE_ICONS.networth, label:'Net Worth', body:'Assets minus debts, pulled automatically from your Accounts and Portfolio.' },
+    { icon:TILE_ICONS.growth, label:'Growth Calculator', body:'See what an investment could grow into over time.' },
+    { icon:TILE_ICONS.goals, label:t('goalsLabel'), body:'Set a savings target and see a projected date you\'ll reach it.' },
+    { icon:TILE_ICONS.debt, label:t('debtPayoffLabel'), body:'Compares two payoff strategies so you can pick one.' },
+    { icon:TILE_ICONS.cashflow, label:t('cashFlowLabel'), body:'Projects your cash 30/60/90 days ahead from real averages.' },
+    { icon:TILE_ICONS.health, label:t('healthScoreLabel'), body:'One transparent number summarizing how you\'re doing overall.' },
+    { icon:TILE_ICONS.insurance, label:t('insuranceLabel'), body:'Track policies and get reminded before renewals.' },
+    { icon:TILE_ICONS.vehicle, label:t('vehiclesLabel'), body:'True monthly cost of a car — payment, insurance, fuel, upkeep.' },
+    { icon:TILE_ICONS.retirement, label:t('retirementLabel'), body:'Three scenarios for what retirement savings could look like.' },
+    { icon:TILE_ICONS.documents, label:t('documentsLabel'), body:'Store receipts and statements privately — only you can open them.' },
+    { icon:TILE_ICONS.tax, label:t('taxCenterLabel'), body:'Income, capital gains, and dividends pulled together, with a rough tax estimate.' }
+  ];
+
+  const itemsHtml = items.map(it => `
+    <div class="tip-row">
+      <div class="tip-icon-badge">${it.icon}</div>
+      <div><div class="tip-title">${it.label}</div><div class="tip-body">${it.body}</div></div>
+    </div>`).join('');
+
+  document.getElementById('mainArea').innerHTML = `
+    <p class="hero-body" style="font-size:13px;">A one-line map of everything in Moneta Compass. Tap the menu icon in the top right any time to get back here.</p>
+    ${itemsHtml}
+  `;
+  document.getElementById('backBtn').addEventListener('click', () => { view = guideReturnView; render(); });
+}
+
+/* ================= Tax Center ================= */
+// Replays the full buy/sell/dividend history in order (cost basis depends
+// on everything before it), but only accumulates gains and dividends that
+// fall in the requested calendar year — so a sale's gain is correct even
+// though it depends on purchases from other years.
+function computeYearlyInvestmentTaxData(year){
+  const bySymbol = {};
+  let capitalGains = 0, dividends = 0;
+  investmentTxns.slice().sort((a,b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id)).forEach(tx => {
+    if(!bySymbol[tx.symbol]) bySymbol[tx.symbol] = { shares:0, totalCost:0 };
+    const h = bySymbol[tx.symbol];
+    const txYear = parseInt(tx.date.slice(0,4),10);
+    if(tx.type === 'buy'){
+      h.totalCost += tx.shares*tx.price + (tx.fees||0);
+      h.shares += tx.shares;
+    }else if(tx.type === 'sell'){
+      const avgCost = h.shares>0 ? h.totalCost/h.shares : 0;
+      const sellShares = Math.min(tx.shares, h.shares);
+      const costOfSold = avgCost*sellShares;
+      const proceeds = sellShares*tx.price - (tx.fees||0);
+      if(txYear === year) capitalGains += proceeds - costOfSold;
+      h.totalCost -= costOfSold;
+      h.shares -= sellShares;
+    }else if(tx.type === 'dividend'){
+      if(txYear === year) dividends += tx.price;
+    }
+  });
+  return { capitalGains, dividends };
+}
+
+function renderTaxCenter(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('taxCenterLabel')}`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const yearsWithData = new Set([currentMonthKey().slice(0,4)]);
+  incomeEntries.forEach(i => yearsWithData.add(i.date.slice(0,4)));
+  investmentTxns.forEach(t => yearsWithData.add(t.date.slice(0,4)));
+  taxEntries.forEach(t => yearsWithData.add(String(t.taxYear)));
+  const years = [...yearsWithData].sort().reverse();
+  const selectedYear = parseInt(document.getElementById('taxYearSelect')?.value || years[0], 10);
+
+  const yearIncome = incomeEntries.filter(i => i.date.slice(0,4) === String(selectedYear));
+  const incomeByCategory = {};
+  yearIncome.forEach(i => { incomeByCategory[i.category] = (incomeByCategory[i.category]||0) + i.amount; });
+  const totalIncome = yearIncome.reduce((s,i)=>s+i.amount,0);
+
+  const { capitalGains, dividends } = computeYearlyInvestmentTaxData(selectedYear);
+
+  const yearTaxEntries = taxEntries.filter(t => t.taxYear === selectedYear);
+  const totalContributions = yearTaxEntries.filter(t => t.entryType==='RRSP' || t.entryType==='FHSA').reduce((s,t)=>s+t.amount,0);
+  const totalDeductions = yearTaxEntries.filter(t => t.entryType==='Deduction' || t.entryType==='Other').reduce((s,t)=>s+t.amount,0);
+
+  const grossIncome = totalIncome + Math.max(0,capitalGains) + dividends;
+  const taxableIncome = Math.max(0, grossIncome - totalContributions - totalDeductions);
+
+  let savedRate = 0;
+  try{ savedRate = parseFloat(localStorage.getItem('moneta-tax-rate')) || 0; }catch(e){}
+  const estimatedTax = taxableIncome * (savedRate/100);
+
+  let html = `
+    <p class="hero-body" style="font-size:13px;">Pulls your income, capital gains, and dividends automatically from what you've already logged. Add RRSP/FHSA contributions and deductions below. This is a simplified estimate, not a tax filing — it uses one flat rate you provide, not real tax brackets, which vary by province/state and change yearly. For an actual return, use tax software or a professional.</p>
+
+    <div class="row">
+      <div class="field">
+        <label>Tax year</label>
+        <select id="taxYearSelect">${years.map(y=>`<option value="${y}" ${y==selectedYear?'selected':''}>${y}</option>`).join('')}</select>
+      </div>
+    </div>
+
+    <div class="section-label">Income (from your Ledger)</div>
+    ${Object.keys(incomeByCategory).length===0 ? `<p class="hero-body" style="font-size:12.5px;">No income logged for ${selectedYear}.</p>` :
+      Object.keys(incomeByCategory).map(cat => `
+        <div class="trend-row"><span>${escapeHtml(cat)}</span><span style="font-family:ui-monospace, SF Mono, Menlo, monospace;">${fmt(incomeByCategory[cat])}</span></div>
+      `).join('')}
+
+    <div class="section-label">Investments (from your Portfolio)</div>
+    <div class="trend-row"><span>Capital gains${capitalGains<0?' (net loss)':''}</span><span style="font-family:ui-monospace, SF Mono, Menlo, monospace;${capitalGains<0?'color:var(--rust);':''}">${fmt(capitalGains)}</span></div>
+    <div class="trend-row"><span>Dividends</span><span style="font-family:ui-monospace, SF Mono, Menlo, monospace;">${fmt(dividends)}</span></div>
+
+    <details class="add-collapsible" style="margin-top:20px;">
+      <summary>Add RRSP/FHSA contribution or deduction</summary>
+      <div class="add-collapsible-body">
+        <div class="row">
+          <div class="field"><select id="taxEntryType">${TAX_ENTRY_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('')}</select></div>
+          <div class="field"><input type="number" id="taxEntryAmount" placeholder="Amount" step="0.01" min="0"></div>
+        </div>
+        <div class="row">
+          <div class="field"><input type="text" id="taxEntryDesc" placeholder="Description (optional)"></div>
+        </div>
+        <button type="button" class="add" id="addTaxEntryBtn">Add for ${selectedYear}</button>
+      </div>
+    </details>
+  `;
+
+  if(yearTaxEntries.length > 0){
+    html += `<div class="section-label">Contributions & deductions (${selectedYear})</div>`;
+    yearTaxEntries.forEach(t => {
+      html += `
+        <div class="trend-row" data-id="${t.id}">
+          <span>${escapeHtml(t.entryType)}${t.description?` · ${escapeHtml(t.description)}`:''}</span>
+          <span style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:ui-monospace, SF Mono, Menlo, monospace;">-${fmt(t.amount)}</span>
+            <button class="stock-del" data-id="${t.id}" aria-label="Delete">✕</button>
+          </span>
+        </div>`;
+    });
+  }
+
+  html += `
+    <div class="section-label">Estimated summary</div>
+    <div class="networth-summary">
+      <div class="nw-card"><div class="label">Gross income</div><div class="value" style="font-size:19px;">${fmt(grossIncome)}</div></div>
+      <div class="nw-card"><div class="label">Contributions & deductions</div><div class="value" style="font-size:19px;">-${fmt(totalContributions+totalDeductions)}</div></div>
+      <div class="nw-card highlight"><div class="label">Taxable income</div><div class="value">${fmt(taxableIncome)}</div></div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label>Your estimated tax rate (%) — from last year's return or a tax calculator for your area</label>
+        <input type="number" id="taxRateInput" value="${savedRate || ''}" min="0" max="70" step="0.1" placeholder="e.g. 22">
+      </div>
+    </div>
+    <div class="total-block">
+      <div class="total-label">Estimated tax at this rate</div>
+      <div class="total-amount" style="font-size:34px;">${fmt(estimatedTax)}</div>
+    </div>
+    <p class="hero-body" style="font-size:12px;">Store your actual notice of assessment, T4s, and receipts in <a href="#" id="goToDocsLink" style="color:var(--moss);">Documents</a> under the Tax category.</p>
+  `;
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.getElementById('taxYearSelect').addEventListener('change', () => renderTaxCenter());
+  document.getElementById('addTaxEntryBtn').addEventListener('click', () => addTaxEntry(selectedYear));
+  document.getElementById('taxRateInput').addEventListener('input', (e) => {
+    try{ localStorage.setItem('moneta-tax-rate', e.target.value || '0'); }catch(err){}
+    renderTaxCenter();
+  });
+  const goToDocsLink = document.getElementById('goToDocsLink');
+  if(goToDocsLink) goToDocsLink.addEventListener('click', (e) => { e.preventDefault(); view="documents"; render(); });
+  document.querySelectorAll('#mainArea .stock-del').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      taxEntries = taxEntries.filter(t => t.id !== id);
+      renderTaxCenter();
+      await sb.from('tax_entries').delete().eq('id', id);
+    });
+  });
+}
+
+async function addTaxEntry(taxYear){
+  const entryType = document.getElementById('taxEntryType').value;
+  const amount = parseFloat(document.getElementById('taxEntryAmount').value);
+  const description = document.getElementById('taxEntryDesc').value.trim();
+  if(!amount || amount <= 0) return;
+
+  const { data, error } = await sb.from('tax_entries').insert({
+    user_id: currentUser.id, tax_year:taxYear, entry_type:entryType, description:description||null, amount
+  }).select().single();
+  if(error){ alert(error.message || 'Could not add that entry.'); return; }
+
+  taxEntries.push({ id:data.id, taxYear, entryType, description, amount });
+  renderTaxCenter();
 }
 
 function csvEscape(val){
@@ -2396,13 +4200,34 @@ function exportDataAsCSV(){
     const to = accounts.find(a=>a.id===tr.toAccountId);
     lines.push([tr.date, csvEscape(from?from.name:''), csvEscape(to?to.name:''), tr.amount, csvEscape(tr.note)].join(','));
   });
+  lines.push('');
+
+  lines.push('INVESTMENT TRANSACTIONS');
+  lines.push(['Date','Symbol','Type','Shares','Price','Fees','Note'].join(','));
+  investmentTxns.forEach(tx => {
+    lines.push([tx.date, csvEscape(tx.symbol), csvEscape(tx.type), tx.shares, tx.price, tx.fees, csvEscape(tx.note)].join(','));
+  });
+  lines.push('');
+
+  lines.push('FINANCIAL GOALS');
+  lines.push(['Name','Type','Target','Current','Target Date','Monthly Contribution'].join(','));
+  financialGoals.forEach(g => {
+    lines.push([csvEscape(g.name), csvEscape(g.goalType), g.targetAmount, g.currentAmount, g.targetDate||'', g.monthlyContribution].join(','));
+  });
+  lines.push('');
+
+  lines.push('TAX ENTRIES');
+  lines.push(['Tax Year','Type','Description','Amount'].join(','));
+  taxEntries.forEach(t => {
+    lines.push([t.taxYear, csvEscape(t.entryType), csvEscape(t.description), t.amount].join(','));
+  });
 
   const csvContent = lines.join('\n');
   const blob = new Blob([csvContent], { type:'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `moneta-compass-export-${currentMonthKey()}.csv`;
+  a.download = `moneta-compass-export-${new Date().toISOString().slice(0,10)}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -2471,6 +4296,7 @@ function renderAvatarBuilder(cfg){
     const { error } = await sb.from('profiles').update({ avatar_type:'custom', avatar_config:cfg, avatar_path:null }).eq('id', currentUser.id);
     if(error){ alert(error.message || 'Could not save avatar.'); return; }
     userProfile.avatarType = 'custom'; userProfile.avatarConfig = cfg; userProfile.avatarPath = null; userProfile.avatarUrl = null;
+    buildAccountMenu();
     renderSettings();
   });
 }
@@ -2511,6 +4337,7 @@ async function uploadAvatarFile(file){
 
     userProfile.avatarType = 'upload'; userProfile.avatarPath = path; userProfile.avatarConfig = null;
     userProfile.avatarUrl = signed ? signed.signedUrl : null;
+    buildAccountMenu();
     renderSettings();
   }catch(err){
     alert(err.message || 'Could not upload that photo.');
@@ -2528,19 +4355,24 @@ function renderSettings(){
   const currencies = ['USD','EUR','GBP','CAD','MXN','IRR'];
 
   const avatarPreview = userProfile.avatarType === 'upload' && userProfile.avatarUrl
-    ? `<img src="${userProfile.avatarUrl}" style="width:96px;height:96px;border-radius:50%;object-fit:cover;">`
+    ? `<img src="${userProfile.avatarUrl}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;">`
     : userProfile.avatarType === 'custom' && userProfile.avatarConfig
-      ? avatarSVG(userProfile.avatarConfig, 96)
-      : `<div style="width:96px;height:96px;border-radius:50%;background:var(--card);border:1px solid var(--paper-line);display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;color:var(--ink-soft);">No photo</div>`;
+      ? avatarSVG(userProfile.avatarConfig, 120)
+      : `<div style="width:120px;height:120px;border-radius:50%;background:var(--input-bg);border:1.5px dashed var(--paper-line);display:flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-size:12px;color:var(--ink-soft);text-align:center;">No photo yet</div>`;
+
+  const iconCreate = '<svg viewBox="0 0 20 20" width="16" height="16"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="7.5" cy="8" r="1.1" fill="currentColor"/><circle cx="12.5" cy="8" r="1.1" fill="currentColor"/><path d="M7 12C8 13.2 12 13.2 13 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>';
+  const iconUpload = '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M10 13V4M10 4L6.5 7.5M10 4L13.5 7.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 13V15C4 15.6 4.4 16 5 16H15C15.6 16 16 15.6 16 15V13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';
+  const iconRemove = '<svg viewBox="0 0 20 20" width="16" height="16"><path d="M5 6H15M8 6V4.5C8 4 8.4 3.5 9 3.5H11C11.6 3.5 12 4 12 4.5V6M8.5 9V13.5M11.5 9V13.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/><path d="M6 6L6.7 15.5C6.7 16.1 7.2 16.5 7.8 16.5H12.2C12.8 16.5 13.3 16.1 13.3 15.5L14 6" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/></svg>';
 
   document.getElementById('mainArea').innerHTML = `
     <div class="section-label">Profile</div>
-    <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
-      <div id="avatarPreviewBox">${avatarPreview}</div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button type="button" class="stop-btn" id="buildAvatarBtn">Create avatar</button>
-        <button type="button" class="stop-btn" id="uploadAvatarBtn">Upload photo</button>
-        ${userProfile.avatarType !== 'none' ? `<button type="button" class="stop-btn" id="removeAvatarBtn">Remove picture</button>` : ''}
+    <div class="auth-card" style="text-align:center;margin-bottom:24px;">
+      <div id="avatarPreviewBox" style="display:flex;justify-content:center;margin-bottom:6px;">${avatarPreview}</div>
+      ${userProfile.username ? `<div style="font-family:var(--font-serif);font-size:16px;font-weight:600;margin-bottom:16px;">@${escapeHtml(userProfile.username)}</div>` : '<div style="margin-bottom:16px;"></div>'}
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <button type="button" class="navlink-btn" id="buildAvatarBtn">${iconCreate}Create avatar</button>
+        <button type="button" class="navlink-btn" id="uploadAvatarBtn">${iconUpload}Upload photo</button>
+        ${userProfile.avatarType !== 'none' ? `<button type="button" class="navlink-btn" id="removeAvatarBtn">${iconRemove}Remove</button>` : ''}
       </div>
       <input type="file" id="avatarFileInput" accept="image/*" style="display:none;">
     </div>
@@ -2556,18 +4388,16 @@ function renderSettings(){
     <div class="login-msg" id="usernameMsg"></div>
     <button type="button" class="add" id="saveUsernameBtn" style="width:100%;margin-bottom:28px;">Save username</button>
 
-    <div class="section-label">${t('language')}</div>
+    <div class="section-label">Preferences</div>
     <div class="row">
       <div class="field">
+        <label>${t('language')}</label>
         <select id="languageSelect">
           ${languages.map(l => `<option value="${l.code}" ${userSettings.language===l.code?'selected':''}>${l.label}</option>`).join('')}
         </select>
       </div>
-    </div>
-
-    <div class="section-label">${t('currency')}</div>
-    <div class="row">
       <div class="field">
+        <label>${t('currency')}</label>
         <select id="currencySelect">
           ${currencies.map(c => `<option value="${c}" ${userSettings.currency===c?'selected':''}>${c} (${CURRENCY_SYMBOLS[c]})</option>`).join('')}
         </select>
@@ -2620,6 +4450,7 @@ function renderSettings(){
     const { error } = await sb.from('profiles').update({ username: newUsername }).eq('id', currentUser.id);
     if(error){ errEl.textContent = error.message; return; }
     userProfile.username = newUsername;
+    buildAccountMenu();
     msgEl.textContent = 'Username updated.';
   });
 
@@ -2646,6 +4477,7 @@ function renderSettings(){
       }
       await sb.from('profiles').update({ avatar_type:'none', avatar_config:null, avatar_path:null }).eq('id', currentUser.id);
       userProfile.avatarType = 'none'; userProfile.avatarConfig = null; userProfile.avatarPath = null; userProfile.avatarUrl = null;
+      buildAccountMenu();
       renderSettings();
     });
   }
@@ -2679,14 +4511,21 @@ function renderSettings(){
 
 function renderWatchlist(){
   document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> ${t('watchlist')}`;
-  navBar([{ label:t('refreshPrices'), onClick: refreshAllQuotes }]);
+  document.getElementById('pageSub').innerHTML = '';
 
   const mainArea = document.getElementById('mainArea');
+  const notTracked = POPULAR_STOCKS.filter(s => !watchlist.some(w => w.symbol === s.symbol));
   let html = `
+    <p class="hero-body" style="font-size:12px;margin:-6px 0 12px;">Prices refresh automatically every 30 seconds while this page is open.</p>
     <div class="add-symbol-row">
       <input type="text" id="symbolInput" placeholder="e.g. AAPL" maxlength="8">
       <button type="button" id="addSymbolBtn">${t('addItem')}</button>
     </div>
+    ${notTracked.length > 0 ? `
+    <div class="section-label">Popular stocks</div>
+    <div class="chip-row">
+      ${notTracked.map(s => `<button type="button" class="stock-chip" data-quick-add="${s.symbol}">${s.symbol} <span>${s.name}</span></button>`).join('')}
+    </div>` : ''}
   `;
 
   if(watchlist.length === 0){
@@ -2719,8 +4558,11 @@ function renderWatchlist(){
   mainArea.innerHTML = html;
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
 
-  document.getElementById('addSymbolBtn').addEventListener('click', addSymbol);
+  document.getElementById('addSymbolBtn').addEventListener('click', () => addSymbol());
   document.getElementById('symbolInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') addSymbol(); });
+  mainArea.querySelectorAll('[data-quick-add]').forEach(chip => {
+    chip.addEventListener('click', () => addSymbol(chip.getAttribute('data-quick-add')));
+  });
 
   mainArea.querySelectorAll('.stock-row').forEach(row => {
     row.addEventListener('click', (e) => {
@@ -2743,17 +4585,24 @@ function renderWatchlist(){
   });
 }
 
+let watchlistRefreshTimer = null;
 function openWatchlist(){
   view = "watchlist";
   render();
   fetchMissingQuotes();
+
+  if(watchlistRefreshTimer) clearInterval(watchlistRefreshTimer);
+  watchlistRefreshTimer = setInterval(() => {
+    if(view !== "watchlist"){ clearInterval(watchlistRefreshTimer); watchlistRefreshTimer = null; return; }
+    refreshAllQuotes();
+  }, 30000);
 }
 
-async function addSymbol(){
+async function addSymbol(presetSymbol){
   const input = document.getElementById('symbolInput');
-  const symbol = input.value.trim().toUpperCase();
+  const symbol = (presetSymbol || input.value.trim()).toUpperCase();
   if(!symbol) return;
-  if(watchlist.some(w => w.symbol === symbol)){ input.value=''; return; }
+  if(watchlist.some(w => w.symbol === symbol)){ if(input) input.value=''; return; }
 
   const { data, error } = await sb.from('watchlist_items').insert({ user_id: currentUser.id, symbol }).select().single();
   if(error){ alert(error.message || 'Could not add that symbol.'); return; }
@@ -2793,7 +4642,7 @@ async function refreshAllQuotes(){
 function openPortfolio(){
   view = "portfolio";
   render();
-  const missing = portfolio.filter(p => !quoteCache[p.symbol]);
+  const missing = portfolio.filter(p => p.shares > 0.00001 && !quoteCache[p.symbol]);
   if(missing.length){
     Promise.all(missing.map(p => fetchQuote(p.symbol))).then(() => {
       if(view === "portfolio") renderPortfolio();
@@ -2806,18 +4655,22 @@ function renderPortfolio(){
   document.getElementById('pageSub').innerHTML = '';
   const mainArea = document.getElementById('mainArea');
 
+  const heldPositions = portfolio.filter(p => p.shares > 0.00001);
+  const totalRealizedGain = portfolio.reduce((s,p) => s + p.realizedGain, 0);
+  const totalDividends = portfolio.reduce((s,p) => s + (p.dividends||0), 0);
+
   let totalValue = 0, totalCost = 0, anyPriced = false;
-  portfolio.forEach(p => {
+  heldPositions.forEach(p => {
     const q = quoteCache[p.symbol];
     if(q && q !== 'error'){ totalValue += q.price * p.shares; anyPriced = true; }
     totalCost += p.costBasis * p.shares;
   });
-  const totalGain = totalValue - totalCost;
-  const totalGainPct = totalCost > 0 ? (totalGain / totalCost) * 100 : 0;
+  const totalUnrealizedGain = totalValue - totalCost;
+  const totalUnrealizedPct = totalCost > 0 ? (totalUnrealizedGain / totalCost) * 100 : 0;
 
   let chartHtml = '';
-  if(portfolio.length > 0 && anyPriced && totalValue > 0){
-    const segments = portfolio
+  if(heldPositions.length > 0 && anyPriced && totalValue > 0){
+    const segments = heldPositions
       .filter(p => quoteCache[p.symbol] && quoteCache[p.symbol] !== 'error')
       .map(p => ({ label:p.symbol, value:quoteCache[p.symbol].price * p.shares, color:getSymbolColor(p.symbol) }))
       .sort((a,b) => b.value - a.value);
@@ -2826,42 +4679,65 @@ function renderPortfolio(){
         <div class="chart-block">
           <div class="chart-title">Portfolio composition</div>
           <div class="chart-block-inner">
-            ${donutChartSVG(segments, {centerLabel:"Value", centerValue: fmtStock(totalValue)})}
+            ${donutChartSVG(segments, {centerLabel:"Value", centerValue: fmtStock(totalValue), tooltipFormat: fmtStock})}
             <div class="legend-list">${donutLegendHTML(segments, fmtStock)}</div>
           </div>
         </div>
       </div>`;
   }
 
+  const todayISO = new Date().toISOString().slice(0,10);
   let html = `
-    <div class="add-symbol-row">
-      <input type="text" id="holdingSymbol" placeholder="Symbol, e.g. AAPL" maxlength="8" style="text-transform:uppercase;">
+    <details class="add-collapsible">
+      <summary>Log a transaction</summary>
+      <div class="add-collapsible-body">
+    <div class="add-symbol-row" style="flex-direction:column;gap:10px;align-items:stretch;">
+      <div class="row">
+        <div class="field"><input type="text" id="txSymbol" placeholder="Symbol, e.g. AAPL" maxlength="8" style="text-transform:uppercase;"></div>
+        <div class="field" style="flex:0 0 110px;">
+          <select id="txType"><option value="buy">Buy</option><option value="sell">Sell</option><option value="dividend">Dividend</option></select>
+        </div>
+      </div>
+      <div class="chip-row" style="margin-bottom:0;">
+        ${POPULAR_STOCKS.slice(0,8).map(s => `<button type="button" class="stock-chip" data-fill-symbol="${s.symbol}">${s.symbol}</button>`).join('')}
+      </div>
+      <div class="row" id="txTradeFields">
+        <div class="field"><input type="number" id="txShares" placeholder="Shares" step="0.0001" min="0"></div>
+        <div class="field"><input type="number" id="txPrice" placeholder="Price per share" step="0.01" min="0"></div>
+      </div>
+      <div class="row" id="txDividendFields" style="display:none;">
+        <div class="field"><input type="number" id="txDividendAmount" placeholder="Total dividend received" step="0.01" min="0"></div>
+      </div>
+      <div class="row">
+        <div class="field" id="txFeesField"><input type="number" id="txFees" placeholder="Fees (optional)" step="0.01" min="0"></div>
+        <div class="field"><input type="date" id="txDate" value="${todayISO}"></div>
+      </div>
+      <button type="button" class="add" id="logTxBtn">Log transaction</button>
     </div>
-    <div class="row">
-      <div class="field"><input type="number" id="holdingShares" placeholder="Shares" step="0.0001" min="0"></div>
-      <div class="field"><input type="number" id="holdingCost" placeholder="Price paid per share" step="0.01" min="0"></div>
-    </div>
-    <div class="row" style="margin-bottom:18px;">
-      <button type="button" class="add" id="addHoldingBtn">${t('addHoldingBtn')}</button>
-    </div>
+      </div>
+    </details>
     ${chartHtml}
   `;
 
-  if(portfolio.length > 0 && anyPriced){
-    const dir = totalGain > 0 ? 'up' : (totalGain < 0 ? 'down' : '');
-    const sign = totalGain > 0 ? '+' : '';
+  if(heldPositions.length > 0 && anyPriced){
+    const dir = totalUnrealizedGain > 0 ? 'up' : (totalUnrealizedGain < 0 ? 'down' : '');
+    const sign = totalUnrealizedGain > 0 ? '+' : '';
+    const realDir = totalRealizedGain > 0 ? 'up' : (totalRealizedGain < 0 ? 'down' : '');
+    const realSign = totalRealizedGain > 0 ? '+' : '';
     html += `
       <div class="portfolio-total">
         <div class="label">${t('totalPortfolioValue')}</div>
         <div class="value">${fmtStock(totalValue)}</div>
-        <div class="sub holding-gain ${dir}">${sign}${fmtStock(Math.abs(totalGain))} (${sign}${totalGainPct.toFixed(2)}%) all-time</div>
+        <div class="sub holding-gain ${dir}">${sign}${fmtStock(Math.abs(totalUnrealizedGain))} (${sign}${totalUnrealizedPct.toFixed(2)}%) unrealized</div>
+        ${totalRealizedGain !== 0 ? `<div class="sub holding-gain ${realDir}">${realSign}${fmtStock(Math.abs(totalRealizedGain))} realized (all-time, from sales)</div>` : ''}
+        ${totalDividends > 0 ? `<div class="sub holding-gain up">+${fmtStock(totalDividends)} in dividends (all-time)</div>` : ''}
       </div>`;
   }
 
-  if(portfolio.length === 0){
+  if(heldPositions.length === 0){
     html += `<div class="empty">${t('noHoldingsYet')}</div>`;
   }else{
-    portfolio.forEach(p => {
+    heldPositions.forEach(p => {
       const q = quoteCache[p.symbol];
       let right = '<div class="holding-value">…</div>';
       if(q === 'error'){
@@ -2878,55 +4754,105 @@ function renderPortfolio(){
           <div class="holding-gain ${dir}">${sign}${fmtStock(Math.abs(gain))} (${sign}${gainPct.toFixed(2)}%)</div>`;
       }
       html += `
-        <div class="holding-row" data-symbol="${escapeHtml(p.symbol)}" data-id="${p.id}">
+        <div class="holding-row" data-symbol="${escapeHtml(p.symbol)}">
           <div>
             <div class="holding-symbol">${escapeHtml(p.symbol)}</div>
-            <div class="holding-meta">${p.shares} sh @ ${fmtStock(p.costBasis)}</div>
+            <div class="holding-meta">${p.shares} sh · avg cost ${fmtStock(p.costBasis)}</div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="text-align:right;">${right}</div>
-            <button class="stock-del" data-id="${p.id}" aria-label="Remove">✕</button>
           </div>
+        </div>`;
+    });
+  }
+
+  if(investmentTxns.length > 0){
+    html += `<div class="section-label">Recent transactions</div>`;
+    investmentTxns.slice().sort((a,b) => b.date.localeCompare(a.date)).slice(0,10).forEach(tx => {
+      const d = new Date(tx.date + "T00:00:00");
+      const dateLabel = d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'});
+      const isDividend = tx.type === 'dividend';
+      const label = isDividend
+        ? `Dividend from ${escapeHtml(tx.symbol)} · ${dateLabel}`
+        : `${tx.type==='buy'?'Bought':'Sold'} ${tx.shares} ${escapeHtml(tx.symbol)} @ ${fmtStock(tx.price)} · ${dateLabel}`;
+      const amount = isDividend ? tx.price : tx.shares*tx.price;
+      html += `
+        <div class="trend-row" data-tx-id="${tx.id}">
+          <span>${label}</span>
+          <span style="display:flex;align-items:center;gap:10px;">
+            <span style="font-family:ui-monospace, SF Mono, Menlo, monospace;${isDividend?'color:var(--moss);':''}">${isDividend?'+':''}${fmtStock(amount)}</span>
+            <button class="stock-del" data-tx-id="${tx.id}" aria-label="Delete transaction">✕</button>
+          </span>
         </div>`;
     });
   }
 
   mainArea.innerHTML = html;
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
-  document.getElementById('addHoldingBtn').addEventListener('click', addHolding);
+  document.getElementById('logTxBtn').addEventListener('click', logTransaction);
+  document.getElementById('txType').addEventListener('change', (e) => {
+    const isDividend = e.target.value === 'dividend';
+    document.getElementById('txTradeFields').style.display = isDividend ? 'none' : 'flex';
+    document.getElementById('txDividendFields').style.display = isDividend ? 'flex' : 'none';
+    document.getElementById('txFeesField').style.display = isDividend ? 'none' : 'flex';
+  });
+  mainArea.querySelectorAll('[data-fill-symbol]').forEach(chip => {
+    chip.addEventListener('click', () => { document.getElementById('txSymbol').value = chip.getAttribute('data-fill-symbol'); });
+  });
 
   mainArea.querySelectorAll('.holding-row').forEach(row => {
-    row.addEventListener('click', (e) => {
-      if(e.target.closest('.stock-del')) return;
+    row.addEventListener('click', () => {
       activeSymbol = row.getAttribute('data-symbol');
       detailReturnView = 'portfolio';
       view = "portfolioDetail";
       render();
     });
   });
-  mainArea.querySelectorAll('.stock-del').forEach(btn => {
+  mainArea.querySelectorAll('[data-tx-id].stock-del').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      const id = btn.getAttribute('data-id');
-      portfolio = portfolio.filter(p => p.id !== id);
-      render();
-      await sb.from('portfolio_holdings').delete().eq('id', id);
+      const id = btn.getAttribute('data-tx-id');
+      investmentTxns = investmentTxns.filter(tx => tx.id !== id);
+      portfolio = computeHoldings();
+      renderPortfolio();
+      await sb.from('investment_transactions').delete().eq('id', id);
     });
   });
 }
 
-async function addHolding(){
-  const symbol = document.getElementById('holdingSymbol').value.trim().toUpperCase();
-  const shares = parseFloat(document.getElementById('holdingShares').value);
-  const costBasis = parseFloat(document.getElementById('holdingCost').value);
-  if(!symbol || !shares || shares <= 0 || !costBasis || costBasis <= 0) return;
+async function logTransaction(){
+  const symbol = document.getElementById('txSymbol').value.trim().toUpperCase();
+  const type = document.getElementById('txType').value;
+  const date = document.getElementById('txDate').value || new Date().toISOString().slice(0,10);
+  if(!symbol) return;
 
-  const { data, error } = await sb.from('portfolio_holdings').insert({
-    user_id: currentUser.id, symbol, shares, cost_basis: costBasis
+  let shares, price, fees = 0;
+  if(type === 'dividend'){
+    const amount = parseFloat(document.getElementById('txDividendAmount').value);
+    if(!amount || amount <= 0) return;
+    shares = 0; price = amount;
+  }else{
+    shares = parseFloat(document.getElementById('txShares').value);
+    price = parseFloat(document.getElementById('txPrice').value);
+    fees = parseFloat(document.getElementById('txFees').value) || 0;
+    if(!shares || shares <= 0 || !price || price <= 0) return;
+
+    if(type === 'sell'){
+      const existing = portfolio.find(p => p.symbol === symbol);
+      if(!existing || existing.shares < shares){
+        alert(`You only hold ${existing ? existing.shares : 0} shares of ${symbol} — can't sell ${shares}.`);
+        return;
+      }
+    }
+  }
+
+  const { data, error } = await sb.from('investment_transactions').insert({
+    user_id: currentUser.id, symbol, type, shares, price, fees, date
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that holding.'); return; }
+  if(error){ alert(error.message || 'Could not log that transaction.'); return; }
 
-  portfolio.push({ id:data.id, symbol, shares, costBasis });
+  investmentTxns.push({ id:data.id, symbol, type, shares, price, fees, date, note:'' });
+  portfolio = computeHoldings();
   renderPortfolio();
   await fetchQuote(symbol);
   if(view === "portfolio") renderPortfolio();
@@ -3247,12 +5173,13 @@ function setEntryType(newType){
   }
 }
 document.getElementById('tabExpense').addEventListener('click', () => setEntryType('expense'));
+document.getElementById('monthPicker').addEventListener('change', () => renderCalendarGrid());
 document.getElementById('tabIncome').addEventListener('click', () => setEntryType('income'));
 
 function openModal(){
   editingEntry = null;
   document.getElementById('monthPicker').value = (view==="detail" && activeMonth) ? activeMonth : currentMonthKey();
-  document.getElementById('dayPicker').value = currentDay();
+  renderCalendarGrid();
   document.getElementById('recurringCheck').checked = false;
   document.getElementById('amount').value = '';
   document.getElementById('note').value = '';
@@ -3282,7 +5209,7 @@ function openEditModal(type, entry){
   document.getElementById('amount').value = entry.amount;
   document.getElementById('category').value = entry.category;
   document.getElementById('monthPicker').value = entry.date.slice(0,7);
-  document.getElementById('dayPicker').value = parseInt(entry.date.slice(8,10),10);
+  renderCalendarGrid(parseInt(entry.date.slice(8,10),10));
   document.getElementById('note').value = entry.note || '';
   if(entry.accountId) acctSelect.value = entry.accountId;
   document.getElementById('recurringCheck').checked = false;
