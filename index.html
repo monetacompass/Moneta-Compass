@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Moneta Compass</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="Icons/icon-192.png">
+<link rel="apple-touch-icon" href="Icons/apple-touch-icon.png">
+<meta name="theme-color" content="#EDE8DC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C201A" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Moneta">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
@@ -433,6 +441,21 @@
   .receipt-preview{ display:none; width:100%; max-height:180px; object-fit:contain; margin-top:8px; border:1px solid var(--paper-line); background:var(--input-bg); }
   .receipt-preview.show{ display:block; }
   .modal-actions{ display:flex; gap:10px; margin-top:16px; }
+
+  .custom-dialog-backdrop{
+    position:fixed; inset:0; background:rgba(20,22,17,0.5); display:none;
+    align-items:center; justify-content:center; z-index:300; padding:20px;
+  }
+  .custom-dialog-backdrop.open{ display:flex; }
+  .custom-dialog{
+    background:var(--paper); border:1px solid var(--paper-line); border-radius:14px;
+    padding:22px; max-width:340px; width:100%; box-shadow:0 16px 48px rgba(0,0,0,0.35);
+  }
+  .custom-dialog-title{ font-family:var(--font-serif); font-size:17px; font-weight:600; margin:0 0 8px; }
+  .custom-dialog-message{ font-family:var(--font-sans); font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin:0 0 16px; white-space:pre-wrap; }
+  .custom-dialog input{ margin-bottom:16px; }
+  .custom-dialog-actions{ display:flex; gap:8px; justify-content:flex-end; }
+  .custom-dialog-actions button{ flex:0 0 auto; padding:9px 18px; }
   button.add{ flex:1; padding:12px; background:var(--ink); color:var(--paper); border:none; font-family:var(--font-sans); font-size:14px; font-weight:600; border-radius:8px; cursor:pointer; transition:opacity 0.15s; }
   button.add:hover{ opacity:0.88; }
   button.add:disabled{ opacity:0.5; cursor:default; }
@@ -516,7 +539,7 @@
       </div>
       <div class="checkbox-row" id="recurringSection">
         <input type="checkbox" id="recurringCheck">
-        <label for="recurringCheck">Repeats every month (e.g. rent, subscriptions)</label>
+        <label for="recurringCheck" id="recurringLabel">Repeats every month (e.g. rent, subscriptions)</label>
       </div>
       <div class="modal-actions">
         <button type="button" class="cancel" id="cancelBtn">Cancel</button>
@@ -534,12 +557,12 @@ const SUPABASE_ANON_KEY = "sb_publishable_moIwIQRb_PEtHwuO0ZkqUw_XxcJ8m-A";
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-sb.auth.onAuthStateChange((event) => {
+sb.auth.onAuthStateChange(async (event) => {
   if(event === 'PASSWORD_RECOVERY'){
-    const newPassword = prompt('Enter a new password:');
+    const newPassword = await customPrompt('Enter a new password:');
     if(newPassword && newPassword.length >= 6){
-      sb.auth.updateUser({ password: newPassword }).then(({ error }) => {
-        alert(error ? error.message : 'Password updated. You can log in with it now.');
+      sb.auth.updateUser({ password: newPassword }).then(async ({ error }) => {
+        await customAlert(error ? error.message : 'Password updated. You can log in with it now.');
       });
     }
   }
@@ -609,6 +632,7 @@ const TILE_ICONS = {
   retirement: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 13C3 8.6 6.1 5 10 5C13.9 5 17 8.6 17 13" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M2 13H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M10 5V2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
   documents: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M5 2.5C5 2 5.4 1.5 6 1.5H12L15 4.5V17C15 17.5 14.6 18 14 18H6C5.4 18 5 17.5 5 17V2.5Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/><path d="M12 1.5V4.5H15" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/><path d="M7.5 9H12.5M7.5 12H12.5M7.5 15H10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>',
   tax: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="6.5" cy="6.5" r="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="13.5" cy="13.5" r="2.5" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M15 5L5 15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  compare: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M10 3V17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4 6H16M4 6L2 10H7L4 6ZM16 6L13 10H18L16 6Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/><path d="M6 17H14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>',
   debt: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M4 10C4 6.7 6.7 4 10 4C13.3 4 16 6.7 16 10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M10 4V10L13 12" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15L6 12M17 15L14 12" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round"/></svg>',
   cashflow: '<svg viewBox="0 0 20 20" width="24" height="24"><path d="M3 11L7 7L10 10L17 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 3H17V7" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15H17" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>',
   goals: '<svg viewBox="0 0 20 20" width="24" height="24"><circle cx="10" cy="10" r="7.5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10" cy="10" r="4.5" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10" cy="10" r="1.4" fill="currentColor"/></svg>'
@@ -632,6 +656,12 @@ const TIPS = [
 let currentUser = null;
 let expenses = [];
 let recurringTemplates = [];
+let recurringIncomeTemplates = [];
+let editingRecurringKind = null; // 'bill' | 'income' | null
+let editingRecurringId = null;
+let compareCountry = 'CA';
+let compareCategory = 'investing';
+let compareInsuranceType = 'all';
 let watchlist = [];      // [{ id, symbol }]
 let quoteCache = {};     // symbol -> { price, change, changePct, high, low }
 let portfolio = [];      // [{ id, symbol, shares, costBasis }] — legacy, kept for old code paths
@@ -661,13 +691,14 @@ function buildAllTiles(){
     { key:'health', icon:TILE_ICONS.health, label:t('healthScoreLabel'), sub:t('howYoureDoing'), onClick:()=>{ view="healthscore"; render(); } },
     { key:'insurance', icon:TILE_ICONS.insurance, label:t('insuranceLabel'), sub:`${insurancePolicies.length} ${t('policiesTracked')}`, onClick:()=>{ view="insurance"; render(); } },
     { key:'vehicle', icon:TILE_ICONS.vehicle, label:t('vehiclesLabel'), sub:`${vehicles.length} ${t('vehiclesTracked')}`, onClick:()=>{ view="vehicles"; render(); } },
-    { key:'tax', icon:TILE_ICONS.tax, label:t('taxCenterLabel'), sub:t('incomeGainsDeductions'), onClick:()=>{ view="taxcenter"; render(); } }
+    { key:'tax', icon:TILE_ICONS.tax, label:t('taxCenterLabel'), sub:t('incomeGainsDeductions'), onClick:()=>{ view="taxcenter"; render(); } },
+    { key:'compare', icon:TILE_ICONS.compare, label:'Compare Providers', sub:'Banks, brokers, insurance & cards', onClick:()=>{ view="compareproviders"; render(); } }
   ];
 }
 
 function buildTileCategories(){
   return [
-    { key:'money', label:t('moneyCategory'), icon:TILE_ICONS.accounts, tileKeys:['accounts','ledger','bills','documents'] },
+    { key:'money', label:t('moneyCategory'), icon:TILE_ICONS.accounts, tileKeys:['accounts','ledger','bills','documents','compare'] },
     { key:'investing', label:t('investingCategory'), icon:TILE_ICONS.portfolio, tileKeys:['watchlist','portfolio','networth'] },
     { key:'planning', label:t('planningCategory'), icon:TILE_ICONS.goals, tileKeys:['growth','goals','debt','cashflow','retirement','tax'] },
     { key:'protection', label:t('protectionCategory'), icon:TILE_ICONS.insurance, tileKeys:['health','insurance','vehicle'] }
@@ -984,6 +1015,77 @@ function fmtStock(usdAmount){
 function monthLabel(key){ const [y,m]=key.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}); }
 function escapeHtml(str){ const div=document.createElement('div'); div.textContent=str; return div.innerHTML; }
 
+/* ================= Custom dialogs (replace native prompt/alert/confirm) ================= */
+function ensureDialogRoot(){
+  if(document.getElementById('customDialogBackdrop')) return;
+  const div = document.createElement('div');
+  div.id = 'customDialogBackdrop';
+  div.className = 'custom-dialog-backdrop';
+  div.innerHTML = `<div class="custom-dialog" id="customDialogBox"></div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click', (e) => { if(e.target === div) closeCustomDialog(null); });
+}
+let customDialogResolve = null;
+function closeCustomDialog(value){
+  const backdrop = document.getElementById('customDialogBackdrop');
+  if(backdrop) backdrop.classList.remove('open');
+  if(customDialogResolve){ const r = customDialogResolve; customDialogResolve = null; r(value); }
+}
+function customAlert(message, title){
+  ensureDialogRoot();
+  return new Promise(resolve => {
+    customDialogResolve = resolve;
+    document.getElementById('customDialogBox').innerHTML = `
+      ${title?`<div class="custom-dialog-title">${escapeHtml(title)}</div>`:''}
+      <div class="custom-dialog-message">${escapeHtml(message)}</div>
+      <div class="custom-dialog-actions"><button type="button" class="add" id="cdOk">OK</button></div>
+    `;
+    document.getElementById('customDialogBackdrop').classList.add('open');
+    document.getElementById('cdOk').addEventListener('click', () => closeCustomDialog(undefined));
+  });
+}
+function customConfirm(message, title){
+  ensureDialogRoot();
+  return new Promise(resolve => {
+    customDialogResolve = resolve;
+    document.getElementById('customDialogBox').innerHTML = `
+      ${title?`<div class="custom-dialog-title">${escapeHtml(title)}</div>`:''}
+      <div class="custom-dialog-message">${escapeHtml(message)}</div>
+      <div class="custom-dialog-actions">
+        <button type="button" class="cancel" id="cdCancel">${t('cancel')}</button>
+        <button type="button" class="add" id="cdConfirm">OK</button>
+      </div>
+    `;
+    document.getElementById('customDialogBackdrop').classList.add('open');
+    document.getElementById('cdCancel').addEventListener('click', () => closeCustomDialog(false));
+    document.getElementById('cdConfirm').addEventListener('click', () => closeCustomDialog(true));
+  });
+}
+function customPrompt(message, defaultValue, title){
+  ensureDialogRoot();
+  return new Promise(resolve => {
+    customDialogResolve = resolve;
+    document.getElementById('customDialogBox').innerHTML = `
+      ${title?`<div class="custom-dialog-title">${escapeHtml(title)}</div>`:''}
+      <div class="custom-dialog-message">${escapeHtml(message)}</div>
+      <input type="text" id="cdInput" value="${defaultValue!=null?escapeHtml(String(defaultValue)):''}">
+      <div class="custom-dialog-actions">
+        <button type="button" class="cancel" id="cdCancel">${t('cancel')}</button>
+        <button type="button" class="add" id="cdConfirm">OK</button>
+      </div>
+    `;
+    document.getElementById('customDialogBackdrop').classList.add('open');
+    const input = document.getElementById('cdInput');
+    input.focus(); input.select();
+    document.getElementById('cdCancel').addEventListener('click', () => closeCustomDialog(null));
+    document.getElementById('cdConfirm').addEventListener('click', () => closeCustomDialog(input.value));
+    input.addEventListener('keydown', (e) => {
+      if(e.key==='Enter'){ e.preventDefault(); closeCustomDialog(input.value); }
+      if(e.key==='Escape') closeCustomDialog(null);
+    });
+  });
+}
+
 // Builds a donut chart from segments [{label, value, color}] using stacked
 // stroke-dasharray circles — no external chart library needed.
 function defaultAvatarConfig(){
@@ -1111,6 +1213,72 @@ const INSURANCE_NAMES = {
   "Desjardins Insurance": "#00814F", "TD Insurance": "#54B948", "Aviva": "#E4022D",
   "The Co-operators": "#00843D", "Belairdirect": "#004C97"
 };
+// General, publicly-known comparison points for common providers — not
+// personalized quotes, not sponsored, not exhaustive. Fees and rewards
+// change; the point is a starting reference with a real link to check
+// current details, not a substitute for reading the provider's own site.
+const PROVIDER_DATA = {
+  investing: {
+    label: 'Investing & Brokerages',
+    CA: [
+      { name:'Questrade', url:'https://www.questrade.com', bestFor:'Active traders & holding US dollars', points:['$0 commission on stocks & ETFs','Margin, options, and USD accounts available','Better for frequent US-dollar trading (Norbert\'s Gambit)','CIPF protected'] },
+      { name:'Wealthsimple', url:'https://www.wealthsimple.com', bestFor:'Beginners & simplicity', points:['$0 commission on stocks & ETFs','Easiest app to start with','Also offers a chequing account & credit card in one place','Currency conversion fee applies on US trades — check current rate'] },
+      { name:'Your bank\'s brokerage (RBC, TD, Scotiabank, etc.)', url:'', bestFor:'Keeping everything at one bank', points:['Convenient if you already bank there','Typically higher trading fees than Questrade or Wealthsimple','Full-service research and in-person advisor access available'] }
+    ],
+    US: [
+      { name:'Fidelity', url:'https://www.fidelity.com', bestFor:'All-around, beginner to advanced', points:['$0 commission on stocks, ETFs, options','No account minimums','Strong research tools and customer support','$0 expense-ratio index funds available'] },
+      { name:'Charles Schwab', url:'https://www.schwab.com', bestFor:'Investors who also want banking', points:['$0 commission trades','thinkorswim platform for active/options traders','Integrated checking account with ATM fee rebates'] },
+      { name:'Robinhood', url:'https://robinhood.com', bestFor:'Mobile-first, simple investing', points:['$0 commission on stocks & ETFs','Fractional shares from $1','Some options/margin fees apply — check current pricing'] },
+      { name:'Vanguard', url:'https://investor.vanguard.com', bestFor:'Long-term, buy-and-hold index investing', points:['Known for low-cost index funds','Built for hands-off, long-term investors'] }
+    ]
+  },
+  banking: {
+    label: 'Chequing & Banking',
+    CA: [
+      { name:'RBC / TD / Scotiabank / BMO / CIBC', url:'', bestFor:'Full-service banking with branches', points:['Large branch and ATM networks','Monthly fees common unless a minimum balance is kept','Widest range of products (mortgages, credit cards, advisors) under one roof'] },
+      { name:'Tangerine', url:'https://www.tangerine.ca', bestFor:'No-fee everyday banking', points:['No monthly fees on chequing','Online/mobile only — no physical branches','Backed by Scotiabank'] },
+      { name:'EQ Bank', url:'https://www.eqbank.ca', bestFor:'Higher interest on your balance', points:['No-fee account with a notably higher interest rate than the Big 5','Online only','CDIC insured'] }
+    ],
+    US: [
+      { name:'Chase / Bank of America / Wells Fargo', url:'', bestFor:'Full-service banking with branches', points:['Large branch and ATM networks','Monthly fees common unless a minimum balance or direct deposit requirement is met','Widest range of in-person services'] },
+      { name:'Capital One 360', url:'https://www.capitalone.com', bestFor:'No-fee checking with some branches', points:['No monthly fees, no minimum balance','Large fee-free ATM network','Physical Cafe locations in some cities'] },
+      { name:'Ally Bank', url:'https://www.ally.com', bestFor:'Online-only, competitive rates', points:['No monthly fees','Higher interest on balances than most brick-and-mortar banks','Online/mobile only — no branches'] }
+    ]
+  },
+  insurance: {
+    label: 'Insurance',
+    CA: [
+      { name:'Intact Insurance', url:'https://www.intact.ca', bestFor:'Home & auto bundling', types:['auto','home'], points:['One of Canada\'s largest home/auto insurers','Bundling discounts common','Usage-based (telematics) programs available'] },
+      { name:'Belairdirect', url:'https://www.belairdirect.com', bestFor:'Direct-to-consumer auto insurance', types:['auto','home'], points:['Sells directly online/by phone, no broker needed','Known for straightforward auto quotes','Owned by Intact'] },
+      { name:'TD Insurance', url:'https://www.tdinsurance.com', bestFor:'Bundling with TD banking', types:['auto','home','life'], points:['Convenient if you already bank with TD','Home, auto, and life coverage','Multi-policy discounts common'] },
+      { name:'Desjardins Insurance', url:'https://www.desjardins.com', bestFor:'Members of Desjardins / Quebec-based', types:['auto','home','life'], points:['Strong presence in Quebec','Home, auto, and life coverage','Member/loyalty discounts available'] },
+      { name:'Aviva Canada', url:'https://www.aviva.ca', bestFor:'Broad coverage options', types:['auto','home','life'], points:['Wide range of home, auto, and life products','Often sold through independent brokers for comparison shopping'] }
+    ],
+    US: [
+      { name:'State Farm', url:'https://www.statefarm.com', bestFor:'Large agent network', types:['auto','home','life'], points:['Largest auto insurer in the US by market share','Extensive local agent network','Bundling discounts for home + auto'] },
+      { name:'GEICO', url:'https://www.geico.com', bestFor:'Lower-cost, online-first auto', types:['auto'], points:['Known for competitive auto rates','Fully online quote and policy management','Limited local agent presence','Primarily an auto insurer — not a bundling option for home'] },
+      { name:'Progressive', url:'https://www.progressive.com', bestFor:'Comparison shopping & usage-based auto', types:['auto','home'], points:['Shows competitor rates alongside its own','Snapshot usage-based discount program for auto','Wide range of coverage add-ons'] },
+      { name:'Allstate', url:'https://www.allstate.com', bestFor:'Full-service with local agents', types:['auto','home','life'], points:['Large local agent network','Home, auto, and life bundling','Accident forgiveness and other loyalty perks available'] },
+      { name:'Liberty Mutual', url:'https://www.libertymutual.com', bestFor:'Customizable auto coverage', types:['auto','home'], points:['Known for highly customizable auto policies','Usage-based (RightTrack) discount program','Home + auto bundling discounts'] }
+    ]
+  },
+  creditcards: {
+    label: 'Credit Cards',
+    CA: [
+      { name:'RBC', url:'https://www.rbcroyalbank.com', bestFor:'Wide range of card tiers', points:['Cash back, travel, and no-fee options available','Cards span student to premium travel tiers'] },
+      { name:'TD', url:'https://www.td.com', bestFor:'Everyday cash back & travel', points:['Popular cash-back and Aeroplan-linked cards','No-fee options available'] },
+      { name:'Scotiabank', url:'https://www.scotiabank.com', bestFor:'Travel rewards (Scene+)', points:['Scene+ points program across travel and everyday spend','No-fee and premium tiers available'] },
+      { name:'American Express Canada', url:'https://www.americanexpress.com/ca', bestFor:'Premium travel rewards', points:['Strong travel rewards and perks on premium cards','Membership Rewards points program','Less universally accepted than Visa/Mastercard at some merchants'] }
+    ],
+    US: [
+      { name:'Chase', url:'https://www.chase.com', bestFor:'Travel & cash back variety', points:['Popular Sapphire and Freedom card lines','Wide range of no-fee to premium travel cards'] },
+      { name:'American Express', url:'https://www.americanexpress.com', bestFor:'Premium travel rewards', points:['Strong travel perks and airport lounge access on premium cards','Membership Rewards points program'] },
+      { name:'Capital One', url:'https://www.capitalone.com', bestFor:'Simple flat-rate cash back', points:['Straightforward cash-back and travel cards','No foreign transaction fees on most cards'] },
+      { name:'Discover', url:'https://www.discover.com', bestFor:'No annual fee, cash back', points:['No annual fee on most cards','Rotating or flat cash-back categories','Free FICO score tracking'] }
+    ]
+  }
+};
+
 const GROCERY_NAMES = [
   "Walmart", "Costco", "Kroger", "Safeway", "Whole Foods", "Trader Joe's", "Publix",
   "Sobeys", "Loblaws", "No Frills", "Metro", "Save-On-Foods", "Aldi", "Target", "Superstore"
@@ -1245,7 +1413,7 @@ async function loadUserData(){
   const { data: rec } = await sb.from('recurring_templates').select('*');
   recurringTemplates = (rec||[]).map(t => ({
     id:t.id, amount:Number(t.amount), category:t.category, note:t.note||'', day:t.day,
-    startMonth:t.start_month, skippedMonths:t.skipped_months||[]
+    startMonth:t.start_month, skippedMonths:t.skipped_months||[], accountId:t.account_id||null
   }));
 
   const newOnes = generateRecurringEntries();
@@ -1283,7 +1451,15 @@ async function loadUserData(){
   netWorthSnapshots = (nws||[]).map(x => ({ id:x.id, date:x.snapshot_date, totalAssets:Number(x.total_assets), totalLiabilities:Number(x.total_liabilities), netWorth:Number(x.net_worth) }));
 
   const { data: inc } = await sb.from('income_entries').select('*').order('date', {ascending:false});
-  incomeEntries = (inc||[]).map(x => ({ id:x.id, amount:Number(x.amount), category:x.category, note:x.note||'', date:x.date, accountId:x.account_id||null }));
+  incomeEntries = (inc||[]).map(x => ({ id:x.id, amount:Number(x.amount), category:x.category, note:x.note||'', date:x.date, accountId:x.account_id||null, recurringIncomeId:x.recurring_income_id||null }));
+
+  const { data: recInc } = await sb.from('recurring_income').select('*');
+  recurringIncomeTemplates = (recInc||[]).map(t => ({
+    id:t.id, amount:Number(t.amount), category:t.category, note:t.note||'', day:t.day,
+    startMonth:t.start_month, skippedMonths:t.skipped_months||[], accountId:t.account_id||null
+  }));
+  const newIncomeOnes = generateRecurringIncomeEntries();
+  if(newIncomeOnes.length) await insertGeneratedIncomeEntries(newIncomeOnes);
 
   const { data: acc } = await sb.from('accounts').select('*').order('created_at', {ascending:true});
   accounts = (acc||[]).map(a => ({
@@ -1338,11 +1514,12 @@ async function loadUserData(){
 function logOut(){
   sb.auth.signOut();
   currentUser = null;
-  expenses = []; recurringTemplates = []; watchlist = []; quoteCache = {};
+  expenses = []; recurringTemplates = []; recurringIncomeTemplates = []; editingRecurringKind = null; editingRecurringId = null; watchlist = []; quoteCache = {};
   portfolio = []; detailsCache = {}; activeSymbol = null; activeMonth = null;
   customCategories = []; categoryBudgets = {};
   netWorthItems = [];
   netWorthSnapshots = [];
+  netWorthSnapshotSaveInFlight = false;
   incomeEntries = [];
   accounts = [];
   transfers = [];
@@ -1502,6 +1679,33 @@ async function insertGeneratedEntries(list){
   if(data) data.forEach((row,i) => { list[i].id = row.id; });
 }
 
+function generateRecurringIncomeEntries(){
+  const nowKey = currentMonthKey();
+  const newOnes = [];
+  recurringIncomeTemplates.forEach(t => {
+    const endKey = t.startMonth > nowKey ? t.startMonth : nowKey;
+    const skipped = t.skippedMonths || [];
+    let m = t.startMonth, guard = 0;
+    while(m <= endKey && guard < 600){
+      guard++;
+      const exists = incomeEntries.some(e => e.recurringIncomeId === t.id && e.date.slice(0,7) === m);
+      if(!exists && !skipped.includes(m)){
+        const day = Math.min(t.day, daysInMonth(m));
+        const entry = { id: uid(), amount:t.amount, category:t.category, note:t.note, date:`${m}-${pad2(day)}`, recurringIncomeId:t.id, accountId:t.accountId||null };
+        incomeEntries.push(entry);
+        newOnes.push(entry);
+      }
+      m = nextMonthKey(m);
+    }
+  });
+  return newOnes;
+}
+async function insertGeneratedIncomeEntries(list){
+  const rows = list.map(e => ({ user_id: currentUser.id, amount:e.amount, category:e.category, note:e.note, date:e.date, recurring_income_id:e.recurringIncomeId, account_id:e.accountId }));
+  const { data } = await sb.from('income_entries').insert(rows).select();
+  if(data) data.forEach((row,i) => { list[i].id = row.id; });
+}
+
 /* ================= Render dispatch ================= */
 function render(){
   document.getElementById('fabAdd').style.display = (currentUser && view !== 'networth' ? 'flex' : 'none');
@@ -1533,6 +1737,7 @@ function render(){
   else if(view === "guide") renderGuide();
   else if(view === "category") renderCategory();
   else if(view === "taxcenter") renderTaxCenter();
+  else if(view === "compareproviders") renderCompareProviders();
   else if(view === "accounts") renderAccounts();
 }
 function buildAccountMenu(){
@@ -1685,7 +1890,6 @@ function renderHome(){
   const monthEntries = expenses.filter(e => e.date.slice(0,7) === monthKey);
   const monthTotal = monthEntries.reduce((s,e)=>s+e.amount,0);
   const monthName = new Date().toLocaleDateString(undefined,{month:'long'});
-  const recurringMonthlyTotal = recurringTemplates.reduce((s,tpl)=>s+tpl.amount,0);
   const monthIncome = incomeEntries.filter(i => i.date.slice(0,7) === monthKey).reduce((s,i)=>s+i.amount,0);
   const remaining = monthIncome - monthTotal;
 
@@ -1703,11 +1907,14 @@ function renderHome(){
   }).join('');
 
   const isBrandNew = expenses.length===0 && incomeEntries.length===0 && recurringTemplates.length===0
-    && watchlist.length===0 && portfolio.length===0 && netWorthItems.length===0;
+    && recurringIncomeTemplates.length===0 && watchlist.length===0 && portfolio.length===0
+    && netWorthItems.length===0 && accounts.length===0 && financialGoals.length===0
+    && insurancePolicies.length===0 && vehicles.length===0 && documents.length===0
+    && taxEntries.length===0 && transfers.length===0;
   const welcomeHint = isBrandNew ? `
     <div class="hero-stat" style="flex-direction:column;align-items:flex-start;gap:6px;">
-      <div class="label" style="font-size:13px;color:var(--ink);font-weight:600;">Welcome! Let's get your first entry in.</div>
-      <div style="font-size:13px;color:var(--ink-soft);">Tap + below to log an expense or income, pick any tile above to explore, or check the <a href="#" id="guideLink" style="color:var(--moss);">Guide</a> for a one-line map of everything.</div>
+      <div class="label" style="font-size:13px;color:var(--ink);font-weight:600;">Welcome! Here's a good place to start.</div>
+      <div style="font-size:13px;color:var(--ink-soft);">Add an account first (chequing, savings, credit card) under Money — everything else builds on it. Then log an expense with +, or check the <a href="#" id="guideLink" style="color:var(--moss);">Guide</a> for a one-line map of everything.</div>
     </div>` : '';
 
   // One consolidated "This month" summary — replaces the old 5-card stat
@@ -1827,7 +2034,13 @@ function renderPublicLanding(){
     { icon:TILE_ICONS.vehicle, label:'Vehicle Finance', sub:'True cost of ownership',
       detail:"Track a vehicle's value against its loan to see your real equity, plus payment, insurance, fuel, and maintenance rolled into one true monthly cost." },
     { icon:TILE_ICONS.tax, label:'Tax Center', sub:'Income, gains & deductions',
-      detail:"Income, capital gains, and dividends are pulled automatically from what you've already logged. Add RRSP/FHSA contributions and deductions, then get a simple estimated-tax figure using your own rate — not a substitute for filing software, but a clear picture ahead of time." }
+      detail:"Income, capital gains, and dividends are pulled automatically from what you've already logged. Add RRSP/FHSA contributions and deductions, then get a simple estimated-tax figure using your own rate — not a substitute for filing software, but a clear picture ahead of time." },
+    { icon:TILE_ICONS.retirement, label:'Retirement Planning', sub:'Three scenarios, not one guess',
+      detail:"Enter your age, current investments, and contributions, and see Conservative, Expected, and Optimistic scenarios side by side for what retirement could look like — with a chart showing nominal value, inflation-adjusted value, and what you actually contributed." },
+    { icon:TILE_ICONS.documents, label:'Documents', sub:'Receipts & statements, privately',
+      detail:"Store receipts, statements, tax documents, and other financial files in your own private vault — the same security model as your profile picture, with nobody else able to access them." },
+    { icon:TILE_ICONS.compare, label:'Compare Providers', sub:'Banks, brokers, insurance & cards',
+      detail:"A research reference for Canada and the US — brokerages, chequing accounts, insurance (filterable by auto, home, or life), and credit card issuers side by side, each linking straight to the provider's own site. Not sponsored, not personalized advice." }
   ];
   const featuresHtml = features.map((f,i) => `
     <div class="dashboard-tile" data-feature="${i}">
@@ -1933,6 +2146,7 @@ function renderMonths(){
     { label:t('insuranceLabel'), onClick:()=>{ view="insurance"; render(); } },
     { label:t('vehiclesLabel'), onClick:()=>{ view="vehicles"; render(); } },
     { label:t('taxCenterLabel'), onClick:()=>{ view="taxcenter"; render(); } },
+    { label:'Compare Providers', onClick:()=>{ view="compareproviders"; render(); } },
     { label:'Retirement', onClick:()=>{ view="retirement"; render(); } },
     { label:t('documentsLabel'), onClick:()=>{ view="documents"; render(); } },
     { label:t('settings'), onClick:()=>{ view="settings"; render(); } },
@@ -1944,7 +2158,7 @@ function renderMonths(){
   const searchHtml = `
     <div class="row" style="margin-bottom:18px;">
       <div class="field">
-        <input type="text" id="txnSearch" placeholder="Search expenses & income by note or category...">
+        <input type="text" id="txnSearch" placeholder="Search everything — expenses, accounts, goals, documents...">
       </div>
     </div>
     <div id="searchResults"></div>
@@ -2020,27 +2234,57 @@ function wireTxnSearch(){
       .map(e => ({ ...e, kind:'expense' }));
     const incMatches = incomeEntries.filter(i => i.category.toLowerCase().includes(q) || (i.note||'').toLowerCase().includes(q))
       .map(i => ({ ...i, kind:'income' }));
-    const all = expMatches.concat(incMatches).sort((a,b) => b.date.localeCompare(a.date));
+    const txnResults = expMatches.concat(incMatches).sort((a,b) => b.date.localeCompare(a.date));
 
-    if(all.length === 0){
+    const otherMatches = [];
+    accounts.filter(a => a.name.toLowerCase().includes(q) || (a.institution||'').toLowerCase().includes(q))
+      .forEach(a => otherMatches.push({ icon:TILE_ICONS.accounts, title:a.name, subtitle:a.institution||a.type, onClick:()=>{ view="accounts"; render(); } }));
+    financialGoals.filter(g => g.name.toLowerCase().includes(q))
+      .forEach(g => otherMatches.push({ icon:TILE_ICONS.goals, title:g.name, subtitle:g.goalType, onClick:()=>{ view="goals"; render(); } }));
+    documents.filter(d => d.label.toLowerCase().includes(q))
+      .forEach(d => otherMatches.push({ icon:TILE_ICONS.documents, title:d.label, subtitle:d.category, onClick:()=>{ view="documents"; render(); } }));
+    insurancePolicies.filter(p => p.policyType.toLowerCase().includes(q) || (p.provider||'').toLowerCase().includes(q))
+      .forEach(p => otherMatches.push({ icon:TILE_ICONS.insurance, title:`${p.policyType}${p.provider?' · '+p.provider:''}`, subtitle:`${fmt(p.premium)} / ${p.premiumFrequency.toLowerCase()}`, onClick:()=>{ view="insurance"; render(); } }));
+    vehicles.filter(v => v.name.toLowerCase().includes(q))
+      .forEach(v => otherMatches.push({ icon:TILE_ICONS.vehicle, title:v.name, subtitle:fmt(v.currentValue), onClick:()=>{ view="vehicles"; render(); } }));
+
+    if(txnResults.length === 0 && otherMatches.length === 0){
       results.innerHTML = `<div class="empty">No matches for "${escapeHtml(input.value)}".</div>`;
       return;
     }
-    results.innerHTML = all.map(item => {
-      const d = new Date(item.date + "T00:00:00");
-      const dateLabel = d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'});
-      const color = item.kind==='income' ? 'var(--moss)' : (CATEGORY_COLORS[item.category] || CATEGORY_COLORS.Other);
-      const sign = item.kind==='income' ? '+' : '';
-      return `
-        <div class="entry-row" data-jump="${item.date.slice(0,7)}" style="cursor:pointer;">
-          <div class="dot" style="background:${color}"></div>
-          <div class="entry-info">
-            <div class="entry-cat">${escapeHtml(item.category)}</div>
-            <div class="entry-note">${dateLabel}${item.note ? ' · ' + escapeHtml(item.note) : ''}</div>
-          </div>
-          <div class="entry-amount" style="${item.kind==='income'?'color:var(--moss);':''}">${sign}${fmt(item.amount)}</div>
-        </div>`;
-    }).join('');
+
+    let html = '';
+    if(otherMatches.length > 0){
+      html += `<div class="section-label">Other matches</div>`;
+      html += otherMatches.map((m,i) => `
+        <div class="trend-row" data-other="${i}" style="cursor:pointer;">
+          <span style="display:flex;align-items:center;gap:10px;"><span class="type-icon-badge" style="width:26px;height:26px;">${m.icon}</span>${escapeHtml(m.title)}</span>
+          <span style="color:var(--ink-soft);font-size:12.5px;">${escapeHtml(m.subtitle)}</span>
+        </div>`).join('');
+    }
+    if(txnResults.length > 0){
+      if(otherMatches.length > 0) html += `<div class="section-label">Expenses &amp; income</div>`;
+      html += txnResults.map(item => {
+        const d = new Date(item.date + "T00:00:00");
+        const dateLabel = d.toLocaleDateString(undefined,{month:'short', day:'numeric', year:'numeric'});
+        const color = item.kind==='income' ? 'var(--moss)' : (CATEGORY_COLORS[item.category] || CATEGORY_COLORS.Other);
+        const sign = item.kind==='income' ? '+' : '';
+        return `
+          <div class="entry-row" data-jump="${item.date.slice(0,7)}" style="cursor:pointer;">
+            <div class="dot" style="background:${color}"></div>
+            <div class="entry-info">
+              <div class="entry-cat">${escapeHtml(item.category)}</div>
+              <div class="entry-note">${dateLabel}${item.note ? ' · ' + escapeHtml(item.note) : ''}</div>
+            </div>
+            <div class="entry-amount" style="${item.kind==='income'?'color:var(--moss);':''}">${sign}${fmt(item.amount)}</div>
+          </div>`;
+      }).join('');
+    }
+    results.innerHTML = html;
+
+    results.querySelectorAll('[data-other]').forEach(row => {
+      row.addEventListener('click', () => otherMatches[parseInt(row.getAttribute('data-other'),10)].onClick());
+    });
     results.querySelectorAll('[data-jump]').forEach(row => {
       row.addEventListener('click', () => { activeMonth = row.getAttribute('data-jump'); view="detail"; render(); });
     });
@@ -2065,7 +2309,7 @@ function wireBudgetForm(){
         await sb.from('category_budgets').upsert({ user_id: currentUser.id, category: cat, monthly_limit: num });
       }
     }
-    alert('Budgets saved.');
+    await customAlert('Budgets saved.');
   });
 }
 
@@ -2292,13 +2536,11 @@ function renderRecurring(){
   document.getElementById('pageSub').innerHTML = '';
 
   const mainArea = document.getElementById('mainArea');
-  if(recurringTemplates.length === 0){
-    mainArea.innerHTML = `<div class="empty">${t('noRecurringYet')}</div>`;
+  if(recurringTemplates.length === 0 && recurringIncomeTemplates.length === 0){
+    mainArea.innerHTML = `<div class="empty">${t('noRecurringYet')} You can also set up recurring income (like a paycheck) from the Add screen.</div>`;
     document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
     return;
   }
-
-  const monthlyTotal = recurringTemplates.reduce((s,tpl) => s + tpl.amount, 0);
 
   function nextDueDate(tpl){
     const today = new Date(); today.setHours(0,0,0,0);
@@ -2312,6 +2554,88 @@ function renderRecurring(){
     }
     return due;
   }
+
+  let html = '';
+
+  const editingTpl = editingRecurringId
+    ? (editingRecurringKind === 'bill' ? recurringTemplates : recurringIncomeTemplates).find(t => t.id === editingRecurringId)
+    : null;
+  if(editingTpl){
+    const isBillEdit = editingRecurringKind === 'bill';
+    const catOptions = isBillEdit
+      ? CATEGORY_ORDER.concat(customCategories.filter(c=>!CATEGORY_ORDER.includes(c)))
+      : INCOME_CATEGORIES;
+    html += `
+      <details class="add-collapsible" id="recurEditDetails" open>
+        <summary>Edit ${isBillEdit ? 'bill' : 'recurring income'}</summary>
+        <div class="add-collapsible-body">
+          <div class="row">
+            <div class="field"><input type="number" id="recurEditAmount" placeholder="Amount" step="0.01" min="0.01" value="${editingTpl.amount}"></div>
+            <div class="field" style="flex:0 0 110px;"><input type="number" id="recurEditDay" placeholder="Day" min="1" max="31" value="${editingTpl.day}"></div>
+          </div>
+          <div class="row">
+            <div class="field"><select id="recurEditCategory">${catOptions.map(c=>`<option value="${c}" ${editingTpl.category===c?'selected':''}>${c}</option>`).join('')}</select></div>
+          </div>
+          <div class="row">
+            <div class="field"><input type="text" id="recurEditNote" placeholder="Note (optional)" value="${escapeHtml(editingTpl.note||'')}"></div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <select id="recurEditAccount">
+                <option value="">No account</option>
+                ${accounts.map(a=>`<option value="${a.id}" ${editingTpl.accountId===a.id?'selected':''}>${escapeHtml(a.name)}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="add" id="saveRecurEditBtn" style="flex:1;">Save changes</button>
+            <button type="button" class="cancel" id="cancelRecurEditBtn">${t('cancel')}</button>
+          </div>
+        </div>
+      </details>
+    `;
+  }
+
+  if(recurringIncomeTemplates.length > 0){
+    const monthlyIncomeTotal = recurringIncomeTemplates.reduce((s,tpl) => s + tpl.amount, 0);
+    const upcomingIncome = recurringIncomeTemplates
+      .map(tpl => ({ tpl, due: nextDueDate(tpl) }))
+      .sort((a,b) => a.due - b.due)
+      .slice(0,6);
+
+    html += `<div class="section-label">Upcoming income</div>`;
+    upcomingIncome.forEach(({tpl,due}) => {
+      const dateLabel = due.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+      html += `
+        <div class="recur-card income-recur-card" data-id="${tpl.id}" style="cursor:pointer;">
+          <div>
+            <div class="recur-name">${escapeHtml(tpl.note || tpl.category)}</div>
+            <div class="recur-meta">expected ${dateLabel} · day ${tpl.day} of every month</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="recur-amount" style="color:var(--moss);">${fmt(tpl.amount)}</div>
+            <button class="stop-btn income-edit-btn" data-id="${tpl.id}" aria-label="Edit amount" title="Edit amount">✎</button>
+            <button class="stop-btn income-stop-btn" data-id="${tpl.id}">${t('stop')}</button>
+          </div>
+        </div>`;
+    });
+    html += `
+      <div class="total-block" style="margin-top:12px;">
+        <div class="total-label">Monthly recurring income</div>
+        <div class="total-amount" style="color:var(--moss);">${fmt(monthlyIncomeTotal)}</div>
+      </div>
+      <p class="hero-body" style="font-size:12.5px;margin:-10px 0 24px;">Tap any income line to log it as received right now.</p>
+    `;
+  }
+
+  if(recurringTemplates.length === 0){
+    mainArea.innerHTML = html;
+    document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+    wireRecurringIncomeHandlers();
+    return;
+  }
+
+  const monthlyTotal = recurringTemplates.reduce((s,tpl) => s + tpl.amount, 0);
 
   const dueSoon = recurringTemplates
     .map(tpl => ({ tpl, due: nextDueDate(tpl) }))
@@ -2340,7 +2664,7 @@ function renderRecurring(){
     Object.keys(byCategory).filter(c => !CATEGORY_ORDER.includes(c))
   );
 
-  let html = `
+  html += `
     ${dueSoonHtml}
     <div class="total-block" style="margin-top:28px;">
       <div class="total-label">Monthly committed bills</div>
@@ -2376,7 +2700,7 @@ function renderRecurring(){
 
   mainArea.innerHTML = html;
 
-  mainArea.querySelectorAll('.recur-card').forEach(row => {
+  mainArea.querySelectorAll('.recur-card:not(.income-recur-card)').forEach(row => {
     row.addEventListener('click', async (e) => {
       if(e.target.closest('button')) return;
       const id = row.getAttribute('data-id');
@@ -2396,27 +2720,21 @@ function renderRecurring(){
         btnAmount.textContent = 'Paid ✓';
         setTimeout(() => { btnAmount.textContent = originalText; }, 1500);
       }catch(err){
-        alert(err.message || 'Could not log that payment.');
+        await customAlert(err.message || 'Could not log that payment.');
       }
     });
   });
   mainArea.querySelectorAll('.edit-amount-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const id = btn.getAttribute('data-id');
-      const tpl = recurringTemplates.find(t => t.id === id);
-      if(!tpl) return;
-      const input = prompt(`Update monthly amount for "${tpl.note || tpl.category}"\nCurrent: ${fmt(tpl.amount)}\n\nEnter the new amount:`);
-      if(input === null) return;
-      const val = parseFloat(input);
-      if(isNaN(val) || val <= 0) return;
-      tpl.amount = val;
+      editingRecurringKind = 'bill';
+      editingRecurringId = btn.getAttribute('data-id');
       renderRecurring();
-      await sb.from('recurring_templates').update({ amount: val }).eq('id', id);
+      document.getElementById('recurEditDetails').scrollIntoView({ behavior:'smooth', block:'start' });
     });
   });
 
-  mainArea.querySelectorAll('.stop-btn:not(.edit-amount-btn)').forEach(btn => {
+  mainArea.querySelectorAll('.stop-btn:not(.edit-amount-btn):not(.income-stop-btn):not(.income-edit-btn)').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const id = btn.getAttribute('data-id');
@@ -2426,6 +2744,86 @@ function renderRecurring(){
     });
   });
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  wireRecurringIncomeHandlers();
+}
+
+function wireRecurringIncomeHandlers(){
+  const mainArea = document.getElementById('mainArea');
+  mainArea.querySelectorAll('.income-recur-card').forEach(row => {
+    row.addEventListener('click', async (e) => {
+      if(e.target.closest('button')) return;
+      const id = row.getAttribute('data-id');
+      const tpl = recurringIncomeTemplates.find(t => t.id === id);
+      if(!tpl) return;
+      const today = new Date();
+      const monthVal = `${today.getFullYear()}-${pad2(today.getMonth()+1)}`;
+      const date = `${monthVal}-${pad2(today.getDate())}`;
+      const amountEl = row.querySelector('.recur-amount');
+      const originalText = amountEl.textContent;
+      try{
+        const { data, error } = await sb.from('income_entries').insert({
+          user_id: currentUser.id, amount: tpl.amount, category: tpl.category, note: tpl.note ? `${tpl.note} (received)` : 'Received', date, account_id: tpl.accountId
+        }).select().single();
+        if(error) throw error;
+        incomeEntries.push({ id:data.id, amount:tpl.amount, category:tpl.category, note: tpl.note ? `${tpl.note} (received)` : 'Received', date, accountId:tpl.accountId });
+        amountEl.textContent = 'Received ✓';
+        setTimeout(() => { amountEl.textContent = originalText; }, 1500);
+      }catch(err){
+        await customAlert(err.message || 'Could not log that income.');
+      }
+    });
+  });
+  mainArea.querySelectorAll('.income-edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editingRecurringKind = 'income';
+      editingRecurringId = btn.getAttribute('data-id');
+      renderRecurring();
+      document.getElementById('recurEditDetails').scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+  mainArea.querySelectorAll('.income-stop-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      recurringIncomeTemplates = recurringIncomeTemplates.filter(rt => rt.id !== id);
+      await sb.from('recurring_income').delete().eq('id', id);
+      render();
+    });
+  });
+
+  const saveBtn = document.getElementById('saveRecurEditBtn');
+  if(saveBtn) saveBtn.addEventListener('click', saveRecurringEdit);
+  const cancelEditBtn = document.getElementById('cancelRecurEditBtn');
+  if(cancelEditBtn) cancelEditBtn.addEventListener('click', () => {
+    editingRecurringKind = null; editingRecurringId = null;
+    renderRecurring();
+  });
+}
+
+async function saveRecurringEdit(){
+  const amount = parseFloat(document.getElementById('recurEditAmount').value);
+  let day = parseInt(document.getElementById('recurEditDay').value, 10);
+  const category = document.getElementById('recurEditCategory').value;
+  const note = document.getElementById('recurEditNote').value.trim();
+  const accountId = document.getElementById('recurEditAccount').value || null;
+  if(!amount || amount <= 0) return;
+  if(!day || day < 1) day = 1; if(day > 31) day = 31;
+
+  const isBillEdit = editingRecurringKind === 'bill';
+  const table = isBillEdit ? 'recurring_templates' : 'recurring_income';
+  const arr = isBillEdit ? recurringTemplates : recurringIncomeTemplates;
+
+  const { error } = await sb.from(table).update({
+    amount, category, note, day, account_id: accountId
+  }).eq('id', editingRecurringId);
+  if(error){ await customAlert(error.message || 'Could not save changes.'); return; }
+
+  const tpl = arr.find(t => t.id === editingRecurringId);
+  if(tpl){ tpl.amount=amount; tpl.category=category; tpl.note=note; tpl.day=day; tpl.accountId=accountId; }
+
+  editingRecurringKind = null; editingRecurringId = null;
+  renderRecurring();
 }
 
 const NET_WORTH_COLORS = {
@@ -2433,7 +2831,10 @@ const NET_WORTH_COLORS = {
   "Credit Cards":"#A8462F", "Loans/Debt":"#6B4C3A"
 };
 
+let netWorthSnapshotSaveInFlight = false;
 async function saveNetWorthSnapshot(dateISO, totalAssets, totalLiabilities, netWorth){
+  if(netWorthSnapshotSaveInFlight) return;
+  netWorthSnapshotSaveInFlight = true;
   try{
     const { data, error } = await sb.from('net_worth_snapshots').upsert({
       user_id: currentUser.id, snapshot_date: dateISO,
@@ -2446,6 +2847,8 @@ async function saveNetWorthSnapshot(dateISO, totalAssets, totalLiabilities, netW
     if(view === "networth") renderNetWorth();
   }catch(e){
     // Silent — a missed snapshot isn't worth interrupting the page for.
+  }finally{
+    netWorthSnapshotSaveInFlight = false;
   }
 }
 
@@ -2639,13 +3042,13 @@ function renderNetWorth(){
 
       let newBalance;
       if(LIABILITY_CATS.includes(cat)){
-        const input = prompt(`Make a payment toward "${item.label}"\nCurrent balance: ${fmt(item.balance)}\n\nHow much are you paying?`);
+        const input = await customPrompt(`Make a payment toward "${item.label}"\nCurrent balance: ${fmt(item.balance)}\n\nHow much are you paying?`);
         if(input === null) return;
         const payment = parseFloat(input);
         if(isNaN(payment) || payment <= 0) return;
         newBalance = Math.max(0, item.balance - payment);
       }else{
-        const input = prompt(`Update balance for "${item.label}"\nCurrent balance: ${fmt(item.balance)}\n\nEnter the new balance:`);
+        const input = await customPrompt(`Update balance for "${item.label}"\nCurrent balance: ${fmt(item.balance)}\n\nEnter the new balance:`);
         if(input === null) return;
         const val = parseFloat(input);
         if(isNaN(val) || val < 0) return;
@@ -2678,7 +3081,7 @@ async function addNetWorthItem(){
   const { data, error } = await sb.from('net_worth_items').insert({
     user_id: currentUser.id, category, label, balance
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that item.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that item.'); return; }
 
   netWorthItems.push({ id:data.id, category, label, balance });
   renderNetWorth();
@@ -2818,13 +3221,13 @@ function renderAccounts(){
 
       let newBalance;
       if(ACCOUNT_LIABILITY_TYPES.includes(type)){
-        const input = prompt(`Make a payment toward "${acct.name}"\nCurrent balance: ${fmt(acct.balance)}\n\nHow much are you paying?`);
+        const input = await customPrompt(`Make a payment toward "${acct.name}"\nCurrent balance: ${fmt(acct.balance)}\n\nHow much are you paying?`);
         if(input === null) return;
         const payment = parseFloat(input);
         if(isNaN(payment) || payment <= 0) return;
         newBalance = Math.max(0, acct.balance - payment);
       }else{
-        const input = prompt(`Update balance for "${acct.name}"\nCurrent balance: ${fmt(acct.balance)}\n\nEnter the new balance:`);
+        const input = await customPrompt(`Update balance for "${acct.name}"\nCurrent balance: ${fmt(acct.balance)}\n\nEnter the new balance:`);
         if(input === null) return;
         const val = parseFloat(input);
         if(isNaN(val) || val < 0) return;
@@ -2843,17 +3246,17 @@ function renderAccounts(){
       const acct = accounts.find(a => a.id === id);
       if(!acct) return;
 
-      const rateInput = prompt(`Interest rate (APR %) for "${acct.name}":`, acct.interestRate!=null ? acct.interestRate : '');
+      const rateInput = await customPrompt(`Interest rate (APR %) for "${acct.name}":`, acct.interestRate!=null ? acct.interestRate : '');
       if(rateInput === null) return;
       const rate = rateInput.trim() === '' ? null : parseFloat(rateInput);
 
-      const paymentInput = prompt(`Minimum monthly payment for "${acct.name}":`, acct.minimumPayment!=null ? acct.minimumPayment : '');
+      const paymentInput = await customPrompt(`Minimum monthly payment for "${acct.name}":`, acct.minimumPayment!=null ? acct.minimumPayment : '');
       if(paymentInput === null) return;
       const minPayment = paymentInput.trim() === '' ? null : parseFloat(paymentInput);
 
       let creditLimit = acct.creditLimit;
       if(acct.type === 'Credit Card'){
-        const limitInput = prompt(`Credit limit for "${acct.name}" (used to show utilization %):`, acct.creditLimit!=null ? acct.creditLimit : '');
+        const limitInput = await customPrompt(`Credit limit for "${acct.name}" (used to show utilization %):`, acct.creditLimit!=null ? acct.creditLimit : '');
         if(limitInput === null) return;
         creditLimit = limitInput.trim() === '' ? null : parseFloat(limitInput);
       }
@@ -2888,7 +3291,7 @@ async function addAccount(){
   const { data, error } = await sb.from('accounts').insert({
     user_id: currentUser.id, name, type, currency: userSettings.currency, balance, institution: institution || null
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that account.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that account.'); return; }
 
   accounts.push({ id:data.id, name, type, currency:userSettings.currency, balance, institution, interestRate:null, minimumPayment:null, creditLimit:null });
   renderAccounts();
@@ -2901,7 +3304,7 @@ async function doTransfer(){
   const note = document.getElementById('transferNote').value.trim();
 
   if(!amount || amount <= 0) return;
-  if(fromId === toId){ alert('Pick two different accounts to transfer between.'); return; }
+  if(fromId === toId){ await customAlert('Pick two different accounts to transfer between.'); return; }
 
   const fromAcct = accounts.find(a => a.id === fromId);
   const toAcct = accounts.find(a => a.id === toId);
@@ -2925,7 +3328,7 @@ async function doTransfer(){
     transfers.unshift({ id:data.id, fromAccountId:fromId, toAccountId:toId, amount, note, date });
     renderAccounts();
   }catch(err){
-    alert(err.message || 'Could not complete that transfer.');
+    await customAlert(err.message || 'Could not complete that transfer.');
   }
 }
 
@@ -3122,7 +3525,7 @@ function renderGoals(){
       const id = row.getAttribute('data-id');
       const goal = financialGoals.find(g => g.id === id);
       if(!goal) return;
-      const input = prompt(`How much have you saved toward "${goal.name}" now?\nCurrent: ${fmt(goal.currentAmount)} of ${fmt(goal.targetAmount)}`);
+      const input = await customPrompt(`How much have you saved toward "${goal.name}" now?\nCurrent: ${fmt(goal.currentAmount)} of ${fmt(goal.targetAmount)}`);
       if(input === null) return;
       const val = parseFloat(input);
       if(isNaN(val) || val < 0) return;
@@ -3165,7 +3568,7 @@ async function addGoal(){
       name, goal_type:goalType, target_amount:targetAmount, current_amount:currentAmount,
       target_date:targetDate, monthly_contribution:monthlyContribution
     }).eq('id', editingGoalId);
-    if(error){ alert(error.message || 'Could not save changes.'); return; }
+    if(error){ await customAlert(error.message || 'Could not save changes.'); return; }
 
     const g = financialGoals.find(x => x.id === editingGoalId);
     if(g){ g.name=name; g.goalType=goalType; g.targetAmount=targetAmount; g.currentAmount=currentAmount; g.targetDate=targetDate; g.monthlyContribution=monthlyContribution; }
@@ -3178,7 +3581,7 @@ async function addGoal(){
     user_id: currentUser.id, name, goal_type:goalType, target_amount:targetAmount,
     current_amount:currentAmount, target_date:targetDate, monthly_contribution:monthlyContribution
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that goal.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that goal.'); return; }
 
   financialGoals.push({ id:data.id, name, goalType, targetAmount, currentAmount, targetDate, monthlyContribution });
   renderGoals();
@@ -3544,7 +3947,7 @@ function renderInsurance(){
       const id = row.getAttribute('data-id');
       const p = insurancePolicies.find(x => x.id === id);
       if(!p) return;
-      const input = prompt(`Update premium for ${p.policyType}${p.provider?' ('+p.provider+')':''}:`, p.premium);
+      const input = await customPrompt(`Update premium for ${p.policyType}${p.provider?' ('+p.provider+')':''}:`, p.premium);
       if(input === null) return;
       const val = parseFloat(input);
       if(isNaN(val) || val < 0) return;
@@ -3587,7 +3990,7 @@ async function addInsurancePolicy(){
       policy_type:policyType, provider:provider||null, premium, premium_frequency:premiumFrequency,
       renewal_date:renewalDate, coverage_amount:coverageAmount
     }).eq('id', editingInsuranceId);
-    if(error){ alert(error.message || 'Could not save changes.'); return; }
+    if(error){ await customAlert(error.message || 'Could not save changes.'); return; }
 
     const p = insurancePolicies.find(x => x.id === editingInsuranceId);
     if(p){ p.policyType=policyType; p.provider=provider; p.premium=premium; p.premiumFrequency=premiumFrequency; p.renewalDate=renewalDate; p.coverageAmount=coverageAmount; }
@@ -3600,7 +4003,7 @@ async function addInsurancePolicy(){
     user_id: currentUser.id, policy_type:policyType, provider:provider||null, premium, premium_frequency:premiumFrequency,
     renewal_date:renewalDate, coverage_amount:coverageAmount
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that policy.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that policy.'); return; }
 
   insurancePolicies.push({ id:data.id, policyType, provider, premium, premiumFrequency, renewalDate, coverageAmount, note:'' });
   renderInsurance();
@@ -3677,7 +4080,7 @@ function renderVehicles(){
       const id = card.getAttribute('data-id');
       const v = vehicles.find(x => x.id === id);
       if(!v) return;
-      const input = prompt(`Update loan balance for ${v.name}:`, v.loanBalance);
+      const input = await customPrompt(`Update loan balance for ${v.name}:`, v.loanBalance);
       if(input === null) return;
       const val = parseFloat(input);
       if(isNaN(val) || val < 0) return;
@@ -3721,7 +4124,7 @@ async function addVehicle(){
       name, current_value:currentValue, loan_balance:loanBalance, monthly_payment:monthlyPayment,
       monthly_insurance:monthlyInsurance, monthly_fuel:monthlyFuel, monthly_maintenance:monthlyMaintenance
     }).eq('id', editingVehicleId);
-    if(error){ alert(error.message || 'Could not save changes.'); return; }
+    if(error){ await customAlert(error.message || 'Could not save changes.'); return; }
 
     const v = vehicles.find(x => x.id === editingVehicleId);
     if(v){ v.name=name; v.currentValue=currentValue; v.loanBalance=loanBalance; v.monthlyPayment=monthlyPayment; v.monthlyInsurance=monthlyInsurance; v.monthlyFuel=monthlyFuel; v.monthlyMaintenance=monthlyMaintenance; }
@@ -3734,7 +4137,7 @@ async function addVehicle(){
     user_id: currentUser.id, name, current_value:currentValue, loan_balance:loanBalance,
     monthly_payment:monthlyPayment, monthly_insurance:monthlyInsurance, monthly_fuel:monthlyFuel, monthly_maintenance:monthlyMaintenance
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that vehicle.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that vehicle.'); return; }
 
   vehicles.push({ id:data.id, name, currentValue, loanBalance, monthlyPayment, monthlyInsurance, monthlyFuel, monthlyMaintenance });
   renderVehicles();
@@ -3892,7 +4295,7 @@ function renderDocuments(){
         const { data, error } = await sb.storage.from('documents').createSignedUrl(doc.storagePath, 300);
         if(error) throw error;
         window.open(data.signedUrl, '_blank');
-      }catch(err){ alert(err.message || 'Could not open that file.'); }
+      }catch(err){ await customAlert(err.message || 'Could not open that file.'); }
     });
   });
   document.querySelectorAll('[data-delete]').forEach(btn => {
@@ -3960,6 +4363,67 @@ function renderCategory(){
   });
 }
 
+/* ================= Compare Providers ================= */
+function renderCompareProviders(){
+  document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Compare Providers`;
+  document.getElementById('pageSub').innerHTML = '';
+
+  const categories = Object.keys(PROVIDER_DATA);
+  let providers = PROVIDER_DATA[compareCategory][compareCountry] || [];
+  const isInsurance = compareCategory === 'insurance';
+  if(isInsurance && compareInsuranceType !== 'all'){
+    providers = providers.filter(p => p.types && p.types.includes(compareInsuranceType));
+  }
+
+  const insuranceTypeRow = isInsurance ? `
+    <div class="chip-row">
+      ${[['all','All types'],['auto','Auto'],['home','Home'],['life','Life']].map(([key,label]) =>
+        `<button type="button" class="stock-chip ${compareInsuranceType===key?'active':''}" data-instype="${key}">${label}</button>`
+      ).join('')}
+    </div>` : '';
+
+  const html = `
+    <div class="insight-card" style="border-left-color:#5B7CA8;">
+      A reference for your own research — general, publicly known features, not a personalized recommendation or sponsored placement. Fees and rewards change often, so confirm current details on each provider's own site before deciding.
+    </div>
+
+    <div class="chip-row" style="margin-bottom:10px;">
+      <button type="button" class="stock-chip ${compareCountry==='CA'?'active':''}" data-country="CA">🇨🇦 Canada</button>
+      <button type="button" class="stock-chip ${compareCountry==='US'?'active':''}" data-country="US">🇺🇸 United States</button>
+    </div>
+    <div class="chip-row">
+      ${categories.map(c => `<button type="button" class="stock-chip ${compareCategory===c?'active':''}" data-cat="${c}">${PROVIDER_DATA[c].label}</button>`).join('')}
+    </div>
+    ${insuranceTypeRow}
+
+    <div class="section-label">${PROVIDER_DATA[compareCategory].label}${isInsurance && compareInsuranceType!=='all' ? ' — ' + {auto:'Auto',home:'Home',life:'Life'}[compareInsuranceType] : ''} — ${compareCountry==='CA'?'Canada':'United States'}</div>
+    ${providers.length===0 ? `<div class="empty">No providers tagged for this combination yet.</div>` : providers.map(p => `
+      <div style="background:var(--card); border:1px solid var(--paper-line); border-radius:10px; padding:16px; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:4px;">
+          <div style="font-family:var(--font-serif); font-size:16px; font-weight:600;">${escapeHtml(p.name)}</div>
+        </div>
+        <div style="font-family:var(--font-sans); font-size:12px; color:var(--moss); font-weight:600; margin-bottom:10px;">Best for: ${escapeHtml(p.bestFor)}</div>
+        <ul style="margin:0 0 12px; padding-left:18px; font-family:var(--font-sans); font-size:13px; color:var(--ink-soft); line-height:1.6;">
+          ${p.points.map(pt => `<li>${escapeHtml(pt)}</li>`).join('')}
+        </ul>
+        ${p.url ? `<a href="${p.url}" target="_blank" rel="noopener" class="navlink-btn">Visit site ↗</a>` : ''}
+      </div>
+    `).join('')}
+  `;
+
+  document.getElementById('mainArea').innerHTML = html;
+  document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
+  document.querySelectorAll('[data-country]').forEach(btn => {
+    btn.addEventListener('click', () => { compareCountry = btn.getAttribute('data-country'); renderCompareProviders(); });
+  });
+  document.querySelectorAll('[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => { compareCategory = btn.getAttribute('data-cat'); compareInsuranceType = 'all'; renderCompareProviders(); });
+  });
+  document.querySelectorAll('[data-instype]').forEach(btn => {
+    btn.addEventListener('click', () => { compareInsuranceType = btn.getAttribute('data-instype'); renderCompareProviders(); });
+  });
+}
+
 function renderGuide(){
   document.getElementById('pageTitle').innerHTML = `<button class="back-btn" id="backBtn" aria-label="Back"><svg width="9" height="14" viewBox="0 0 9 14" style="display:block;"><path d="M8 1L2 7L8 13" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button> Guide`;
   document.getElementById('pageSub').innerHTML = '';
@@ -3980,7 +4444,8 @@ function renderGuide(){
     { icon:TILE_ICONS.vehicle, label:t('vehiclesLabel'), body:'True monthly cost of a car — payment, insurance, fuel, upkeep.' },
     { icon:TILE_ICONS.retirement, label:t('retirementLabel'), body:'Three scenarios for what retirement savings could look like.' },
     { icon:TILE_ICONS.documents, label:t('documentsLabel'), body:'Store receipts and statements privately — only you can open them.' },
-    { icon:TILE_ICONS.tax, label:t('taxCenterLabel'), body:'Income, capital gains, and dividends pulled together, with a rough tax estimate.' }
+    { icon:TILE_ICONS.tax, label:t('taxCenterLabel'), body:'Income, capital gains, and dividends pulled together, with a rough tax estimate.' },
+    { icon:TILE_ICONS.compare, label:'Compare Providers', body:'Banks, brokers, insurers, and cards side by side, for Canada and the US.' }
   ];
 
   const itemsHtml = items.map(it => `
@@ -4155,7 +4620,7 @@ async function addTaxEntry(taxYear){
   const { data, error } = await sb.from('tax_entries').insert({
     user_id: currentUser.id, tax_year:taxYear, entry_type:entryType, description:description||null, amount
   }).select().single();
-  if(error){ alert(error.message || 'Could not add that entry.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that entry.'); return; }
 
   taxEntries.push({ id:data.id, taxYear, entryType, description, amount });
   renderTaxCenter();
@@ -4234,6 +4699,56 @@ function exportDataAsCSV(){
   URL.revokeObjectURL(url);
 }
 
+async function deleteAccountFlow(){
+  const confirmed = await customConfirm(
+    "This permanently deletes your account and everything in it — every expense, account, holding, goal, document — with no way to undo it.\n\n" +
+    "Consider downloading a CSV backup first (the button above this one).\n\n" +
+    "Continue to the final confirmation?"
+  );
+  if(!confirmed) return;
+
+  const typed = await customPrompt('Type DELETE (all capitals) to confirm you want to permanently delete your account:');
+  if(typed !== 'DELETE'){
+    if(typed !== null) await customAlert("That didn't match — nothing was deleted.");
+    return;
+  }
+
+  const btn = document.getElementById('deleteAccountBtn');
+  btn.disabled = true;
+  btn.textContent = 'Deleting...';
+
+  try{
+    const { data, error } = await sb.functions.invoke('delete-account', {});
+    if(error) throw error;
+    if(data && data.error) throw new Error(data.error);
+
+    await customAlert('Your account and all your data have been deleted.');
+    await sb.auth.signOut();
+    currentUser = null;
+    expenses = []; recurringTemplates = []; recurringIncomeTemplates = []; watchlist = []; quoteCache = {};
+    portfolio = []; detailsCache = {}; activeSymbol = null; activeMonth = null;
+    customCategories = []; categoryBudgets = {};
+    netWorthItems = []; netWorthSnapshots = [];
+    incomeEntries = [];
+    accounts = [];
+    transfers = [];
+    financialGoals = [];
+    insurancePolicies = [];
+    vehicles = [];
+    documents = [];
+    taxEntries = [];
+    userProfile = { username:null, avatarType:'none', avatarConfig:null, avatarPath:null, avatarUrl:null };
+    userSettings = { language: 'en', currency: 'USD' };
+    applyDirection();
+    view = "home";
+    render();
+  }catch(err){
+    await customAlert(err.message || 'Could not delete your account. Please try again, or reach out on X if this keeps happening.');
+    btn.disabled = false;
+    btn.textContent = 'Delete my account';
+  }
+}
+
 function renderAvatarBuilder(cfg){
   const panel = document.getElementById('avatarBuilderPanel');
   const swatchRow = (label, id, colors, current) => `
@@ -4294,7 +4809,7 @@ function renderAvatarBuilder(cfg){
   document.getElementById('cancelAvatarBtn').addEventListener('click', () => { panel.innerHTML = ''; });
   document.getElementById('saveAvatarBtn').addEventListener('click', async () => {
     const { error } = await sb.from('profiles').update({ avatar_type:'custom', avatar_config:cfg, avatar_path:null }).eq('id', currentUser.id);
-    if(error){ alert(error.message || 'Could not save avatar.'); return; }
+    if(error){ await customAlert(error.message || 'Could not save avatar.'); return; }
     userProfile.avatarType = 'custom'; userProfile.avatarConfig = cfg; userProfile.avatarPath = null; userProfile.avatarUrl = null;
     buildAccountMenu();
     renderSettings();
@@ -4302,7 +4817,7 @@ function renderAvatarBuilder(cfg){
 }
 
 async function uploadAvatarFile(file){
-  if(!file.type.startsWith('image/')){ alert('Please choose an image file.'); return; }
+  if(!file.type.startsWith('image/')){ await customAlert('Please choose an image file.'); return; }
   try{
     const dataUrl = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -4340,7 +4855,7 @@ async function uploadAvatarFile(file){
     buildAccountMenu();
     renderSettings();
   }catch(err){
-    alert(err.message || 'Could not upload that photo.');
+    await customAlert(err.message || 'Could not upload that photo.');
   }
 }
 
@@ -4421,7 +4936,8 @@ function renderSettings(){
     <button type="button" class="add" id="exportCsvBtn" style="width:100%;margin-bottom:24px;">Download CSV</button>
 
     <div class="section-label">${t('deleteAccount')}</div>
-    <p class="hero-body" style="font-size:13px;">Full self-service account deletion isn't wired up yet — it needs a small server-side piece for safety. For now, contact whoever manages this app's Supabase project to remove your account and data.</p>
+    <p class="hero-body" style="font-size:13px;">Permanently deletes your account and everything in it — every expense, account, holding, goal, document, all of it. This cannot be undone.</p>
+    <button type="button" class="cancel" id="deleteAccountBtn" style="width:100%;color:var(--rust);border-color:var(--rust);margin-bottom:24px;">Delete my account</button>
 
     <div class="contact-footer">
       <div class="contact-label">Contact us</div>
@@ -4433,6 +4949,7 @@ function renderSettings(){
 
   document.getElementById('backBtn').addEventListener('click', () => { view="months"; render(); });
   document.getElementById('exportCsvBtn').addEventListener('click', exportDataAsCSV);
+  document.getElementById('deleteAccountBtn').addEventListener('click', deleteAccountFlow);
 
   document.getElementById('saveUsernameBtn').addEventListener('click', async () => {
     const newUsername = document.getElementById('usernameInput').value.trim();
@@ -4605,7 +5122,7 @@ async function addSymbol(presetSymbol){
   if(watchlist.some(w => w.symbol === symbol)){ if(input) input.value=''; return; }
 
   const { data, error } = await sb.from('watchlist_items').insert({ user_id: currentUser.id, symbol }).select().single();
-  if(error){ alert(error.message || 'Could not add that symbol.'); return; }
+  if(error){ await customAlert(error.message || 'Could not add that symbol.'); return; }
   watchlist.push({ id:data.id, symbol });
   renderWatchlist();
   await fetchQuote(symbol);
@@ -4840,7 +5357,7 @@ async function logTransaction(){
     if(type === 'sell'){
       const existing = portfolio.find(p => p.symbol === symbol);
       if(!existing || existing.shares < shares){
-        alert(`You only hold ${existing ? existing.shares : 0} shares of ${symbol} — can't sell ${shares}.`);
+        await customAlert(`You only hold ${existing ? existing.shares : 0} shares of ${symbol} — can't sell ${shares}.`);
         return;
       }
     }
@@ -4849,7 +5366,7 @@ async function logTransaction(){
   const { data, error } = await sb.from('investment_transactions').insert({
     user_id: currentUser.id, symbol, type, shares, price, fees, date
   }).select().single();
-  if(error){ alert(error.message || 'Could not log that transaction.'); return; }
+  if(error){ await customAlert(error.message || 'Could not log that transaction.'); return; }
 
   investmentTxns.push({ id:data.id, symbol, type, shares, price, fees, date, note:'' });
   portfolio = computeHoldings();
@@ -5134,7 +5651,7 @@ function ensureCategoryColor(cat){
 
 document.getElementById('category').addEventListener('change', async (e) => {
   if(e.target.value === '__new__'){
-    const name = prompt('New category name:');
+    const name = await customPrompt('New category name:');
     if(name && name.trim()){
       const trimmed = name.trim();
       if(!customCategories.includes(trimmed) && !CATEGORY_ORDER.includes(trimmed)){
@@ -5162,7 +5679,10 @@ function setEntryType(newType){
     : (newType==='expense' ? t('addExpense') : t('addIncome'));
   document.getElementById('addSubmitBtn').textContent = editingEntry ? 'Save changes' : (newType==='expense' ? t('addExpense') : t('addIncome'));
   document.getElementById('receiptSection').style.display = (newType==='expense' && !editingEntry) ? 'block' : 'none';
-  document.getElementById('recurringSection').style.display = (newType==='expense' && !editingEntry) ? 'flex' : 'none';
+  document.getElementById('recurringSection').style.display = !editingEntry ? 'flex' : 'none';
+  document.getElementById('recurringLabel').textContent = newType==='expense'
+    ? 'Repeats every month (e.g. rent, subscriptions)'
+    : 'Repeats every month (e.g. paycheck, rental income)';
   const tabsEl = document.getElementById('tabExpense').parentElement;
   if(tabsEl) tabsEl.style.display = editingEntry ? 'none' : 'flex';
   const categorySelect = document.getElementById('category');
@@ -5239,7 +5759,7 @@ entryForm.addEventListener('submit', async (ev) => {
   if(!day || day<1) day=1; if(day>31) day=31;
   const category = document.getElementById('category').value;
   const note = document.getElementById('note').value.trim();
-  const isRecurring = entryType==='expense' && !editingEntry && document.getElementById('recurringCheck').checked;
+  const isRecurring = !editingEntry && document.getElementById('recurringCheck').checked;
   const date = `${monthVal}-${pad2(day)}`;
   const accountId = document.getElementById('entryAccount').value || null;
 
@@ -5252,6 +5772,14 @@ entryForm.addEventListener('submit', async (ev) => {
       const arr = editingEntry.type === 'income' ? incomeEntries : expenses;
       const item = arr.find(x => x.id === editingEntry.id);
       if(item){ item.amount=amount; item.category=category; item.note=note; item.date=date; item.accountId=accountId; }
+    }else if(entryType === 'income' && isRecurring){
+      const { data, error } = await sb.from('recurring_income').insert({
+        user_id: currentUser.id, amount, category, note, day, start_month: monthVal, skipped_months: [], account_id: accountId
+      }).select().single();
+      if(error) throw error;
+      recurringIncomeTemplates.push({ id:data.id, amount, category, note, day, startMonth:monthVal, skippedMonths:[], accountId });
+      const newOnes = generateRecurringIncomeEntries();
+      if(newOnes.length) await insertGeneratedIncomeEntries(newOnes);
     }else if(entryType === 'income'){
       const { data, error } = await sb.from('income_entries').insert({
         user_id: currentUser.id, amount, category, note, date, account_id: accountId
@@ -5278,13 +5806,19 @@ entryForm.addEventListener('submit', async (ev) => {
     render();
     closeModal();
   }catch(err){
-    alert(err.message || 'Could not save that entry. Try again.');
+    await customAlert(err.message || 'Could not save that entry. Try again.');
   }finally{
     addSubmitBtn.disabled = false;
   }
 });
 
 boot();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
